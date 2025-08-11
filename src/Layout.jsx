@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 const navigationItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Tournaments", url: "/tournaments", icon: Trophy },
-  { title: "Register", url: "/register", icon: UserPlus },
   { title: "Moments", url: "/moments", icon: Camera },
   { title: "About", url: "/about", icon: Info },
   { title: "Sponsors", url: "/sponsors", icon: Handshake },
@@ -69,7 +68,7 @@ export default function Layout({ children }) {
 
             {/* CTA Button & Mobile Menu */}
             <div className="flex items-center gap-4">
-              <Link to="/register" className="hidden sm:block">
+              <Link to="/tournaments" className="hidden sm:block">
                 <Button className="btn-accent font-semibold px-6 shadow-md hover:shadow-lg transition-all">Register Now</Button>
               </Link>
               <button

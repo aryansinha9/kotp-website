@@ -1,13 +1,46 @@
-// PASTE THIS CODE INTO: src/Entities/Sponsor.js
+// REPLACE THE CONTENTS OF: src/Entities/Sponsor.js
 
-import { mockSponsors } from '@/mock/db';
+import { supabase } from '@/supabaseClient';
 
 const SponsorAPI = {
-  _delay: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
-  filter: async (filters, sortBy, limit) => {
-    console.log('Mock Fetching Sponsors');
-    await SponsorAPI._delay(400);
-    return mockSponsors.slice(0, limit);
+  filter: async (filters, sortBy = 'tier', limit) => {
+    let query = supabase.from('sponsors').select('*');
+    
+    for (const key in filters) {
+      query = query.eq(key, filters[key]);
+    }
+
+    query = query.order(sortBy, { ascending: true });
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching sponsors:', error);
+      return [];
+    }
+
+    return data;
+  },
+
+  // NEW FUNCTION: Fetch all sponsors, ordered by tier
+  list: async (sortBy = 'tier') => {
+    let query = supabase
+      .from('sponsors')
+      .select('*')
+      .order(sortBy, { ascending: true });
+    
+    const { data, error } = await query;
+    
+    if (error) {
+        console.error('Error fetching all sponsors:', error);
+        return [];
+    }
+
+    return data;
   }
 };
 

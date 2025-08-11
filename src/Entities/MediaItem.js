@@ -1,22 +1,49 @@
-// PASTE THIS CODE INTO: src/Entities/MediaItem.js
+// REPLACE THE CONTENTS OF: src/Entities/MediaItem.js
 
-import { mockMediaItems } from '@/mock/db';
+import { supabase } from '@/supabaseClient';
 
 const MediaItemAPI = {
-  _delay: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
-  filter: async (filters, sortBy, limit) => {
-    console.log('Mock Fetching Media Items');
-    await MediaItemAPI._delay(600);
-    
-    let results = mockMediaItems.filter(t => {
-        return Object.entries(filters).every(([key, value]) => t[key] === value);
-    });
+  // This is the existing filter function
+  filter: async (filters, sortBy = 'created_at', limit) => {
+    let query = supabase.from('media_items').select('*');
+
+    for (const key in filters) {
+      query = query.eq(key, filters[key]);
+    }
+
+    // Sort newest first
+    query = query.order(sortBy, { ascending: false });
 
     if (limit) {
-        return results.slice(0, limit);
+      query = query.limit(limit);
     }
-    return results;
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching media items:', error);
+      return [];
+    }
+
+    return data;
+  },
+
+  // NEW FUNCTION: Fetch all media items
+  list: async (sortBy = 'created_at') => {
+    let query = supabase
+      .from('media_items')
+      .select('*')
+      .order(sortBy, { ascending: false }); // Sort newest first
+    
+    const { data, error } = await query;
+    
+    if (error) {
+        console.error('Error fetching all media items:', error);
+        return [];
+    }
+
+    return data;
   }
 };
 
-export const MediaItem = MediaItemAPI; // <-- This is the line that makes it available!
+export const MediaItem = MediaItemAPI;

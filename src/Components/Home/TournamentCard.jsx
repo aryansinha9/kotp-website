@@ -64,7 +64,7 @@ export default function TournamentCard({ tournament }) {
           </div>
         </div>
         <div className="flex gap-3">
-          <Link to="/register" className="flex-1">
+          <Link to={`/register/${tournament.id}`} className="flex-1">
             <Button className="w-full btn-accent font-semibold hover:opacity-90 transition-opacity shadow-md hover:shadow-lg">Register Now</Button>
           </Link>
           <Link to={`/tournament-details?id=${tournament.id}`}>

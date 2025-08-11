@@ -1,31 +1,62 @@
-// PASTE THIS CODE INTO: src/Entities/Tournament.js
+// REPLACE THE CONTENTS OF: src/Entities/Tournament.js
 
-import { mockTournaments } from '@/mock/db';
+import { supabase } from '@/supabaseClient';
+
+// Helper function to parse the sortBy string
+const parseSortBy = (sortBy) => {
+  const isDescending = sortBy.startsWith('-');
+  const columnName = isDescending ? sortBy.substring(1) : sortBy;
+  return { columnName, ascending: !isDescending };
+};
 
 const TournamentAPI = {
-  // Simulate network delay
-  _delay: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
+  filter: async (sortBy = 'start_date', limit) => {
+    const { columnName, ascending } = parseSortBy(sortBy);
+    let query = supabase.from('tournaments').select('*');
 
-  // Mimics Base44's `filter` method
-  filter: async (filters, sortBy, limit) => {
-    console.log('Mock Fetching Tournaments with filters:', filters);
-    await TournamentAPI._delay(500); // Simulate loading time
+    // No filters for now, but leaving the structure
     
-    let results = mockTournaments.filter(t => {
-        return Object.entries(filters).every(([key, value]) => t[key] === value);
-    });
+    query = query.order(columnName, { ascending });
 
     if (limit) {
-        return results.slice(0, limit);
+      query = query.limit(limit);
     }
-    return results;
+
+    const { data, error } = await query;
+    if (error) {
+      console.error('Error fetching tournaments:', error);
+      return [];
+    }
+    return data;
   },
-  
-  // Mimics Base44's `list` method
-  list: async () => {
-    console.log('Mock Fetching all Tournaments');
-    await TournamentAPI._delay(500);
-    return mockTournaments;
+
+  list: async (sortBy = 'start_date') => {
+    const { columnName, ascending } = parseSortBy(sortBy);
+    let query = supabase
+      .from('tournaments')
+      .select('*')
+      .order(columnName, { ascending });
+
+    const { data, error } = await query;
+    if (error) {
+      console.error('Error fetching all tournaments:', error);
+      return [];
+    }
+    return data;
+  },
+
+  getById: async (id) => {
+    const { data, error } = await supabase
+      .from('tournaments')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error(`Error fetching tournament with id ${id}:`, error);
+      return null;
+    }
+    return data;
   }
 };
 
