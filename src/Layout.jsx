@@ -120,64 +120,94 @@ export default function Layout({ children }) {
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center gap-3 mb-4">
-                 <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3710b9f79_Screenshot2025-08-09at72020pm.png" alt="KOTP Logo" className="w-14 h-14 bg-white rounded-full" />
-                <div>
-                  <h3 className="text-lg font-bold">King of the Pitch</h3>
-                  <p className="text-sm text-slate-400">Premier Tournaments</p>
-                </div>
-              </div>
-              <p className="text-slate-400 text-sm mb-6">The ultimate stage for youth football. Compete with the best, showcase your talent.</p>
-              <div className="flex gap-3">
-                <a href="mailto:info@elitefootball.com" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors"><Mail className="w-5 h-5" /></a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors"><Facebook className="w-5 h-5" /></a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors"><Instagram className="w-5 h-5" /></a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors"><Youtube className="w-5 h-5" /></a>
-              </div>
-            </div>
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <div className="space-y-2">
-                <Link to="/register" className="block text-slate-400 hover:text-white transition-colors">Register Now</Link>
-                <Link to="/tournaments" className="block text-slate-400 hover:text-white transition-colors">Upcoming Tournaments</Link>
-                <Link to="/faq" className="block text-slate-400 hover:text-white transition-colors">FAQ & Rules</Link>
-                <Link to="/contact" className="block text-slate-400 hover:text-white transition-colors">Contact Us</Link>
-              </div>
-            </div>
-            {/* Information */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Information</h4>
-              <div className="space-y-2">
-                <Link to="/about" className="block text-slate-400 hover:text-white transition-colors">About Us</Link>
-                <Link to="/sponsors" className="block text-slate-400 hover:text-white transition-colors">Become a Sponsor</Link>
-                <Link to="/volunteers" className="block text-slate-400 hover:text-white transition-colors">Volunteer with Us</Link>
-                <Link to="/shop" className="block text-slate-400 hover:text-white transition-colors">Official Merchandise</Link>
-              </div>
-            </div>
-            {/* Contact */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-              <div className="space-y-3 text-slate-400">
-                <div><p className="font-medium text-white">Email</p><p>info@elitefootball.com</p></div>
-                <div><p className="font-medium text-white">Phone</p><p>+61 2 9876 5432</p></div>
-                <div><p className="font-medium text-white">Main Venue</p><p>Sydney Olympic Park</p><p>NSW 2127, Australia</p></div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-slate-400 text-sm">© 2024 King of the Pitch Tournament Series. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="text-slate-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
-              <a href="#" className="text-slate-400 hover:text-white text-sm transition-colors">Terms & Conditions</a>
-            </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      {/* Brand */}
+      <div className="md:col-span-1">
+        <div className="flex items-center gap-3 mb-4">
+            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3710b9f79_Screenshot2025-08-09at72020pm.png" alt="KOTP Logo" className="w-14 h-14 bg-white rounded-full" />
+          <div>
+            <h3 className="text-lg font-bold">King of the Pitch</h3>
+            <p className="text-sm text-slate-400">Premier Tournaments</p>
           </div>
         </div>
-      </footer>
+        <p className="text-slate-400 text-sm mb-6">The ultimate stage for youth football. Compete with the best, showcase your talent.</p>
+        
+        {/* Social Links -- CHANGED */}
+        <div className="flex gap-3">
+          <a href="mailto:kotp.football@gmail.com" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Email">
+            <Mail className="w-5 h-5" />
+          </a>
+          <a href="https://www.facebook.com/kotp.football/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Facebook">
+            <Facebook className="w-5 h-5" />
+          </a>
+          <a href="https://www.instagram.com/kotp.football/?hl=en" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Instagram">
+            <Instagram className="w-5 h-5" />
+          </a>
+          <a href="https://www.youtube.com/@kotp.football" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="YouTube">
+            <Youtube className="w-5 h-5" />
+          </a>
+        </div>
+      </div>
+
+      {/* Quick Links -- VERIFIED */}
+      <div>
+        <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+        <div className="space-y-2">
+          <Link to="/tournaments" className="block text-slate-400 hover:text-white transition-colors">Register Now</Link>
+          <Link to="/tournaments" className="block text-slate-400 hover:text-white transition-colors">Upcoming Tournaments</Link>
+          <Link to="/faq" className="block text-slate-400 hover:text-white transition-colors">FAQ & Rules</Link>
+          <Link to="/contact" className="block text-slate-400 hover:text-white transition-colors">Contact Us</Link>
+        </div>
+      </div>
+
+      {/* Information -- VERIFIED */}
+      <div>
+        <h4 className="text-lg font-semibold mb-4">Information</h4>
+        <div className="space-y-2">
+          <Link to="/about" className="block text-slate-400 hover:text-white transition-colors">About Us</Link>
+          <Link to="/sponsors" className="block text-slate-400 hover:text-white transition-colors">Become a Sponsor</Link>
+          <Link to="/volunteers" className="block text-slate-400 hover:text-white transition-colors">Volunteer with Us</Link>
+          <Link to="/shop" className="block text-slate-400 hover:text-white transition-colors">Official Merchandise</Link>
+        </div>
+      </div>
+
+      {/* Contact Info -- CHANGED */}
+      <div>
+        <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
+        <div className="space-y-3 text-slate-400">
+          <div>
+            <p className="font-medium text-white">Email</p>
+            <a href="mailto:kotp.football@gmail.com" className="hover:text-white transition-colors">kotp.football@gmail.com</a>
+          </div>
+          <div>
+            <p className="font-medium text-white">Phone</p>
+            <a href="tel:+61298765432" className="hover:text-white transition-colors">+61 2 9876 5432</a>
+          </div>
+          <div>
+            <p className="font-medium text-white">Main Venue</p>
+            <p>Wanderers Fives</p>
+            <p>Football Dr, Rooty Hill NSW 2766</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+  <p className="text-slate-400 text-sm">
+    © 2024 King of the Pitch Tournament Series. All rights reserved.
+  </p>
+  <div className="flex gap-4 items-center mt-4 md:mt-0"> {/* Adjusted gap for better spacing */}
+    <Link to="#" className="text-slate-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
+    <span className="text-slate-600">|</span> {/* Separator */}
+    <Link to="#" className="text-slate-400 hover:text-white text-sm transition-colors">Terms & Conditions</Link>
+    <span className="text-slate-600">|</span> {/* Separator */}
+    {/* NEW LINK ADDED HERE */}
+    <Link to="/admin" className="text-slate-400 hover:text-white text-sm transition-colors">Admin Login</Link>
+  </div>
+</div>
+  </div>
+</footer>
 
       {/* Floating Register Button (Mobile) */}
       <div className="fixed bottom-6 right-6 z-50 sm:hidden">

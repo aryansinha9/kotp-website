@@ -10,11 +10,15 @@ const parseSortBy = (sortBy) => {
 };
 
 const TournamentAPI = {
-  filter: async (sortBy = 'start_date', limit) => {
+  // NEW, IMPROVED filter function
+  filter: async (filters = {}, sortBy = 'start_date', limit) => {
     const { columnName, ascending } = parseSortBy(sortBy);
     let query = supabase.from('tournaments').select('*');
 
-    // No filters for now, but leaving the structure
+    // Apply all filters from the filters object
+    for (const key in filters) {
+      query = query.eq(key, filters[key]);
+    }
     
     query = query.order(columnName, { ascending });
 
@@ -30,6 +34,7 @@ const TournamentAPI = {
     return data;
   },
 
+  // The list function is also fine, but we'll keep it consistent
   list: async (sortBy = 'start_date') => {
     const { columnName, ascending } = parseSortBy(sortBy);
     let query = supabase

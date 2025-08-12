@@ -1,0 +1,7 @@
+/* Custom styles for Select dropdown to match site aesthetic */
+.select-content-white {
+  @apply bg-white text-slate-800 shadow-lg border border-slate-200;
+}
+.select-item-grey {
+  @apply focus:bg-slate-100 focus:text-slate-900;
+}

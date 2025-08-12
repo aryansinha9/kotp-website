@@ -4,10 +4,9 @@ import React, { useState, useEffect } from "react";
 import { Tournament } from "@/Entities/all";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, Calendar, Trophy, XCircle } from "lucide-react"; // Changed Badge to XCircle for clarity
+import { Search, Filter, Trophy, XCircle } from "lucide-react";
 import TournamentCard from "../components/home/TournamentCard"; // Re-using the card from the home page
 
 export default function Tournaments() {
@@ -21,10 +20,9 @@ export default function Tournaments() {
     const loadTournaments = async () => {
       try {
         setLoading(true);
-        // Fetch all tournaments, sorted by newest first
-        const data = await Tournament.list("-start_date");
+        // This fetches all tournaments, not just upcoming ones
+        const data = await Tournament.list("-start_date"); 
         setAllTournaments(data);
-        setFilteredTournaments(data); // Initially, all tournaments are shown
       } catch (error) {
         console.error("Error loading tournaments:", error);
       } finally {
@@ -104,7 +102,10 @@ export default function Tournaments() {
               </div>
             ) : filteredTournaments.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {filteredTournaments.map((tournament) => <TournamentCard key={tournament.id} tournament={tournament} />)}
+                {/* THIS IS THE LINE I FIXED */}
+                {filteredTournaments.map((tournament) => (
+                  <TournamentCard key={tournament.id} tournament={tournament} />
+                ))}
               </div>
             ) : (
               <div className="text-center py-16">

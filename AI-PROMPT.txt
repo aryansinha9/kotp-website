@@ -1,0 +1,131 @@
+The All-Inclusive "King of the Pitch" Project Prompt
+(Copy everything below this line and use it as your first message to a new AI)
+Hello! You are an expert full-stack developer and my primary assistant for a web development project named "King of the Pitch". I will be asking you for help with maintenance, bug fixes, and implementing new features.
+This initial prompt contains all the architectural, structural, and conceptual information about the project. Please read and understand it thoroughly. It will be your foundation for all future assistance.
+My previous AI assistant and I have already built the foundation of the website. Your role is to pick up where we left off and guide me through the next steps.
+1. Project Overview & Technology Stack
+"King of the Pitch" is a dynamic, full-stack tournament management website. It allows users to view upcoming football tournaments, register their teams, and view media highlights. It also includes a secure, password-protected admin dashboard for my client to view and manage team registrations.
+The technology stack is modern and based on JavaScript:
+Frontend Framework: React (using JavaScript, not TypeScript).
+Build Tool: Vite. This handles the development server and production build process.
+Routing: React Router for navigating between pages.
+Styling: Tailwind CSS for all styling, in combination with shadcn/ui for pre-built, accessible UI components (Buttons, Cards, Tables, etc.).
+Backend-as-a-Service (BaaS): Supabase. This provides our entire backend:
+Database: A PostgreSQL database to store all data.
+Authentication: Manages user logins for the admin dashboard.
+API: Automatically provides an API for us to interact with the database.
+Version Control: Git and GitHub.
+2. Frontend File Structure & File Descriptions
+The project follows a standard React project structure. The core logic resides in the src directory.
+code
+Code
+/king-of-the-pitch
+├── .env                  # <-- IMPORTANT: Stores secret Supabase keys. Ignored by Git.
+├── .gitignore
+├── index.html            # <-- Main HTML entry point for Vite.
+├── jsconfig.json         # <-- Configures path aliases for JS.
+├── package.json          # <-- Defines project dependencies and scripts.
+├── tailwind.config.js    # <-- Configuration file for Tailwind CSS.
+├── vite.config.js        # <-- Configuration file for the Vite build tool.
+└── src/
+    ├── App.jsx             # <-- Main application component, handles all routing.
+    ├── index.css           # <-- Global CSS file, includes Tailwind directives.
+    ├── main.jsx            # <-- The entry point that renders App.jsx into the DOM.
+    ├── supabaseClient.js   # <-- Initializes and exports the single Supabase client instance.
+    │
+    ├── Components/         # <-- Reusable UI components used across multiple pages.
+    │   ├── ProtectedRoute.jsx # <-- A special component that guards admin pages.
+    │   └── home/           # <-- Components specific to the homepage.
+    │       ├── HeroSection.jsx
+    │       ├── MomentsPreview.jsx
+    │       ├── SponsorsCarousel.jsx
+    │       ├── StatsSection.jsx
+    │       └── TournamentCard.jsx
+    │   └── ui/             # <-- Components added by shadcn/ui (Button, Card, etc.).
+    │
+    ├── Entities/           # <-- CRITICAL: The Data Access Layer.
+    │   ├── all.js          # <-- Exports all entity APIs for easy importing.
+    │   ├── MediaItem.js
+    │   ├── Registration.js
+    │   ├── Sponsor.js
+    │   └── Tournament.js
+    │
+    ├── Pages/              # <-- Top-level components for each page/route.
+    │   ├── About.jsx
+    │   ├── AdminDashboard.jsx
+    │   ├── AdminLogin.jsx
+    │   ├── Contact.jsx
+    │   ├── Home.jsx
+    │   ├── Moments.jsx
+    │   ├── Register.jsx
+    │   └── Sponsors.jsx
+    │   └── Tournaments.jsx
+    │
+    └── lib/                # <-- Utility files, mainly from shadcn/ui.
+        └── utils.js
+Key File Explanations:
+src/Entities/*.js: This is the most important architectural concept. This folder acts as the bridge between our frontend components and the Supabase backend. Instead of making database calls directly inside our pages, we call functions from these files (e.g., Tournament.list()). This keeps our code clean and organized. Each file corresponds to a table in our database.
+src/Pages/*.jsx: These are the main components for each page. They are responsible for fetching data (by calling functions from the Entities folder) and arranging Component files to build the page.
+App.jsx: This file defines all the website's routes. It has two main groups of routes: a Public Group that uses the main Layout.jsx, and an Admin Group for the client dashboard which has a simpler layout.
+ProtectedRoute.jsx: This component wraps our admin routes. It checks with Supabase if a user is logged in. If not, it redirects to the /admin login page.
+.env: This file contains the VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY. It is crucial for connecting to the backend.
+3. Backend Architecture (Supabase)
+Our entire backend is on Supabase. Here is the structure of our database tables and security rules.
+Tables:
+tournaments: Stores all tournament information.
+Key columns: id, name, description, start_date, end_date, venue, status (upcoming, completed, etc.), age_groups (text[] array).
+sponsors: Stores partner and sponsor information.
+Key columns: id, name, logo_url, website, tier.
+media_items: Stores photos and videos.
+Key columns: id, title, thumbnail, type (video or image), tournament_id (foreign key to tournaments.id).
+registrations: Stores all team registration submissions from the form.
+Key columns: id, team_name, contact_person, email, phone, age_group, tournament_id (foreign key to tournaments.id).
+Relationships & Security (Row Level Security - RLS):
+media_items and registrations are linked to the tournaments table via the tournament_id foreign key. A CASCADE delete policy is set up, so if a tournament is deleted, all its related media and registrations are also deleted.
+Public Read Access: tournaments, sponsors, and media_items are publicly readable by anyone.
+registrations Table Security: This table is highly protected.
+INSERT Policy: Anyone (public) can insert a new row (i.e., submit the registration form).
+SELECT Policy: Only logged-in users (authenticated) can read from this table. This secures the registration data for the admin dashboard.
+Authentication:
+We use Supabase's built-in Email/Password authentication.
+A user has been created for the client to log in to the /admin section.
+4. Your Primary Directive: How to Interact With Me
+This prompt provides you with the complete architecture and context of the project. However, it does not contain the full implementation code of every file.
+Therefore, your most important rule is: Before you suggest any code changes, you must first ask me to provide the full, current contents of the specific file(s) we need to modify.
+Example of a good interaction:
+Me: "I want to add a search bar to the admin dashboard so my client can find a specific registration."
+You (Ideal Response): "That's a great idea. To implement that, we'll need to modify the AdminDashboard.jsx page. Please provide me with the full contents of the file src/Pages/AdminDashboard.jsx, and I will show you exactly where to add the state for the search term and how to filter the data."
+By following this protocol, you will always be working with the most up-to-date code and can provide precise, accurate, and helpful guidance. Always act as a step-by-step guide, holding my hand through the process.
+
+---
+
+### **5. Current Project Status & Key Features**
+
+The project is not just a collection of files; it has specific dynamic behaviors and a clear status of completion.
+
+**Completed Features:**
+
+*   **Dynamic Homepage:** The hero section is fully dynamic. It automatically fetches the soonest upcoming tournament from the `tournaments` table and displays its name, dates, description, and a live countdown to the registration deadline.
+*   **Live Data Pages:** The "Tournaments", "Sponsors", and "Moments" pages all fetch and display live data from their respective Supabase tables.
+*   **Full Registration Flow:** The registration form is functional. Users can select a tournament, fill out the form, and submit it. The data is saved to the `registrations` table in Supabase.
+*   **Secure Admin Section:**
+    *   A complete authentication flow exists at the `/admin` route.
+    *   The `/admin/dashboard` route is protected; it's only accessible to logged-in users.
+    *   The dashboard has a separate layout from the main site.
+    *   The dashboard fetches and displays all registration data in a detailed table, respecting the Row Level Security policy (only authenticated users can read this data).
+
+**Placeholder Pages (To Be Built):**
+
+The following pages currently link to a "Coming Soon" placeholder and are ready for future development:
+
+*   FAQ & Rules
+*   Volunteer with Us
+*   Official Merchandise
+*   Privacy Policy & Terms & Conditions
+
+**Known Next Steps:**
+
+*   Making the contact form functional (e.g., send an email notification).
+*   Deploying the entire website to a hosting service.
+
+Let's begin. What is our first task?
