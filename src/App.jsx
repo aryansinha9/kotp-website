@@ -18,6 +18,7 @@ import Register from './Pages/Register';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import Gallery from './Pages/Gallery';
 
 // A component for the public-facing layout
 const PublicLayout = () => (
@@ -44,6 +45,7 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/tournaments" element={<Tournaments />} />
+          <Route path="/gallery/:tournamentId" element={<Gallery />} />
           <Route path="/register/:tournamentId" element={<Register />} />
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />
