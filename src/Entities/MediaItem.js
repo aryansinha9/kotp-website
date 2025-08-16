@@ -1,53 +1,42 @@
+// FINAL, CORRECTED VERSION of src/Entities/MediaItem.js
+
 import { supabase } from '@/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
 const MediaItemAPI = {
-  // For the public Moments page (Album Covers)
+  // For the public Moments page. The .limit() has been REMOVED.
   getGalleries: async () => {
-  const { data, error } = await supabase
-    .from('tournaments')
-    .select(`
-      id,
-      name,
-      media_items (
+    const { data, error } = await supabase
+      .from('tournaments')
+      .select(`
         id,
-        storage_path
-      )
-    `)
-    .eq('status', 'completed')
-    .not('media_items', 'is', null)
-    // This part limits the inner query to just one item
-    .limit(1, { foreignTable: 'media_items' });
+        name,
+        media_items (
+          id,
+          storage_path,
+          type
+        )
+      `)
+      .eq('status', 'completed')
+      .not('media_items', 'is', null);
 
-  if (error) {
-    console.error('Error fetching galleries:', error);
-    return [];
-  }
-  return data;
-},
+    if (error) {
+      console.error('Error fetching galleries:', error);
+      return [];
+    }
+    return data;
+  },
 
   // For the dedicated Gallery Page
-getGalleryByTournamentId: async (tournamentId) => {
-  const { data, error } = await supabase
-    .from('tournaments')
-    .select(`
-      id,
-      name,
-      media_items (
-        id,
-        storage_path,
-        type
-      )
-    `)
-    .eq('id', tournamentId)
-    .single(); // Use .single() to get just one tournament object
-
-  if (error) {
-    console.error('Error fetching single gallery:', error);
-    return null;
-  }
-  return data;
-},
+  getGalleryByTournamentId: async (tournamentId) => {
+    const { data, error } = await supabase
+      .from('tournaments')
+      .select(`id, name, media_items(id, storage_path, type)`)
+      .eq('id', tournamentId)
+      .single();
+    if (error) { console.error('Error fetching single gallery:', error); return null; }
+    return data;
+  },
 
   // For the Admin Dashboard
   upload: async (file, tournamentId) => {

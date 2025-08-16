@@ -55,8 +55,8 @@ export default function About() {
           </div>
           <div className="order-1 md:order-2">
             <img
-              src="https://images.unsplash.com/photo-1521484226848-6a9b13997f39?auto=format&fit=crop&q=80&w=1964"
-              alt="Team celebrating"
+              src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/DSC06316-Enhanced-NR.jpg"
+              alt="Players Celebrating"
               className="rounded-2xl shadow-xl w-full h-full object-cover"
             />
           </div>

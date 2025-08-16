@@ -5,3 +5,4 @@ export * from './Sponsor.js';
 export * from './MediaItem.js';
 export * from './Registration.js';
 export * from './FeaturedReel.js';
+export * from './YouTubeVideo.js';
