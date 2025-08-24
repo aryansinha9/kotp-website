@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { Award, Target, Users, Heart } from 'lucide-react';
 
 export default function About() {

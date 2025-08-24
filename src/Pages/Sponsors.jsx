@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Sponsor } from "@/Entities/all";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Handshake } from "lucide-react";
 
 export default function Sponsors() {

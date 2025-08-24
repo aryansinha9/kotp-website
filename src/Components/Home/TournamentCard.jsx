@@ -2,9 +2,9 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/Components/ui/button";
+import { Badge } from "@/Components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { CalendarDays, MapPin, Users, DollarSign, Clock, AlertCircle } from "lucide-react";
 import { format, differenceInDays, isSameDay } from "date-fns"; // Import isSameDay helper
 

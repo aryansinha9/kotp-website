@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { CheckCircle } from 'lucide-react';
 
 export default function RegistrationSuccess() {

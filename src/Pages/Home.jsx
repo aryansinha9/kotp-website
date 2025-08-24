@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Tournament, MediaItem, Sponsor } from "@/Entities/all";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Trophy, Star, ArrowRight, CreditCard, Zap, Users, Handshake } from "lucide-react";
 
-import HeroSection from "../components/home/HeroSection";
-import TournamentCard from "../components/home/TournamentCard";
-import MomentsPreview from "../components/home/MomentsPreview";
-import SponsorsCarousel from "../components/home/SponsorsCarousel";
-import StatsSection from "../components/home/StatsSection";
+import HeroSection from "../Components/Home/HeroSection";
+import TournamentCard from "../Components/Home/TournamentCard";
+import MomentsPreview from "../Components/Home/MomentsPreview";
+import SponsorsCarousel from "../Components/Home/SponsorsCarousel";
+import StatsSection from "../Components/Home/StatsSection";
 
 export default function Home() {
   const [upcomingTournaments, setUpcomingTournaments] = useState([]);

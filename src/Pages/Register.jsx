@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 // --- CHANGE: Added useSearchParams to read URL parameters
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Tournament } from '@/Entities/all';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 // --- CHANGE: Imported the Supabase client to call our Edge Function

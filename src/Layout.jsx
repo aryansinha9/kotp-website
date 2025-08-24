@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Home, Trophy, UserPlus, Camera, Info, Handshake, Mail, HelpCircle, Users, ShoppingCart, Menu, X, Facebook, Instagram, Youtube
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 
 // Note: I've simplified the navigationItems to use direct paths instead of createPageUrl
 const navigationItems = [
