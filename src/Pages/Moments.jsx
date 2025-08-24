@@ -3,16 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
-import { MediaItem, FeaturedReel, YouTubeVideo } from '@/Entities/all'; // <-- Import YouTubeVideo
+import { MediaItem, FeaturedReel, YouTubeVideo } from '@/Entities/all';
 import { Loader2, Camera } from 'lucide-react';
 
-// Helper component to get the public URL for a storage item
 const getMediaUrl = (path) => {
   const { data } = supabase.storage.from('tournament-gallery').getPublicUrl(path);
   return data.publicUrl;
 };
 
-// Helper component to safely render the Instagram embed HTML
 const ReelEmbed = ({ htmlContent }) => {
   useEffect(() => {
     if (window.instgrm) {
@@ -22,7 +20,6 @@ const ReelEmbed = ({ htmlContent }) => {
   return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
 };
 
-// --- NEW HELPER COMPONENT FOR YOUTUBE VIDEOS ---
 const YouTubeEmbed = ({ video }) => {
   const getYouTubeId = (url) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -54,6 +51,15 @@ export default function Moments() {
   const [reels, setReels] = useState([]);
   const [featuredVideo, setFeaturedVideo] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const findAlbumCover = (mediaItems) => {
+    const firstImage = mediaItems.find(item => item.type === 'image');
+    if (firstImage) {
+      return getMediaUrl(firstImage.storage_path);
+    }
+    
+    return getMediaUrl('site-assets/default-gallery-cover.jpg');
+  };
 
   useEffect(() => {
     const loadAllMedia = async () => {
@@ -95,7 +101,6 @@ export default function Moments() {
           </div>
         ) : (
           <div className="space-y-20">
-            {/* --- SECTION 1: Tournament Galleries --- */}
             {galleries.length > 0 && (
               <section>
                 <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
@@ -108,9 +113,9 @@ export default function Moments() {
                       key={album.id}
                       className="group relative aspect-square block cursor-pointer overflow-hidden rounded-xl shadow-lg"
                     >
-                      {album.media_items.length > 0 ? (
+                      {album.media_items && album.media_items.length > 0 ? (
                         <img
-                          src={getMediaUrl(album.media_items[0].storage_path)}
+                          src={findAlbumCover(album.media_items)}
                           alt={`Cover for ${album.name} gallery`}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
@@ -131,7 +136,6 @@ export default function Moments() {
               </section>
             )}
 
-            {/* --- SECTION 2: Featured YouTube Video (moved above reels) --- */}
             {featuredVideo && (
               <section>
                 <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
@@ -142,8 +146,7 @@ export default function Moments() {
                 </div>
               </section>
             )}
-
-            {/* --- SECTION 3: Instagram Reels --- */}
+            
             {reels.length > 0 && (
               <section>
                 <h2 className="text-3xl font-bold text-slate-800 mb-8 text-center">
@@ -157,7 +160,6 @@ export default function Moments() {
               </section>
             )}
 
-            {/* --- FALLBACK MESSAGE --- */}
             {!loading && galleries.length === 0 && reels.length === 0 && !featuredVideo && (
               <div className="text-center py-16">
                 <Camera className="w-16 h-16 text-slate-300 mx-auto mb-6" />

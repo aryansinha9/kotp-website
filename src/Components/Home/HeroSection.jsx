@@ -1,4 +1,4 @@
-// REPLACE THE CONTENTS OF: src/Components/home/HeroSection.jsx
+// src/Components/home/HeroSection.jsx (Restored to state before dynamic image)
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -25,15 +25,36 @@ export default function HeroSection({ tournament, loading }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    if (!tournament?.registration_deadline) return;
+    // This is the version with the detailed logging to debug the countdown.
+    console.clear();
+    console.log("--- Starting Countdown Calculation ---");
+    
+    if (!tournament?.registration_deadline) {
+      console.log("Calculation stopped: No registration deadline found on the tournament object.");
+      return;
+    }
+    
+    console.log("1. Raw deadline string from Supabase:", tournament.registration_deadline);
 
     const calculateTimeLeft = () => {
-      const now = new Date();
       const deadline = new Date(tournament.registration_deadline);
-      const diff = differenceInSeconds(deadline, now);
+      const now = new Date();
 
+      if (isNaN(deadline.getTime())) {
+        console.error("2. ERROR: The deadline string could not be parsed into a valid date.");
+        return;
+      }
+      
+      console.log("2. Deadline object (in your browser's timezone):", deadline.toString());
+      console.log("3. 'Now' object (your computer's current time):", now.toString());
+      
+      const diff = differenceInSeconds(deadline, now);
+      console.log("4. Difference in seconds (deadline - now):", diff);
+      
       if (diff <= 0) {
+        console.log("5. Result: Difference is zero or negative. Setting countdown to 0.");
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        clearInterval(timer);
         return;
       }
 
@@ -41,11 +62,13 @@ export default function HeroSection({ tournament, loading }) {
       const hours = Math.floor((diff % (60 * 60 * 24)) / (60 * 60));
       const minutes = Math.floor((diff % (60 * 60)) / 60);
       const seconds = Math.floor(diff % 60);
+
+      console.log(`5. Result: Setting countdown to ${days}d, ${hours}h, ${minutes}m, ${seconds}s.`);
       setTimeLeft({ days, hours, minutes, seconds });
     };
     
-    calculateTimeLeft(); // Initial calculation
-    const timer = setInterval(calculateTimeLeft, 1000); // Update every second
+    const timer = setInterval(calculateTimeLeft, 5000);
+    calculateTimeLeft();
 
     return () => clearInterval(timer);
   }, [tournament]);
@@ -55,14 +78,15 @@ export default function HeroSection({ tournament, loading }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={tournament?.hero_image || "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=2940&q=80"} alt="Football tournament action" className="w-full h-full object-cover" />
+        {/* This uses the original, hardcoded Unsplash URL */}
+        <img src={"https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/IMG_7059.jpg"} alt="Football tournament action" className="w-full h-full object-cover" />
         <div className="absolute inset-0 hero-gradient opacity-90"></div>
       </div>
       
       {loading && <HeroSkeleton />}
 
       {!loading && tournament && (
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white pb-16">
           <div className="mb-6">
             <Badge className="bg-white/10 text-amber-300 border-amber-300/30 px-4 py-2 text-sm font-semibold shadow-lg">
               <Star className="w-4 h-4 mr-2 text-amber-300" fill="currentColor" />
@@ -73,9 +97,12 @@ export default function HeroSection({ tournament, loading }) {
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight mb-8 uppercase">
             {tournament.name}
             <span className="block text-2xl md:text-3xl lg:text-4xl font-semibold text-amber-300 mt-2 normal-case">
-                {format(new Date(tournament.start_date), "MMMM d")}
-                {format(new Date(tournament.start_date), 'd') !== format(new Date(tournament.end_date), 'd') && `–${format(new Date(tournament.end_date), "d")}`}
-                {`, ${format(new Date(tournament.end_date), "yyyy")}`}          
+              {format(new Date(tournament.start_date), "MMMM d")}
+              {
+                format(new Date(tournament.start_date), 'd') !== format(new Date(tournament.end_date), 'd') &&
+                ` – ${format(new Date(tournament.end_date), "d")}`
+              }
+              {`, ${format(new Date(tournament.end_date), "yyyy")}`}
             </span>
           </h1>
 
@@ -121,8 +148,8 @@ export default function HeroSection({ tournament, loading }) {
             </Link>
           </div>
 
-          <div className="mt-8">
-            <Badge className="bg-amber-500 text-white border-amber-400 px-4 py-2 animate-pulse">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2"> 
+            <Badge className="bg-amber-500 text-white border-amber-400 px-4 py-2 animate-pulse inline-flex">
               <Clock className="w-4 h-4 mr-2" />
               Only {spotsLeft} spots remaining!
             </Badge>
@@ -130,7 +157,6 @@ export default function HeroSection({ tournament, loading }) {
         </div>
       )}
 
-      {/* Case for when loading is done but there are NO upcoming tournaments */}
       {!loading && !tournament && (
            <div className="relative z-10 text-center text-white">
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-8 uppercase">King of the Pitch</h1>

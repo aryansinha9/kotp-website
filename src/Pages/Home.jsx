@@ -1,4 +1,4 @@
-// REPLACE THE CONTENTS OF: src/Pages/Home.jsx
+// src/Pages/Home.jsx (with updated data processing)
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -14,7 +14,7 @@ import StatsSection from "../components/home/StatsSection";
 
 export default function Home() {
   const [upcomingTournaments, setUpcomingTournaments] = useState([]);
-  const [featuredTournament, setFeaturedTournament] = useState(null); // <-- NEW STATE
+  const [featuredTournament, setFeaturedTournament] = useState(null);
   const [featuredMedia, setFeaturedMedia] = useState([]);
   const [sponsors, setSponsors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,21 +23,27 @@ export default function Home() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // We now fetch upcoming tournaments sorted by the soonest start_date
-        const [tournamentsData, mediaData, sponsorsData] = await Promise.all([
-          Tournament.filter({ status: "upcoming" }, "start_date", 3), // <-- CHANGED SORTING
-          MediaItem.filter({ featured: true }, "-created_at", 6),
+        const [tournamentsData, galleriesData, sponsorsData] = await Promise.all([
+          Tournament.filter({ status: "upcoming" }, "start_date", 3),
+          MediaItem.getGalleries(),
           Sponsor.filter({ active: true }, "tier", 8)
         ]);
         
         setUpcomingTournaments(tournamentsData);
-        setFeaturedMedia(mediaData);
         setSponsors(sponsorsData);
         
-        // ** WHAT WE CHANGED **
-        // Take the very first tournament from the upcoming list to be our featured one.
         if (tournamentsData && tournamentsData.length > 0) {
             setFeaturedTournament(tournamentsData[0]);
+        }
+
+        // Process galleriesData to get a flat list of media items
+        if (galleriesData && galleriesData.length > 0) {
+          // 1. Flatten the nested media_items from all tournaments into one array
+          const allMediaItems = galleriesData.flatMap(gallery => gallery.media_items || []);
+          // 2. Filter to get only the videos
+          const allVideos = allMediaItems.filter(item => item.type === 'video');
+          // 3. Set this as our featured media
+          setFeaturedMedia(allVideos);
         }
 
       } catch (error) {
@@ -51,9 +57,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* ** WHAT WE CHANGED **
-          We now pass the featured tournament down to the HeroSection.
-          We also pass the loading state. */}
       <HeroSection tournament={featuredTournament} loading={loading} />
 
       {/* Upcoming Tournaments */}
