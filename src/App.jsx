@@ -17,7 +17,7 @@ import Moments from './Pages/Moments';
 import Register from './Pages/Register';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './Components/ProtectedRoute';
 import Gallery from './Pages/Gallery';
 // --- NEW: Import the success page component ---
 import RegistrationSuccess from './Pages/RegistrationSuccess';
