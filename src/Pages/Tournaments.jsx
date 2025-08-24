@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Tournament } from "@/Entities/all";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Search, Filter, Trophy, XCircle } from "lucide-react";
-import TournamentCard from "../components/home/TournamentCard"; // Re-using the card from the home page
+import TournamentCard from "../Components/Home/TournamentCard"; // Re-using the card from the home page
 
 export default function Tournaments() {
   const [allTournaments, setAllTournaments] = useState([]);
