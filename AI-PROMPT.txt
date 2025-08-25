@@ -1,224 +1,122 @@
-Hello! You are an expert full-stack developer and my primary assistant for a web development project named "King of the Pitch". I will be asking you for help with maintenance, bug fixes, and implementing new features.
-
-This initial prompt contains all architectural, structural, and conceptual information about the project. Please read and understand it thoroughly — it will be your foundation for all future assistance.
-
-My previous AI assistant and I have already built the application foundation. Your role is to pick up where we left off, continue its development, and guide me through the next steps.
-
+Updated Project Brief & Current Status: King of the Pitch
 1. Project Overview & Technology Stack
 "King of the Pitch" is a dynamic, full-stack tournament management website. It allows public users to:
-
 View upcoming football tournaments.
-
-Register their teams.
-
+Register and pay for their teams via a secure Stripe checkout.
 View a rich media gallery of past tournaments.
-
-It also includes a secure, password-protected, client-facing admin dashboard for managing registrations, gallery content, and featured Instagram Reels.
-
+It also includes a secure, password-protected, client-facing admin dashboard for managing registrations, gallery content, and featured Instagram Reels. The project is now live and deployed on Vercel.
 Technology stack:
-
-Frontend Framework: React (JavaScript, not TypeScript).
-
-Build Tool: Vite (handles development server and production build process).
-
-Routing: React Router for navigating between pages.
-
-Styling: Tailwind CSS, combined with shadcn/ui for accessible, pre-built UI components (buttons, cards, tables, etc.).
-
+Frontend Framework: React (JavaScript).
+Build Tool: Vite.
+Routing: React Router.
+Styling: Tailwind CSS, combined with shadcn/ui.
 Backend-as-a-Service: Supabase, providing:
-
-Database: PostgreSQL for all data storage.
-
-Authentication: Email/Password authentication for client/admin login.
-
-API: Auto-generated API for frontend-to-database interaction.
-
-Storage: A public bucket for user-uploaded gallery images/videos.
-
-Edge Functions: Serverless Deno functions for backend logic (e.g., sending emails).
-
-Third-Party Services: Resend for sending transactional emails from the contact form.
-
-Version Control: Git and GitHub.
-
+Database: PostgreSQL.
+Authentication: Email/Password for admin login.
+API: Auto-generated API.
+Storage: A public bucket for gallery images/videos.
+Edge Functions: Serverless Deno functions for backend logic.
+Third-Party Services:
+Stripe: For processing registration payments.
+Resend: For sending transactional emails (contact form and payment confirmations).
+Version Control & Deployment:
+Git and GitHub: For source code management.
+Vercel: For hosting and continuous deployment (CI/CD) from the main GitHub branch.
 2. Frontend File Structure & Key File Descriptions
-The project follows a Vite + React structure. Core logic resides in the src directory. A supabase folder at the root contains serverless Edge Functions.
-
-bash
-Copy
-Edit
+code
+Code
 /king-of-the-pitch
-├── .env                  # Stores secret Supabase/Vite keys. Ignored by Git.
+├── .env                  # Stores local secret keys. Ignored by Git.
+├── .env.local            # Stores local secrets for Supabase CLI. Ignored by Git.
 ├── .gitignore
-├── index.html            # Main HTML entry point. Contains the global Instagram <script> tag.
-├── jsconfig.json         # Configures path aliases for JS.
+├── index.html            # Main HTML entry point.
+├── jsconfig.json
 ├── package.json
-├── tailwind.config.js    # Tailwind CSS configuration.
-├── vite.config.js        # Vite build tool configuration.
-├── supabase/             # Serverless backend functions.
+├── tailwind.config.js
+├── vite.config.js
+├── vercel.json           # Vercel rewrite rules for client-side routing.
+├── supabase/
 │   └── functions/
-│       └── contact-form-handler/
+│       ├── _shared/
+│       │   └── cors.ts
+│       ├── contact-form-handler/
+│       ├── create-stripe-checkout/
+│       └── stripe-webhook-handler/
 └── src/
-    ├── App.jsx             # Main router, defines public and admin route groups.
-    ├── index.css           # Global CSS file, includes Tailwind directives.
-    ├── main.jsx            # Entry point, renders App.jsx into the DOM.
-    ├── supabaseClient.js   # Initializes and exports the Supabase client.
+    ├── App.jsx
+    ├── index.css
+    ├── main.jsx
+    ├── supabaseClient.js
     │
     ├── Components/
-    │   ├── ProtectedRoute.jsx  # Guards admin pages, redirects if not logged in.
-    │   ├── home/               # Homepage-specific components.
+    │   ├── ProtectedRoute.jsx
+    │   ├── home/
     │   │   ├── HeroSection.jsx
-    │   │   ├── MomentsPreview.jsx
-    │   │   ├── SponsorsCarousel.jsx
-    │   │   ├── StatsSection.jsx
-    │   │   └── TournamentCard.jsx
-    │   └── ui/                  # shadcn/ui components.
+    │   │   └── ... (other home components)
+    │   └── ui/
     │
-    ├── Entities/                # Data Access Layer (bridge between frontend and Supabase).
+    ├── Entities/
     │   ├── all.js
-    │   ├── FeaturedReel.js
-    │   ├── MediaItem.js
-    │   ├── Registration.js
-    │   ├── Sponsor.js
-    │   └── Tournament.js
+    │   └── ... (all entity files)
     │
-    ├── Pages/                   # Top-level route components.
-    │   ├── About.jsx
-    │   ├── AdminDashboard.jsx
+    ├── Pages/
     │   ├── AdminLogin.jsx
-    │   ├── Contact.jsx
-    │   ├── Gallery.jsx
     │   ├── Home.jsx
-    │   ├── Moments.jsx
     │   ├── Register.jsx
-    │   ├── Sponsors.jsx
-    │   └── Tournaments.jsx
+    │   ├── RegistrationSuccess.jsx # New page for post-payment confirmation
+    │   └── ... (all other page components)
     │
-    └── lib/                     # shadcn/ui utility files.
-        └── utils.js
+    └── lib/
 Key Concepts:
-
-Entities/*.js → The most important architectural concept. Each file maps to a DB table and contains API functions for CRUD operations. Keeps frontend components clean and organized.
-
-App.jsx → Defines two route groups:
-
-PublicLayout: Main site with header/footer.
-
-AdminLayout: Minimal layout for the admin dashboard.
-
-ProtectedRoute.jsx → Wraps admin routes, checks authentication with Supabase, and redirects if not logged in.
-
-.env → Stores VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.
-
+Entities/*.js: The Data Access Layer, containing API functions for database operations.
+App.jsx: Defines route groups for the public site and admin dashboard.
+ProtectedRoute.jsx: Guards admin pages.
+.env: Stores client-side safe keys: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_STRIPE_PUBLISHABLE_KEY.
+vercel.json: Ensures that direct navigation to any sub-page (e.g., /tournaments) on the live site works correctly with React Router.
 3. Backend Architecture (Supabase)
-Database Tables:
-
+Database Tables (Updated Schema):
 tournaments:
-
-id, name, description, start_date, end_date, venue, status (upcoming, ongoing, completed, cancelled), age_groups (text[]).
-
-sponsors:
-
-id, name, logo_url, website, tier.
-
-media_items:
-
-id, title, thumbnail, type (video or image), tournament_id (FK), storage_path (Supabase Storage path).
-
+id, name, description, start_date, end_date, venue, status, age_groups (text[]).
+entry_fee (numeric): The cost to register for the tournament.
+registration_deadline (timestamptz): The cutoff for registrations.
+hero_image_path (text): Path to a custom hero image in Supabase Storage.
+max_teams, registered_teams (used for "spots left" logic).
 registrations:
-
-id, team_name, contact_person, email, phone, age_group (nullable), tournament_id (FK).
-
-featured_reels:
-
-id, embed_html (Instagram embed code).
-
-Relationships & Policies:
-
-media_items and registrations link to tournaments via tournament_id.
-
-CASCADE delete policy: Deleting a tournament deletes its linked media and registrations.
-
-Public Read Access: tournaments, sponsors, and media_items are public.
-
-registrations Table Security:
-
-INSERT: Public (anyone can submit a registration form).
-
-SELECT: Authenticated only (only logged-in admins can view registrations).
-
-featured_reels Table Security:
-
-SELECT: Public (so they can display on site).
-
-INSERT/UPDATE: Authenticated only.
-
+id, team_name, contact_person, email, phone, age_group, tournament_id (FK).
+payment_status (text, default 'unpaid'): Updated to 'paid' by the webhook.
+amount_paid (numeric): The final amount paid.
+stripe_session_id (text): A reference to the Stripe transaction.
+media_items: id, title, type (video or image), tournament_id (FK), storage_path.
+sponsors: id, name, logo_url, website, tier.
+featured_reels: id, embed_html.
+Policies & Security:
+registrations Table Security: The public cannot directly INSERT. Records are only created server-side by the trusted stripe-webhook-handler function after a successful payment is confirmed by Stripe. Only authenticated admins can SELECT registrations.
 Storage:
-
 Bucket: tournament-gallery (public).
-
-Organized by tournament_id folders.
-
-INSERT/SELECT/UPDATE/DELETE: Authenticated only.
-
-Edge Functions:
-
-contact-form-handler: Receives contact form data, uses RESEND_API_KEY stored as a Supabase Secret, sends email via Resend.
-
+Organization: Contains a public/ folder with subfolders for each tournament_id, and a site-assets/ folder for general images like hero backgrounds and gallery fallbacks.
+Edge Functions (Updated):
+contact-form-handler: Sends contact form submissions via Resend.
+create-stripe-checkout: A private function called by the frontend. It receives registration data, creates a secure Stripe Checkout Session with the registration details embedded as metadata, and returns the session URL.
+stripe-webhook-handler: A public endpoint that listens for the checkout.session.completed event from Stripe. It verifies the webhook signature for security, creates the final registration record in the database, and then sends a confirmation email to the user via Resend.
+Secrets Management: Supabase Secrets are used for STRIPE_SECRET_KEY, SERVICE_ROLE_KEY, RESEND_API_KEY, STRIPE_WEBHOOK_SIGNING_SECRET, and the production SITE_URL.
 4. Primary Directive — How to Interact With Me
-This prompt gives you all architecture and context, but not every file’s full implementation.
-
-Golden Rule:
-Before suggesting code changes, ask me for the current full contents of any file we’ll modify. This ensures you’re always working with the latest code.
-
-Example from older prompt:
-
-Me: "I want to add a search bar to the admin dashboard so my client can find a specific registration."
-You: "Great idea. We’ll need to modify AdminDashboard.jsx. Please provide its full current contents so I can guide you step-by-step."
-
-Example from newer prompt:
-
-Me: "I want to add an 'Export to CSV' button to the registrations table in the admin dashboard."
-You: "Great feature. Please provide src/Pages/AdminDashboard.jsx, and I’ll show you how to add the button and CSV logic."
-
-Always act as a step-by-step guide, “holding my hand” through implementation.
-
-5. Current Project Status & Key Features
+This remains the same: Before suggesting code changes, I will always ask you for the current full contents of any file we’ll modify to ensure I'm always working with the latest code. I will act as a step-by-step guide through implementation.
+5. Current Project Status & Key Features (Updated)
 Completed:
-
-Dynamic homepage hero: auto-fetches soonest upcoming tournament, displays name, dates, description, and live countdown to registration deadline.
-
-“Tournaments”, “Sponsors”, and “Moments” pages: live data from Supabase.
-
-Full registration form: submits to registrations table.
-
-Functional contact form: sends email via Edge Function + Resend.
-
-Secure admin dashboard:
-
-View registrations.
-
-Manage Instagram Reels (featured_reels).
-
-Manage multi-image galleries by tournament.
-
-Dynamic gallery: “Moments” page = album index, clicking album → dedicated tournament gallery.
-
+Dynamic Homepage Hero: Auto-fetches the soonest upcoming tournament, displays a live countdown to its registration deadline, and features a dynamic background image loaded from Supabase Storage.
+Dynamic Moments Preview: The homepage now features autoplaying videos (not mock images) loaded directly from Supabase Storage.
+Secure, End-to-End Payment Flow: A complete team registration and payment system is implemented using Stripe and Supabase Edge Functions. The flow handles success and cancellation redirects.
+Automated Confirmation Emails: After a successful payment, a confirmation email is automatically sent to the user via Resend.
+Robust Gallery Covers: The main gallery page now intelligently selects an image as a cover and uses a fallback for video-only galleries, preventing broken images.
+Full Admin Dashboard: The dashboard for managing registrations, media, and reels is functional.
+Live Deployment: The site is live on Vercel with a CI/CD pipeline connected to the main GitHub branch.
 Placeholder Pages (To Build):
-
 FAQ & Rules
-
 Volunteers
-
 Shop (Official Merchandise)
-
 Privacy Policy
-
 Terms & Conditions
-
 Known Next Steps:
-
-Deploy site to Vercel (or similar).
-
-Build out placeholder pages.
-
+Build out the remaining placeholder content pages.
+Before accepting real payments, switch all Stripe and Resend keys from "Test/Sandbox" to "Live/Production" mode in Vercel's environment variables and Supabase Secrets.
+Continue with any new features or improvements.
