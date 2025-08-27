@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: 'aryansinha8424@gmail.com',
+      to: 'kotp.football@gmail.com',
       subject: `New KOTP Contact Form Submission: ${subject}`,
       html: `<p>New message from ${name} (${email}).</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Message:</strong></p><p>${message}</p>`
     });
