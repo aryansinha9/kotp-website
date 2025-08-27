@@ -19,17 +19,16 @@ import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
 import Gallery from './Pages/Gallery';
-// --- NEW: Import the success page component ---
 import RegistrationSuccess from './Pages/RegistrationSuccess';
+// --- NEW: Import the UpdatePassword component ---
+import UpdatePassword from './Pages/UpdatePassword';
 
-// A component for the public-facing layout
 const PublicLayout = () => (
   <Layout>
-    <Outlet /> {/* Child routes will render here */}
+    <Outlet />
   </Layout>
 );
 
-// A placeholder for our Admin routes
 const AdminLayout = () => (
     <div className="bg-slate-50 min-h-screen">
         <Outlet />
@@ -58,8 +57,10 @@ export default function App() {
           <Route path="/tournament-details" element={<ComingSoon />} />
         </Route>
 
-        {/* --- NEW: Add the standalone route for the success page --- */}
         <Route path="/registration-success" element={<RegistrationSuccess />} />
+
+        {/* --- NEW: Add the standalone route for the Update Password page --- */}
+        <Route path="/update-password" element={<UpdatePassword />} />
 
         {/* Group 2: Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
