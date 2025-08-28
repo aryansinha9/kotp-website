@@ -20,8 +20,10 @@ import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
 import Gallery from './Pages/Gallery';
 import RegistrationSuccess from './Pages/RegistrationSuccess';
-// --- NEW: Import the UpdatePassword component ---
 import UpdatePassword from './Pages/UpdatePassword';
+// --- NEW: Import the policy and terms pages ---
+import PrivacyPolicy from './Pages/PrivacyPolicy';
+import TermsAndConditions from './Pages/TermsAndConditions';
 
 const PublicLayout = () => (
   <Layout>
@@ -51,6 +53,13 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* --- CHANGED: Placeholder routes are now real --- */}
+          {/* These two are now active pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          
+          {/* These are still placeholders, but you can create pages for them in the future */}
           <Route path="/faq" element={<ComingSoon />} />
           <Route path="/volunteers" element={<ComingSoon />} />
           <Route path="/shop" element={<ComingSoon />} />
@@ -58,8 +67,6 @@ export default function App() {
         </Route>
 
         <Route path="/registration-success" element={<RegistrationSuccess />} />
-
-        {/* --- NEW: Add the standalone route for the Update Password page --- */}
         <Route path="/update-password" element={<UpdatePassword />} />
 
         {/* Group 2: Admin Routes */}
@@ -74,7 +81,6 @@ export default function App() {
                 } 
             />
         </Route>
-
       </Routes>
     </Router>
   );

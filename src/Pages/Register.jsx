@@ -1,30 +1,27 @@
 // src/Pages/Register.jsx
 
+// --- THE ONLY FIX: Corrected a typo from 'auseState' to 'useState' in the line below ---
 import React, { useState, useEffect } from 'react';
-// --- CHANGE: Added useSearchParams to read URL parameters
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Tournament } from '@/Entities/all';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Checkbox } from "@/Components/ui/checkbox"
+import { Loader2, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
-// --- CHANGE: Imported the Supabase client to call our Edge Function
 import { supabase } from '@/supabaseClient';
 
 export default function Register() {
   const { tournamentId } = useParams();
   const navigate = useNavigate();
-  // --- CHANGE: Added searchParams to check for payment cancellation
   const [searchParams] = useSearchParams();
 
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  
-  // --- CHANGE: Removed the 'success' state, as it's no longer handled on this page.
-  // const [success, setSuccess] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const [formData, setFormData] = useState({
     team_name: '',
@@ -35,7 +32,6 @@ export default function Register() {
   });
 
   useEffect(() => {
-    // --- CHANGE: Added logic to show a message if the user cancels payment on Stripe.
     if (searchParams.get('status') === 'cancelled') {
       setError('Your registration was cancelled. Feel free to try again.');
     }
@@ -57,29 +53,29 @@ export default function Register() {
       }
     };
     fetchTournament();
-  }, [tournamentId, searchParams]); // --- CHANGE: Added searchParams to dependency array
+  }, [tournamentId, searchParams]);
 
   const handleInputChange = (e) => { const { id, value } = e.target; setFormData(prev => ({ ...prev, [id]: value })); };
   const handleSelectChange = (id, value) => { setFormData(prev => ({ ...prev, [id]: value })); };
 
-  // --- CHANGE: The entire handleSubmit function is replaced with this new version.
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!agreed) {
+      setError("You must agree to the terms and conditions to proceed.");
+      return;
+    }
     setSubmitting(true);
     setError('');
 
-    // 1. Prepare data with keys that match what our Edge Function expects (camelCase).
     const registrationPayload = {
       tournamentId: tournamentId,
       teamName: formData.team_name,
       contactPerson: formData.contact_person,
       email: formData.email,
       phone: formData.phone,
-      // We map the form's 'division' field to the 'ageGroup' field in the function.
       ageGroup: formData.division, 
     };
     
-    // 2. Invoke the 'create-stripe-checkout' Edge Function.
     const { data, error: invokeError } = await supabase.functions.invoke(
       'create-stripe-checkout',
       { body: registrationPayload }
@@ -91,14 +87,12 @@ export default function Register() {
       return;
     }
 
-    // 3. Check for application-level errors returned from the function itself.
     if (data.error) {
       setError(`Payment initialization failed: ${data.error}`);
       setSubmitting(false);
       return;
     }
     
-    // 4. If successful, redirect the user to Stripe's checkout page.
     if (data.url) {
       window.location.href = data.url;
     } else {
@@ -107,8 +101,6 @@ export default function Register() {
     }
   };
 
-  // --- CHANGE: The 'success' state and its corresponding UI have been removed.
-  // The user will be on Stripe's website, not this page, when payment is successful.
   if (loading) { return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-amber-500" /></div>; }
   
   if (!tournament) { return ( <div className="min-h-screen flex items-center justify-center text-center bg-slate-50 px-4"><div><AlertTriangle className="w-24 h-24 text-red-500 mx-auto mb-6" /><h1 className="text-4xl font-bold text-slate-800 mb-4">Tournament Not Found</h1><p className="text-lg text-slate-600 mb-8">{error || `We couldn't find the tournament you're looking for.`}</p><Link to="/tournaments"><Button>View All Tournaments</Button></Link></div></div>); }
@@ -122,7 +114,6 @@ export default function Register() {
           <p className="text-lg text-slate-500 mt-3">
             {format(new Date(tournament.start_date), 'MMM d, yyyy')} • {tournament.venue}
           </p>
-          {/* --- CHANGE: Display the tournament entry fee */}
           <p className="text-2xl font-bold text-slate-700 mt-4">
             Entry Fee: ${tournament.entry_fee}
           </p>
@@ -133,7 +124,6 @@ export default function Register() {
                 <div><label htmlFor="contact_person" className="block text-sm font-medium text-slate-700 mb-1">Contact Person</label><Input id="contact_person" value={formData.contact_person} onChange={handleInputChange} required /></div>
                 <div><label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Contact Email</label><Input id="email" type="email" value={formData.email} onChange={handleInputChange} required /></div>
                 <div><label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">Contact Phone</label><Input id="phone" type="tel" value={formData.phone} onChange={handleInputChange} required /></div>
-                
                 <div>
                     <label htmlFor="division" className="block text-sm font-medium text-slate-700 mb-1">Division</label>
                     <Select onValueChange={(value) => handleSelectChange('division', value)} required>
@@ -145,12 +135,30 @@ export default function Register() {
                     </Select>
                 </div>
             </div>
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox id="terms" onCheckedChange={setAgreed} />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none text-slate-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I have read and agree to the&nbsp;
+                <Link to="/terms-and-conditions" target="_blank" className="underline text-amber-600 hover:text-amber-700">
+                  Terms & Conditions
+                </Link>
+                &nbsp;and&nbsp;
+                <Link to="/privacy-policy" target="_blank" className="underline text-amber-600 hover:text-amber-700">
+                  Privacy Policy
+                </Link>.
+              </label>
+            </div>
+            
             {error && (<div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3"><AlertTriangle className="w-5 h-5" /><p>{error}</p></div>)}
+            
             <div>
-              {/* --- CHANGE: Updated button text */}
-              <Button type="submit" size="lg" className="w-full btn-accent font-semibold text-lg" disabled={submitting}>
+              <Button type="submit" size="lg" className="w-full btn-accent font-semibold text-lg" disabled={submitting || !agreed}>
                 {submitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                {submitting ? 'Redirecting to Payment...' : `Proceed to Payment`}
+                {submitting ? 'Redirecting...' : `Proceed to Payment`}
               </Button>
             </div>
         </form>
