@@ -66,7 +66,7 @@ export default function Sponsors() {
                   <img
                     src={sponsor.logo_url}
                     alt={sponsor.name}
-                    className="w-28 h-20 object-contain mx-auto filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="w-40 h-24 object-contain mx-auto filter grayscale group-hover:grayscale-0 transition-all duration-300"
                   />
                 </a>
                 <p className="mt-4 text-sm font-semibold text-slate-700">{sponsor.name}</p>
