@@ -62,12 +62,12 @@ export default function Contact() {
       title: 'Main Venue',
       value: (
   <>
-    Wanderers Fives
+    Ultimate Soccer
     <br />
-    Football Dr, Rooty Hill NSW 2766
+    405 The Horsley Dr, Fairfield NSW 2165
   </>
 ), // <-- CORRECTED ADDRESS
-      href: 'https://www.google.com/maps/search/?api=1&query=Football+Dr,+Rooty+Hill+NSW+2766', // <-- CORRECTED MAPS LINK
+      href: 'https://maps.app.goo.gl/XpvYN1Jmq7prLkhn8', // <-- CORRECTED MAPS LINK
     },
   ];
 
@@ -84,7 +84,7 @@ export default function Contact() {
                 
                 {/* --- THE MAP IFRAME IS UPDATED HERE --- */}
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3826.0247979167993!2d150.85408544666183!3d-33.77451587153432!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b129b4c733a144d%3A0xa5dcda9c00918d6b!2sWanderers%20Fives!5e1!3m2!1sen!2sau!4v1755001104585!5m2!1sen!2sau"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7643.81884892991!2d150.95739079999998!3d-33.8665541!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12bd7f5f107e21%3A0xa0822d1b700897ce!2sUltimate%20Soccer!5e1!3m2!1sen!2sau!4v1756441085693!5m2!1sen!2sau"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
