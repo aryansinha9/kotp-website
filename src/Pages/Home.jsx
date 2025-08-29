@@ -109,8 +109,17 @@ export default function Home() {
       {/* Sponsors Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50">
           <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-12"><h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Ventures</h2><p className="text-xl text-slate-600 max-w-3xl mx-auto">We're proud to collaborate with leading brands to bring the best youth football experience.</p></div>
-              {!loading && sponsors.length > 0 ? (<><SponsorsCarousel sponsors={sponsors} loading={loading} /><div className="text-center mt-12"><Link to="/sponsors"><Button variant="outline" className="border-amber-400 text-amber-700 hover:bg-amber-50 font-semibold px-8"><Handshake className="w-4 h-4 mr-2" />Become a Partner<ArrowRight className="w-4 h-4 ml-2" /></Button></Link></div></>) : (!loading && <div className="text-center py-12"><Star className="w-16 h-16 text-slate-300 mx-auto mb-4" /><p className="text-slate-500 text-lg">No partners listed at the moment.</p><p className="text-slate-400">Interested in supporting youth sports?</p><Link to="/sponsors" className="inline-block mt-4"><Button className="bg-amber-500 text-white hover:bg-amber-600">Partner With Us</Button></Link></div>)}
+              {/* Corrected title to be consistent */}
+              <div className="text-center mb-12"><h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Partners</h2><p className="text-xl text-slate-600 max-w-3xl mx-auto">We're proud to collaborate with leading brands to bring the best youth football experience.</p></div>
+              
+              {!loading && sponsors.length > 0 ? (
+                // The duplicate button that was here has been removed.
+                // Now, only the SponsorsCarousel component is rendered, which has its own button.
+                <SponsorsCarousel sponsors={sponsors} loading={loading} />
+              ) : (
+                // The fallback content remains the same
+                !loading && <div className="text-center py-12"><Star className="w-16 h-16 text-slate-300 mx-auto mb-4" /><p className="text-slate-500 text-lg">No partners listed at the moment.</p><p className="text-slate-400">Interested in supporting youth sports?</p><Link to="/sponsors" className="inline-block mt-4"><Button className="bg-amber-500 text-white hover:bg-amber-600">Partner With Us</Button></Link></div>
+              )}
           </div>
       </section>
       
