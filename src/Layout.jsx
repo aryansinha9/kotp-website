@@ -184,8 +184,8 @@ export default function Layout({ children }) {
                 </div>
                 <div>
                   <p className="font-medium text-white">Main Venue</p>
-                  <p>Wanderers Fives</p>
-                  <p>Football Dr, Rooty Hill NSW 2766</p>
+                  <p>Ultimate Soccer</p>
+                  <p>405 The Horsley Dr, Fairfield NSW 2165</p>
                 </div>
               </div>
             </div>
