@@ -39,7 +39,7 @@ export default function Layout({ children }) {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/3710b9f79_Screenshot2025-08-09at72020pm.png" alt="KOTP Logo" className="w-14 h-14" />
+              <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/KOTP%20SVG%20LOGO.svg" alt="KOTP Logo" className="w-14 h-14" />
               <div className="hidden sm:block">
                 <h1 className="text-xl font-bold text-slate-900">King of the Pitch</h1>
                 <p className="text-xs text-slate-500">Premier Tournaments</p>
