@@ -1,4 +1,4 @@
-// src/Pages/Sponsors.jsx (New Redesigned Version with Live Data - COMPLETE)
+// src/Pages/Sponsors.jsx (Corrected - Duplicate components removed)
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
@@ -7,49 +7,68 @@ import { Eye, Heart, Star, Send, Building2, Trophy, Users } from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
 import { Button } from "@/Components/ui/button";
-import { Sponsor } from "@/Entities/all"; // <-- IMPORT our Sponsor entity
-import { supabase } from "@/supabaseClient"; // <-- IMPORT supabase for the contact form
+import { Sponsor } from "@/Entities/all";
+import { supabase } from "@/supabaseClient";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const BUCKET_NAME = 'tournament-gallery';
 const STORAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/`;
 
-// --- These are the beautiful sub-components from your new design. They remain unchanged. ---
-const ValueCard = ({ icon: Icon, title, description, delay }) => { /* ... (Unchanged) ... */ };
-const SponsorTier = ({ tier, sponsors, index }) => { /* ... (Unchanged) ... */ };
+const ValueCard = ({ icon: Icon, title, description, delay }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay }} className="text-center">
+      <div className="bg-[#FF6B00]/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#FF6B00]/20 transition-colors"><Icon className="w-10 h-10 text-[#FF6B00]" /></div>
+      <h3 className="headline-font text-2xl text-white mb-4">{title}</h3>
+      <p className="text-gray-400 leading-relaxed">{description}</p>
+    </motion.div>
+  );
+};
+
+const SponsorTier = ({ tier, sponsors, index }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay: index * 0.2 }} className="mb-12">
+      <div className="text-center mb-8">
+        <h3 className="headline-font text-3xl md:text-4xl text-white mb-2">{tier}</h3>
+        <div className="w-24 h-1 bg-[#FF6B00] mx-auto"></div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {sponsors.map((sponsor) => (
+          <a href={sponsor.website} target="_blank" rel="noopener noreferrer" key={sponsor.id} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 flex items-center justify-center hover:border-[#FF6B00]/50 transition-all duration-300 group">
+            <img src={`${STORAGE_BASE_URL}${sponsor.logo_url}`} alt={sponsor.name} className="max-w-full max-h-16 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" />
+          </a>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
 
 export default function Sponsors() {
-  // --- TRANSPLANTED LOGIC: State for the contact form ---
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-
-  // --- TRANSPLANTED LOGIC: State for live sponsor data ---
   const [sponsorTiers, setSponsorTiers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- TRANSPLANTED LOGIC: Fetching and processing live sponsor data ---
   useEffect(() => {
     const loadSponsors = async () => {
       setLoading(true);
       try {
-        const data = await Sponsor.getAll(); // Using a generic getAll for simplicity
-        
-        // Group sponsors by tier
+        const data = await Sponsor.getAll(); 
         const tiers = {
           1: { name: 'TITLE PARTNERS', sponsors: [] },
           2: { name: 'PLATINUM PARTNERS', sponsors: [] },
           3: { name: 'COMMUNITY PARTNERS', sponsors: [] },
         };
-        
         data.forEach(sponsor => {
           if (tiers[sponsor.tier]) {
             tiers[sponsor.tier].sponsors.push(sponsor);
           }
         });
-
         setSponsorTiers(Object.values(tiers).filter(t => t.sponsors.length > 0));
-
       } catch (err) {
         console.error("Error fetching sponsors:", err);
       } finally {
@@ -59,7 +78,6 @@ export default function Sponsors() {
     loadSponsors();
   }, []);
 
-  // --- TRANSPLANTED LOGIC: The working contact form handler ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -73,13 +91,18 @@ export default function Sponsors() {
       setError('Message could not be sent. Please try again later.');
     } else {
       setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 5000); // Reset after 5 seconds
+      setFormData({ name: "", email: "", message: "" }); // Clear form on success
+      setTimeout(() => setSubmitted(false), 5000);
     }
   };
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const partnershipValues = [ /* ... (Static data remains) ... */ ];
+  const partnershipValues = [
+    { icon: Eye, title: "UNMATCHED VISIBILITY", description: "Your brand showcased across all our tournaments, academy sessions, and digital platforms." },
+    { icon: Heart, title: "AUTHENTIC CONNECTION", description: "Associate with a movement that's genuinely transforming Western Sydney's youth through sport." },
+    { icon: Star, title: "ASSOCIATE WITH GREATNESS", description: "Align your brand with excellence, competition, and the champions of tomorrow." }
+  ];
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
@@ -107,10 +130,15 @@ export default function Sponsors() {
       </section>
 
       <section className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]">
-        {/* ... (Impact Stats remain unchanged) ... */}
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-8 text-center"><Trophy className="w-12 h-12 text-[#FF6B00] mx-auto mb-4" /><div className="headline-font text-5xl text-white mb-2">50+</div><p className="text-gray-400">Tournaments Hosted</p></motion.div>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-8 text-center"><Users className="w-12 h-12 text-[#FF6B00] mx-auto mb-4" /><div className="headline-font text-5xl text-white mb-2">5,000+</div><p className="text-gray-400">Active Players</p></motion.div>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-8 text-center"><Eye className="w-12 h-12 text-[#FF6B00] mx-auto mb-4" /><div className="headline-font text-5xl text-white mb-2">100K+</div><p className="text-gray-400">Social Media Reach</p></motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* --- INTEGRATED: This section now displays live sponsor data --- */}
       <section className="py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
@@ -118,7 +146,6 @@ export default function Sponsors() {
             <div className="w-32 h-1 bg-[#FF6B00] mx-auto mb-6"></div>
             <p className="text-gray-400 text-xl">Thank you to our valued partners who support the kingdom</p>
           </motion.div>
-
           {loading ? (
             <p className="text-center text-gray-400">Loading partners...</p>
           ) : sponsorTiers.length > 0 ? (
@@ -131,7 +158,6 @@ export default function Sponsors() {
         </div>
       </section>
 
-      {/* --- INTEGRATED: This contact form is now fully functional --- */}
       <section className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]">
         <div className="max-w-3xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
@@ -166,36 +192,3 @@ export default function Sponsors() {
     </div>
   );
 }
-
-// NOTE: These components from your new design are included for completeness.
-const ValueCard = ({ icon: Icon, title, description, delay }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay }} className="text-center">
-      <div className="bg-[#FF6B00]/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 group-hover:bg-[#FF6B00]/20 transition-colors"><Icon className="w-10 h-10 text-[#FF6B00]" /></div>
-      <h3 className="headline-font text-2xl text-white mb-4">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{description}</p>
-    </motion.div>
-  );
-};
-
-const SponsorTier = ({ tier, sponsors, index }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay: index * 0.2 }} className="mb-12">
-      <div className="text-center mb-8">
-        <h3 className="headline-font text-3xl md:text-4xl text-white mb-2">{tier}</h3>
-        <div className="w-24 h-1 bg-[#FF6B00] mx-auto"></div>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-        {sponsors.map((sponsor) => (
-          <a href={sponsor.website} target="_blank" rel="noopener noreferrer" key={sponsor.id} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 flex items-center justify-center hover:border-[#FF6B00]/50 transition-all duration-300 group">
-            <img src={`${STORAGE_BASE_URL}${sponsor.logo_url}`} alt={sponsor.name} className="max-w-full max-h-16 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" />
-          </a>
-        ))}
-      </div>
-    </motion.div>
-  );
-};
