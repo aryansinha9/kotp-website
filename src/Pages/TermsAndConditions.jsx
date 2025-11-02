@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FileText, AlertCircle, Shield, Users, CreditCard, Scale } from "lucide-react";
+import { FileText, AlertCircle, Shield, Users, CreditCard, Scale, Camera } from "lucide-react";
 
 const Section = ({ icon: Icon, title, children }) => {
   return (
