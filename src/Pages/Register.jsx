@@ -1,28 +1,27 @@
-// src/Pages/Register.jsx
+// src/Pages/Register.jsx (New Redesigned Version with Live Payment Logic - COMPLETE)
 
-// --- THE ONLY FIX: Corrected a typo from 'auseState' to 'useState' in the line below ---
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Tournament } from '@/Entities/all';
-import { Button } from '@/Components/ui/button';
+import { motion } from 'framer-motion';
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { Crown, User, Mail, Phone, Users, CheckCircle, AlertCircle } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import { Checkbox } from "@/Components/ui/checkbox"
-import { Loader2, AlertTriangle } from 'lucide-react';
-import { format } from 'date-fns';
+import { Button } from '@/Components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Checkbox } from '@/Components/ui/checkbox';
+import { Tournament } from '@/Entities/all';
 import { supabase } from '@/supabaseClient';
+import { format } from 'date-fns';
 
 export default function Register() {
+  // --- TRANSPLANTED LOGIC: All hooks from our old, working component ---
   const { tournamentId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [agreed, setAgreed] = useState(false);
-
   const [formData, setFormData] = useState({
     team_name: '',
     contact_person: '',
@@ -31,22 +30,22 @@ export default function Register() {
     division: '',
   });
 
+  // --- TRANSPLANTED LOGIC: Fetching tournament data from Supabase ---
   useEffect(() => {
     if (searchParams.get('status') === 'cancelled') {
-      setError('Your registration was cancelled. Feel free to try again.');
+      setError('Your payment was cancelled. Please try again.');
     }
-
     const fetchTournament = async () => {
       try {
         setLoading(true);
         const data = await Tournament.getById(tournamentId);
-        if (data) { 
-          setTournament(data); 
-        } else { 
-          setError(`Tournament with ID #${tournamentId} could not be found.`); 
+        if (data) {
+          setTournament(data);
+        } else {
+          setError(`Tournament with ID #${tournamentId} could not be found.`);
         }
       } catch (err) {
-        setError('Failed to load tournament details.'); 
+        setError('Failed to load tournament details.');
         console.error(err);
       } finally {
         setLoading(false);
@@ -55,9 +54,11 @@ export default function Register() {
     fetchTournament();
   }, [tournamentId, searchParams]);
 
-  const handleInputChange = (e) => { const { id, value } = e.target; setFormData(prev => ({ ...prev, [id]: value })); };
-  const handleSelectChange = (id, value) => { setFormData(prev => ({ ...prev, [id]: value })); };
+  const handleChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
+  // --- TRANSPLANTED LOGIC: The working handleSubmit function that calls our Stripe function ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!agreed) {
@@ -66,33 +67,28 @@ export default function Register() {
     }
     setSubmitting(true);
     setError('');
-
     const registrationPayload = {
       tournamentId: tournamentId,
       teamName: formData.team_name,
       contactPerson: formData.contact_person,
       email: formData.email,
       phone: formData.phone,
-      ageGroup: formData.division, 
+      ageGroup: formData.division,
     };
-    
     const { data, error: invokeError } = await supabase.functions.invoke(
       'create-stripe-checkout',
       { body: registrationPayload }
     );
-
     if (invokeError) {
       setError(`Could not contact payment server: ${invokeError.message}`);
       setSubmitting(false);
       return;
     }
-
     if (data.error) {
       setError(`Payment initialization failed: ${data.error}`);
       setSubmitting(false);
       return;
     }
-    
     if (data.url) {
       window.location.href = data.url;
     } else {
@@ -101,68 +97,82 @@ export default function Register() {
     }
   };
 
-  if (loading) { return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-amber-500" /></div>; }
-  
-  if (!tournament) { return ( <div className="min-h-screen flex items-center justify-center text-center bg-slate-50 px-4"><div><AlertTriangle className="w-24 h-24 text-red-500 mx-auto mb-6" /><h1 className="text-4xl font-bold text-slate-800 mb-4">Tournament Not Found</h1><p className="text-lg text-slate-600 mb-8">{error || `We couldn't find the tournament you're looking for.`}</p><Link to="/tournaments"><Button>View All Tournaments</Button></Link></div></div>); }
+  // --- Render a simple loading/error state if tournament data isn't ready ---
+  if (loading) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><p className="text-gray-400">Loading Tournament...</p></div>;
+  }
+  if (!tournament) {
+    return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-center px-4"><div className="text-white"><AlertCircle className="w-12 h-12 text-[#FF6B00] mx-auto mb-4" /><h1 className="headline-font text-3xl">Tournament Not Found</h1><p className="text-gray-400 mt-2">{error}</p></div></div>;
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg-px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <p className="text-amber-600 font-semibold">Registering for</p>
-          <h1 className="text-4xl font-bold text-slate-900 mt-2">{tournament.name}</h1>
-          <p className="text-lg text-slate-500 mt-3">
-            {format(new Date(tournament.start_date), 'MMM d, yyyy')} • {tournament.venue}
-          </p>
-          <p className="text-2xl font-bold text-slate-700 mt-4">
-            Entry Fee: ${tournament.entry_fee}
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label htmlFor="team_name" className="block text-sm font-medium text-slate-700 mb-1">Team Name</label><Input id="team_name" value={formData.team_name} onChange={handleInputChange} required /></div>
-                <div><label htmlFor="contact_person" className="block text-sm font-medium text-slate-700 mb-1">Contact Person</label><Input id="contact_person" value={formData.contact_person} onChange={handleInputChange} required /></div>
-                <div><label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Contact Email</label><Input id="email" type="email" value={formData.email} onChange={handleInputChange} required /></div>
-                <div><label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">Contact Phone</label><Input id="phone" type="tel" value={formData.phone} onChange={handleInputChange} required /></div>
-                <div>
-                    <label htmlFor="division" className="block text-sm font-medium text-slate-700 mb-1">Division</label>
-                    <Select onValueChange={(value) => handleSelectChange('division', value)} required>
-                        <SelectTrigger><SelectValue placeholder="Select a division" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Div 1">Division 1</SelectItem>
-                            <SelectItem value="Div 2">Division 2</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+    <div className="min-h-screen bg-[#0a0a0a] py-24 px-4">
+      <div className="max-w-4xl mx-auto mb-12">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
+          <div className="bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <Crown className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="headline-font text-5xl md:text-7xl text-white mb-4 text-glow">CLAIM YOUR CROWN</h1>
+          <p className="text-gray-400 text-xl">Registering for: <span className="text-white font-semibold">{tournament.name}</span></p>
+          <p className="headline-font text-3xl text-[#FF6B00] mt-2">Fee: ${tournament.entry_fee}</p>
+        </motion.div>
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-4xl mx-auto">
+        <form onSubmit={handleSubmit} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-8 md:p-12">
+          <div className="space-y-6">
+            <div>
+              <h2 className="headline-font text-3xl text-white mb-2">REGISTRATION DETAILS</h2>
+              <p className="text-gray-400">Enter your team and contact information.</p>
             </div>
 
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox id="terms" onCheckedChange={setAgreed} />
-              <label
-                htmlFor="terms"
-                className="text-sm font-medium leading-none text-slate-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6B00]" />TEAM NAME *</label>
+                <Input value={formData.team_name} onChange={(e) => handleChange("team_name", e.target.value)} required className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12" placeholder="Your team name" />
+              </div>
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm flex items-center gap-2"><User className="w-4 h-4 text-[#FF6B00]" />CONTACT PERSON *</label>
+                <Input value={formData.contact_person} onChange={(e) => handleChange("contact_person", e.target.value)} required className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12" placeholder="Your full name" />
+              </div>
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm flex items-center gap-2"><Mail className="w-4 h-4 text-[#FF6B00]" />EMAIL *</label>
+                <Input type="email" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} required className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12" placeholder="your@email.com" />
+              </div>
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm flex items-center gap-2"><Phone className="w-4 h-4 text-[#FF6B00]" />PHONE *</label>
+                <Input type="tel" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} required className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12" placeholder="Phone number" />
+              </div>
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6B00]" />DIVISION *</label>
+                <Select value={formData.division} onValueChange={(value) => handleChange("division", value)} required>
+                  <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12"><SelectValue placeholder="Select your division" /></SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-white/10">
+                    {tournament.age_groups?.map((group) => (<SelectItem key={group} value={group} className="text-white hover:bg-white/5">{group}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 pt-4">
+              <Checkbox id="terms" onCheckedChange={setAgreed} className="border-white/20" />
+              <label htmlFor="terms" className="text-sm text-gray-400">
                 I have read and agree to the&nbsp;
-                <Link to="/terms-and-conditions" target="_blank" className="underline text-amber-600 hover:text-amber-700">
-                  Terms & Conditions
-                </Link>
+                <Link to="/terms-and-conditions" target="_blank" className="underline text-[#FF6B00] hover:text-orange-400">Terms & Conditions</Link>
                 &nbsp;and&nbsp;
-                <Link to="/privacy-policy" target="_blank" className="underline text-amber-600 hover:text-amber-700">
-                  Privacy Policy
-                </Link>.
+                <Link to="/privacy-policy" target="_blank" className="underline text-[#FF6B00] hover:text-orange-400">Privacy Policy</Link>.
               </label>
             </div>
-            
-            {error && (<div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3"><AlertTriangle className="w-5 h-5" /><p>{error}</p></div>)}
-            
-            <div>
-              <Button type="submit" size="lg" className="w-full btn-accent font-semibold text-lg" disabled={submitting || !agreed}>
-                {submitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                {submitting ? 'Redirecting...' : `Proceed to Payment`}
-              </Button>
-            </div>
+            {error && (<p className="text-red-500 text-sm text-center">{error}</p>)}
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <Button type="submit" disabled={submitting || !agreed} className="w-full kotp-button bg-[#FF6B00] text-white py-6 rounded-md headline-font text-lg tracking-wider hover:scale-105 transition-transform duration-300 disabled:opacity-50">
+              {submitting ? "REDIRECTING TO PAYMENT..." : "PROCEED TO PAYMENT"}
+            </Button>
+          </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
