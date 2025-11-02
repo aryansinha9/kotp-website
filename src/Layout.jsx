@@ -1,4 +1,4 @@
-// src/Layout.jsx (New Redesigned Version - COMPLETE)
+// src/Layout.jsx (with Admin Login link in footer)
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -128,6 +128,8 @@ export default function Layout({ children }) {
                 <Link to="/privacy-policy" className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors">PRIVACY POLICY</Link>
                 <Link to="/terms-and-conditions" className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors">TERMS & CONDITIONS</Link>
                 <Link to="/contact" className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors">CONTACT US</Link>
+                {/* --- THIS IS THE NEW LINK --- */}
+                <Link to="/admin" className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors">ADMIN LOGIN</Link>
               </div>
             </div>
           </div>
