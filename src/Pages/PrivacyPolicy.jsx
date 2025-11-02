@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Shield, Lock, Eye, Database, UserCheck, FileText } from "lucide-react";
+import { Shield, Lock, Eye, Database, UserCheck, FileText, Users } from "lucide-react";
 
 const Section = ({ icon: Icon, title, children }) => {
   return (
