@@ -1,30 +1,100 @@
-// REPLACE THE CONTENTS OF: src/Pages/Tournaments.jsx
+// src/Pages/Tournaments.jsx (New Redesigned Version with Live Data - COMPLETE)
 
-import React, { useState, useEffect } from "react";
-import { Tournament } from "@/Entities/all";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Search, Filter, Trophy, XCircle } from "lucide-react";
-import TournamentCard from "../Components/Home/TournamentCard"; // Re-using the card from the home page
+import React, { useState, useRef, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Trophy, Calendar, MapPin, Users, Crown, Medal, Award } from "lucide-react";
+import { Tournament } from "@/Entities/all"; // <-- IMPORT our Tournament entity
+import { format } from "date-fns"; // <-- IMPORT date-fns for formatting dates
+
+// --- Construct the base URL for your Supabase storage ---
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const BUCKET_NAME = 'tournament-gallery';
+const STORAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/`;
+
+// --- This is the new TournamentCard component from your redesign ---
+// I've modified it to accept live data and link correctly.
+const TournamentCard = ({ tournament, index }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  // --- Data Transformation: Map Supabase data to the card's expected props ---
+  const cardData = {
+    name: tournament.name,
+    // Format the date range nicely
+    date: `${format(new Date(tournament.start_date), "MMMM d")} - ${format(new Date(tournament.end_date), "d, yyyy")}`,
+    location: tournament.venue,
+    // Join the array of age groups into a string
+    divisions: tournament.age_groups.join(', '),
+    // The design uses "prize", we'll display the entry fee here for now.
+    prize: tournament.entry_fee,
+    // Construct the full image URL from the path in the database
+    image: tournament.hero_image_path 
+      ? `${STORAGE_BASE_URL}${tournament.hero_image_path}`
+      : "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=2000", // Fallback image
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative bg-[#1a1a1a] border border-white/10 rounded-lg overflow-hidden hover:border-[#FF6B00] transition-all duration-300 flex flex-col"
+    >
+      <div className="relative h-48 overflow-hidden">
+        <img src={cardData.image} alt={cardData.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+      </div>
+
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="headline-font text-2xl text-white mb-4 group-hover:text-[#FF6B00] transition-colors">
+          {cardData.name}
+        </h3>
+        <div className="space-y-3 mb-6 flex-grow">
+          <div className="flex items-center gap-3 text-gray-400"><Calendar className="w-5 h-5 text-[#FF6B00]" /><span>{cardData.date}</span></div>
+          <div className="flex items-center gap-3 text-gray-400"><MapPin className="w-5 h-5 text-[#FF6B00]" /><span>{cardData.location}</span></div>
+          <div className="flex items-center gap-3 text-gray-400"><Users className="w-5 h-5 text-[#FF6B00]" /><span>{cardData.divisions}</span></div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-[#FF6B00] headline-font text-xl">${cardData.prize}</div>
+          {/* --- FUNCTIONALITY: This button now links to the correct registration page --- */}
+          <Link to={`/register/${tournament.id}`}>
+            <button className="kotp-button bg-[#FF6B00] text-white px-6 py-2 rounded-md headline-font text-sm tracking-wider hover:scale-105 transition-transform duration-300">
+              REGISTER
+            </button>
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- Hall of Fame component remains static for now, as we don't have this data in Supabase yet ---
+const HallOfFameCard = ({ winner, index }) => { /* ... (Unchanged from your file) ... */ };
 
 export default function Tournaments() {
-  const [allTournaments, setAllTournaments] = useState([]);
-  const [filteredTournaments, setFilteredTournaments] = useState([]);
+  // --- TRANSPLANTED LOGIC: State for live data ---
+  const [upcomingTournaments, setUpcomingTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("upcoming");
 
+  // --- STATIC DATA: This is from your new design, we'll keep it for now ---
+  const hallOfFame = [
+    { tournament: "2024 Summer Crown", team: "Western Warriors", year: "2024", image: "..." },
+    { tournament: "2024 Spring Classic", team: "Sydney Strikers", year: "2024", image: "..." },
+    { tournament: "2023 Championship", team: "Parramatta Kings", year: "2023", image: "..." },
+    { tournament: "2023 Winter Cup", team: "Blacktown Legends", year: "2023", image: "..." }
+  ];
+
+  // --- TRANSPLANTED LOGIC: Fetching live tournament data ---
   useEffect(() => {
     const loadTournaments = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        // This fetches all tournaments, not just upcoming ones
-        const data = await Tournament.list("-start_date"); 
-        setAllTournaments(data);
+        const data = await Tournament.filter({ status: 'upcoming' }, 'start_date');
+        setUpcomingTournaments(data);
       } catch (error) {
-        console.error("Error loading tournaments:", error);
+        console.error("Error fetching tournaments:", error);
       } finally {
         setLoading(false);
       }
@@ -32,91 +102,110 @@ export default function Tournaments() {
     loadTournaments();
   }, []);
 
-  // Effect to apply filters whenever the source data or filters change
-  useEffect(() => {
-    let result = allTournaments;
-
-    // Filter by search term
-    if (searchTerm) {
-      result = result.filter(t =>
-        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.venue.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter by active tab (status)
-    if (activeTab !== 'all') {
-      result = result.filter(t => t.status === activeTab);
-    }
-    
-    setFilteredTournaments(result);
-  }, [searchTerm, activeTab, allTournaments]);
-
-  const upcomingTournaments = allTournaments.filter(t => t.status === 'upcoming');
-  const ongoingTournaments = allTournaments.filter(t => t.status === 'ongoing');
-  const completedTournaments = allTournaments.filter(t => t.status === 'completed');
-
-  const clearFilters = () => {
-      setSearchTerm("");
-      setActiveTab("all");
-  }
-
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 uppercase tracking-wider">KOTP Tournaments</h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">Find your next challenge. Browse our upcoming, live, and past tournaments.</p>
+    <div className="relative min-h-screen">
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000" alt="Tournament" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
+        <div className="relative z-10 text-center px-4">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <Trophy className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
+            <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">BECOME A LEGEND.</h1>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>
+          </motion.div>
         </div>
+      </section>
 
-        {/* Filter Card */}
-        <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg"><Filter className="w-5 h-5" />Filter Tournaments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                <Input placeholder="Search by name or venue..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
-              </div>
-              <Button onClick={clearFilters} variant="outline"><XCircle className="w-4 h-4 mr-2" />Clear Filters</Button>
+      <section className="py-24 px-4 bg-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="mb-12">
+            <h2 className="headline-font text-5xl md:text-6xl text-white mb-4">UPCOMING TOURNAMENTS</h2>
+            <div className="w-32 h-1 bg-[#FF6B00]"></div>
+          </motion.div>
+
+          {/* --- INTEGRATED: This grid now displays live data from Supabase --- */}
+          {loading ? (
+            <p className="text-gray-400">Loading tournaments...</p>
+          ) : upcomingTournaments.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {upcomingTournaments.map((tournament, index) => (
+                <TournamentCard key={tournament.id} tournament={tournament} index={index} />
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            <p className="text-gray-400 text-center text-xl">No upcoming tournaments scheduled. Please check back soon!</p>
+          )}
+        </div>
+      </section>
 
-        {/* Tabs for Status */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm p-1 rounded-xl">
-            <TabsTrigger value="upcoming">Upcoming ({upcomingTournaments.length})</TabsTrigger>
-            <TabsTrigger value="ongoing">Live ({ongoingTournaments.length})</TabsTrigger>
-            <TabsTrigger value="completed">Completed ({completedTournaments.length})</TabsTrigger>
-            <TabsTrigger value="all">All ({allTournaments.length})</TabsTrigger>
-          </TabsList>
-
-          <div className="mt-8">
-            {loading ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map((i) => <div key={i} className="h-96 bg-slate-200 rounded-xl animate-pulse" />)}
-              </div>
-            ) : filteredTournaments.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* THIS IS THE LINE I FIXED */}
-                {filteredTournaments.map((tournament) => (
-                  <TournamentCard key={tournament.id} tournament={tournament} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <Trophy className="w-16 h-16 text-slate-300 mx-auto mb-6" />
-                <h3 className="text-2xl font-semibold text-slate-600 mb-2">No tournaments found</h3>
-                <p className="text-slate-500">Try adjusting your search or clearing the filters.</p>
-              </div>
-            )}
+      {/* --- The rest of the page remains the same, using static data for now --- */}
+      <section className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]">
+        <div className="max-w-7xl mx-auto">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-12">
+            <Award className="w-16 h-16 text-[#FF6B00] mx-auto mb-6" />
+            <h2 className="headline-font text-5xl md:text-6xl text-white mb-4">HALL OF FAME</h2>
+            <p className="text-gray-400 text-xl">Celebrating our champions</p>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {hallOfFame.map((winner, index) => ( <HallOfFameCard key={index} winner={winner} index={index} /> ))}
           </div>
-        </Tabs>
-      </div>
+        </div>
+      </section>
+      
+      <section className="py-24 px-4 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+            <h2 className="headline-font text-5xl md:text-7xl text-white mb-6">YOUR TIME IS NOW</h2>
+            <p className="text-gray-400 text-xl mb-8">Don't miss your chance to compete against the best</p>
+            <Link to="/tournaments">
+              <button className="kotp-button bg-[#FF6B00] text-white px-12 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
+                REGISTER FOR NEXT TOURNAMENT
+              </button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
+
+// NOTE: I've included the HallOfFameCard component here for completeness, as it was in your original file.
+const HallOfFameCard = ({ winner, index }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative bg-[#1a1a1a] rounded-lg overflow-hidden hover:shadow-xl hover:shadow-[#FF6B00]/20 transition-all duration-300"
+    >
+      <div className="relative h-80 overflow-hidden">
+        <img
+          src={winner.image}
+          alt={winner.tournament}
+          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        
+        <div className="absolute top-4 left-4">
+          <div className="bg-[#FF6B00] rounded-full p-3">
+            <Crown className="w-6 h-6 text-white" />
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="text-xs text-gray-400 mb-1">{winner.year}</div>
+          <h3 className="headline-font text-2xl text-white mb-2">
+            {winner.tournament}
+          </h3>
+          <div className="flex items-center gap-2">
+            <Medal className="w-5 h-5 text-[#FF6B00]" />
+            <span className="text-gray-300">{winner.team}</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
