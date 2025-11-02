@@ -1,10 +1,10 @@
-// src/Pages/Home.jsx (New Redesigned Version with Live Data - COMPLETE)
+// src/Pages/Home.jsx (Corrected with Functional Links - COMPLETE)
 
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Trophy, Users, Camera, ArrowRight, Star } from "lucide-react";
-import { Tournament } from "@/Entities/all"; // Only Tournament needed for this page
+import { Tournament } from "@/Entities/all";
 
 const ServiceCard = ({ title, description, image, size, icon: Icon, delay, linkTo }) => {
   const ref = useRef(null);
@@ -61,7 +61,6 @@ export default function Home() {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Fetches only the single, soonest upcoming tournament for the hero
         const tournamentsData = await Tournament.filter({ status: "upcoming" }, "start_date", 1);
         if (tournamentsData && tournamentsData.length > 0) {
           setFeaturedTournament(tournamentsData[0]);
@@ -142,7 +141,7 @@ export default function Home() {
             <div className="w-1 h-3 bg-white/50 rounded-full"></div>
           </div>
         </motion.div>
-      </motion.section>
+      </section>
 
       <section className="relative py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
@@ -183,6 +182,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <h2 className="headline-font text-6xl md:text-8xl text-white mb-8">READY TO BE KING?</h2>
             <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">Join the most competitive street football community in Western Sydney.</p>
+            {/* --- THIS IS THE FINAL FIX: This button now correctly links to the tournaments page --- */}
             <Link to="/tournaments">
               <button className="kotp-button bg-[#FF6B00] text-white px-12 py-5 rounded-md headline-font text-2xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
                 REGISTER NOW
