@@ -1,4 +1,4 @@
-// src/Pages/Contact.jsx (New Redesigned Version with Live Form Logic - COMPLETE)
+// src/Pages/Contact.jsx (Corrected - Duplicate component removed)
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
@@ -9,7 +9,7 @@ import { Button } from "@/Components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { supabase } from "@/supabaseClient"; // <-- IMPORT supabase for the contact form
+import { supabase } from "@/supabaseClient";
 
 // Fix for default marker icons in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -18,12 +18,25 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
-const customIcon = new L.Icon({ /* ... (icon config unchanged) ... */ });
+const customIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+});
 
-const InfoCard = ({ icon: Icon, title, content, delay }) => { /* ... (Unchanged) ... */ };
+const InfoCard = ({ icon: Icon, title, content, delay }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group">
+      <div className="bg-[#FF6B00]/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4 group-hover:bg-[#FF6B00]/20 transition-colors"><Icon className="w-7 h-7 text-[#FF6B00]" /></div>
+      <h3 className="headline-font text-xl text-white mb-2">{title}</h3>
+      <p className="text-gray-400 leading-relaxed">{content}</p>
+    </motion.div>
+  );
+};
 
 export default function Contact() {
-  // --- TRANSPLANTED LOGIC: State for the functional contact form ---
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -31,22 +44,19 @@ export default function Contact() {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // --- TRANSPLANTED LOGIC: The working handleSubmit function ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     const payload = { ...formData, subject: `KOTP Contact Form: ${formData.name}` };
 
-    const { error: invokeError } = await supabase.functions.invoke('contact-form-handler', {
-      body: JSON.stringify(payload),
-    });
+    const { error: invokeError } = await supabase.functions.invoke('contact-form-handler', { body: JSON.stringify(payload) });
 
     if (invokeError) {
       setError('Your message could not be sent. Please try again later.');
     } else {
       setSubmitted(true);
-      setFormData({ name: "", email: "", message: "" }); // Clear form
+      setFormData({ name: "", email: "", message: "" });
       setTimeout(() => setSubmitted(false), 5000);
     }
     setSubmitting(false);
@@ -56,7 +66,7 @@ export default function Contact() {
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
-      <style>{` /* ... (Leaflet styles unchanged) ... */ `}</style>
+      <style>{` .leaflet-container { background: #0a0a0a; } .leaflet-tile { filter: grayscale(100%) invert(100%) contrast(80%) brightness(0.7); } .leaflet-popup-content-wrapper { background: #1a1a1a; color: white; border: 1px solid rgba(255, 107, 0, 0.3); } .leaflet-popup-tip { background: #1a1a1a; } .leaflet-control-attribution { background: rgba(26, 26, 26, 0.8) !important; color: #666 !important; } .leaflet-control-attribution a { color: #FF6B00 !important; } `}</style>
 
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?q=80&w=2000" alt="Contact" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
@@ -88,8 +98,6 @@ export default function Contact() {
                 <h2 className="headline-font text-4xl md:text-5xl text-white mb-4">SEND US A MESSAGE</h2>
                 <div className="w-24 h-1 bg-[#FF6B00]"></div>
               </div>
-              
-              {/* --- INTEGRATED: This form is now fully functional --- */}
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -105,37 +113,50 @@ export default function Contact() {
                   <label className="block text-white mb-2 headline-font text-sm">MESSAGE *</label>
                   <Textarea name="message" value={formData.message} onChange={handleChange} required className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] min-h-[180px]" placeholder="Tell us what's on your mind..." />
                 </div>
-                
                 {error && <p className="text-red-500 text-sm">{error}</p>}
-
                 <Button type="submit" disabled={submitting || submitted} className="w-full kotp-button bg-[#FF6B00] text-white py-6 rounded-md headline-font text-lg tracking-wider hover:scale-105 transition-transform duration-300 disabled:opacity-50">
                   {submitted ? <><CheckCircle className="w-5 h-5 mr-2" /> MESSAGE SENT!</> : submitting ? "SENDING..." : <><Send className="w-5 h-5 mr-2" /> SEND MESSAGE</>}
                 </Button>
               </form>
             </motion.div>
-            
-            {/* ... (Map section is unchanged) ... */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-              {/* ... */}
+              <div className="mb-8">
+                <h2 className="headline-font text-4xl md:text-5xl text-white mb-4">FIND US HERE</h2>
+                <div className="w-24 h-1 bg-[#FF6B00]"></div>
+              </div>
+              <div className="relative h-[500px] rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#FF6B00]/50 transition-all duration-300">
+                <MapContainer center={position} zoom={15} style={{ height: "100%", width: "100%" }} scrollWheelZoom={false}>
+                  <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker position={position} icon={customIcon}>
+                    <Popup><div className="p-2"><p className="headline-font text-[#FF6B00] text-lg mb-1">KING OF THE PITCH</p><p className="text-sm text-gray-300">Parramatta Park<br />Western Sydney, NSW</p></div></Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+              <div className="mt-6 bg-[#1a1a1a] border border-white/10 rounded-lg p-6">
+                <h3 className="headline-font text-xl text-white mb-3">DIRECTIONS</h3>
+                <p className="text-gray-400 mb-4">Located in the heart of Western Sydney, easily accessible by car or public transport.</p>
+                <div className="flex flex-wrap gap-3">
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=Parramatta+Park+NSW" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#FF6B00]/10 border border-[#FF6B00]/30 text-[#FF6B00] px-4 py-2 rounded-md hover:bg-[#FF6B00]/20 transition-colors">
+                    <MapPin className="w-4 h-4" /><span className="headline-font text-sm">GET DIRECTIONS</span>
+                  </a>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
-      
-      {/* ... (Social media section is unchanged) ... */}
+
+      <section className="py-24 px-4 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+            <h2 className="headline-font text-4xl md:text-5xl text-white mb-6">FOLLOW THE KINGDOM</h2>
+            <p className="text-gray-400 text-lg mb-8">Stay updated with the latest news, highlights, and tournament announcements</p>
+            <div className="flex justify-center gap-6">
+              {/* Social links can be updated here */}
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
-
-// NOTE: InfoCard is included here for completeness.
-const InfoCard = ({ icon: Icon, title, content, delay }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }} transition={{ duration: 0.6, delay }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group">
-      <div className="bg-[#FF6B00]/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4 group-hover:bg-[#FF6B00]/20 transition-colors"><Icon className="w-7 h-7 text-[#FF6B00]" /></div>
-      <h3 className="headline-font text-xl text-white mb-2">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{content}</p>
-    </motion.div>
-  );
-};
