@@ -1,4 +1,4 @@
-// src/Pages/AdminDashboard.jsx (Corrected with missing Select import)
+// src/Pages/AdminDashboard.jsx (New Redesigned Version with Live Data)
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,21 +7,40 @@ import { Registration, FeaturedReel, Tournament, MediaItem } from '@/Entities/al
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, CheckCircle, AlertCircle, Image as ImageIcon, Video } from "lucide-react";
 import { format } from 'date-fns';
-// --- THIS IS THE FIX: Added the missing import for the Select component ---
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
+// --- STYLED HELPER COMPONENTS ---
+const Section = ({ icon: Icon, title, count, defaultOpen = false, children }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg overflow-hidden">
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors">
+        <div className="flex items-center gap-4">
+          <div className="bg-[#FF6B00]/10 rounded-lg p-3"><Icon className="w-6 h-6 text-[#FF6B00]" /></div>
+          <div className="text-left"><h2 className="headline-font text-2xl text-white">{title} {count !== undefined && `(${count})`}</h2></div>
+        </div>
+        {isOpen ? <ChevronUp className="w-6 h-6 text-gray-400" /> : <ChevronDown className="w-6 h-6 text-gray-400" />}
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+            <div className="p-6 border-t border-white/10">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
-// --- Styled Helper Components (No changes here) ---
-const Section = ({ icon: Icon, title, count, defaultOpen = false, children }) => { /* ... */ };
-const StyledTable = ({ headers, children }) => { /* ... */ };
-const StyledTableRow = ({ children }) => { /* ... */ };
-const StyledTableCell = ({ children, className = '' }) => { /* ... */ };
-const StyledButton = ({ children, disabled, ...props }) => { /* ... */ };
-const StyledTextarea = (props) => { /* ... */ };
+const StyledTable = ({ headers, children }) => ( <div className="overflow-x-auto"><table className="w-full text-sm text-left text-gray-300"><thead className="bg-[#0a0a0a] uppercase text-xs text-gray-400 headline-font tracking-wider"><tr>{headers.map(h => <th key={h} scope="col" className="px-6 py-3 whitespace-nowrap">{h}</th>)}</tr></thead><tbody>{children}</tbody></table></div> );
+const StyledTableRow = ({ children }) => <tr className="border-b border-white/10 hover:bg-white/5 transition-colors">{children}</tr>;
+const StyledTableCell = ({ children, className = '' }) => <td className={`px-6 py-4 whitespace-nowrap ${className}`}>{children}</td>;
+const StyledButton = ({ children, disabled, ...props }) => <button {...props} disabled={disabled} className={`w-full kotp-button bg-[#FF6B00] text-white py-4 rounded-md headline-font text-lg tracking-wider hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center ${props.className}`}>{children}</button>;
+const StyledTextarea = (props) => <textarea {...props} className={`w-full bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] focus:ring-0 rounded-md p-4 min-h-[120px] font-mono text-sm ${props.className}`} />;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  // All state and handler functions remain the same
+  // --- TRANSPLANTED: All state from our old, functional dashboard ---
   const [registrations, setRegistrations] = useState([]);
   const [reels, setReels] = useState([]);
   const [tournaments, setTournaments] = useState([]);
@@ -34,6 +53,7 @@ export default function AdminDashboard() {
   const [submittingReel, setSubmittingReel] = useState(false);
   const [reelMessage, setReelMessage] = useState({ type: "", text: "" });
 
+  // --- TRANSPLANTED: All data fetching and handler functions ---
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -81,10 +101,7 @@ export default function AdminDashboard() {
     if (error) { setReelMessage({ type: "error", text: `Failed to add reel: ${error.message}` }); } 
     else {
       setReelMessage({ type: "success", text: "Reel added successfully!" });
-      setNewReelEmbedCode(''); 
-      // Manually update state to avoid full reload, just an example
-      const updatedReels = await FeaturedReel.list();
-      setReels(updatedReels);
+      setNewReelEmbedCode(''); await loadData();
       setTimeout(() => setReelMessage({ type: "", text: "" }), 5000);
     }
     setSubmittingReel(false);
@@ -94,12 +111,7 @@ export default function AdminDashboard() {
     if (window.confirm("Are you sure you want to delete this reel?")) {
       const { error } = await FeaturedReel.deleteById(reelId);
       if (error) { setReelMessage({ type: "error", text: `Failed to delete reel: ${error.message}` }); }
-      else { 
-        setReelMessage({ type: "success", text: "Reel deleted."}); 
-        // Manually update state
-        setReels(reels.filter(r => r.id !== reelId));
-        setTimeout(() => setReelMessage({ type: "", text: "" }), 3000);
-      }
+      else { setReelMessage({ type: "success", text: "Reel deleted."}); await loadData(); setTimeout(() => setReelMessage({ type: "", text: "" }), 3000); }
     }
   };
 
