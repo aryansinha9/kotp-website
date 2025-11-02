@@ -1,4 +1,4 @@
-// src/Pages/Home.jsx (Corrected with Functional Links - COMPLETE)
+// src/Pages/Home.jsx (Corrected - Mismatched tag fixed)
 
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,13 +11,7 @@ const ServiceCard = ({ title, description, image, size, icon: Icon, delay, linkT
   const isInView = useInView(ref, { once: true });
   return (
     <Link to={linkTo}>
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-        transition={{ duration: 0.6, delay }}
-        className={`relative group overflow-hidden rounded-lg ${ size === "large" ? "col-span-full lg:col-span-2 lg:row-span-2" : "col-span-full lg:col-span-1" }`}
-      >
+      <motion.div ref={ref} initial={{ opacity: 0, y: 50 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }} transition={{ duration: 0.6, delay }} className={`relative group overflow-hidden rounded-lg ${ size === "large" ? "col-span-full lg:col-span-2 lg:row-span-2" : "col-span-full lg:col-span-1" }`}>
         <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
           <img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
@@ -99,49 +93,31 @@ export default function Home() {
           <img src={heroImageUrl} alt="Football Action" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/60"></div>
         </motion.div>
-
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5 }}>
-            {loading ? (
-              <div className="h-24 w-full max-w-4xl bg-white/10 rounded-lg mx-auto animate-pulse"></div>
-            ) : featuredTournament ? (
+            {loading ? ( <div className="h-24 w-full max-w-4xl bg-white/10 rounded-lg mx-auto animate-pulse"></div> ) : featuredTournament ? (
               <>
-                <h1 className="headline-font text-6xl md:text-8xl lg:text-9xl text-white mb-6 text-glow">
-                  {featuredTournament.name}
-                </h1>
-                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                  {featuredTournament.description}
-                </p>
+                <h1 className="headline-font text-6xl md:text-8xl lg:text-9xl text-white mb-6 text-glow">{featuredTournament.name}</h1>
+                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">{featuredTournament.description}</p>
                 <Link to={`/register/${featuredTournament.id}`}>
-                  <button className="kotp-button bg-[#FF6B00] text-white px-10 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
-                    REGISTER YOUR TEAM
-                  </button>
+                  <button className="kotp-button bg-[#FF6B00] text-white px-10 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">REGISTER YOUR TEAM</button>
                 </Link>
               </>
             ) : (
               <>
-                <h1 className="headline-font text-6xl md:text-8xl lg:text-9xl text-white mb-6 text-glow">
-                  THIS IS OUR KINGDOM.
-                </h1>
-                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                  Western Sydney's Premier Street Football Experience
-                </p>
+                <h1 className="headline-font text-6xl md:text-8xl lg:text-9xl text-white mb-6 text-glow">THIS IS OUR KINGDOM.</h1>
+                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">Western Sydney's Premier Street Football Experience</p>
                 <Link to="/tournaments">
-                  <button className="kotp-button bg-[#FF6B00] text-white px-10 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
-                    FIND YOUR TOURNAMENT
-                  </button>
+                  <button className="kotp-button bg-[#FF6B00] text-white px-10 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">FIND YOUR TOURNAMENT</button>
                 </Link>
               </>
             )}
           </motion.div>
         </div>
-        
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-3 bg-white/50 rounded-full"></div>
-          </div>
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2"><div className="w-1 h-3 bg-white/50 rounded-full"></div></div>
         </motion.div>
-      </section>
+      </motion.section>
 
       <section className="relative py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
@@ -157,40 +133,31 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-24 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5">
-          <div className="headline-font text-[20rem] text-white">KOTP</div>
-        </div>
+      <motion.section className="relative py-24 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-5"><div className="headline-font text-[20rem] text-white">KOTP</div></div>
         <div className="relative max-w-7xl mx-auto px-4">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
             <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">THE HYPE IS REAL.</h2>
             <p className="text-gray-400 text-xl">Hear from our champions</p>
           </motion.div>
           <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial} />
-            ))}
+            {testimonials.map((testimonial, index) => ( <TestimonialCard key={index} {...testimonial} /> ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="relative py-32 px-4 bg-[#0a0a0a]">
-        <div className="absolute inset-0 opacity-10">
-          <div className="headline-font text-[15rem] text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">KOTP</div>
-        </div>
+      <motion.section className="relative py-32 px-4 bg-[#0a0a0a]">
+        <div className="absolute inset-0 opacity-10"><div className="headline-font text-[15rem] text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">KOTP</div></div>
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <h2 className="headline-font text-6xl md:text-8xl text-white mb-8">READY TO BE KING?</h2>
             <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">Join the most competitive street football community in Western Sydney.</p>
-            {/* --- THIS IS THE FINAL FIX: This button now correctly links to the tournaments page --- */}
             <Link to="/tournaments">
-              <button className="kotp-button bg-[#FF6B00] text-white px-12 py-5 rounded-md headline-font text-2xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
-                REGISTER NOW
-              </button>
+              <button className="kotp-button bg-[#FF6B00] text-white px-12 py-5 rounded-md headline-font text-2xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">REGISTER NOW</button>
             </Link>
           </motion.div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
