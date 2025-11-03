@@ -1,4 +1,4 @@
-// src/Pages/AdminDashboard.jsx (FINAL - Redesigned with Live Score Panel)
+// src/Pages/AdminDashboard.jsx (FINAL, FULLY FUNCTIONAL VERSION)
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,24 +9,17 @@ import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
-// --- Helper Components ---
+// Helper Components (Section, StyledTable, etc.) remain the same
 const Section = ({ icon: Icon, title, count, defaultOpen = false, children }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg overflow-hidden">
       <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors">
-        <div className="flex items-center gap-4">
-          <div className="bg-[#FF6B00]/10 rounded-lg p-3"><Icon className="w-6 h-6 text-[#FF6B00]" /></div>
-          <div className="text-left"><h2 className="headline-font text-2xl text-white">{title} {count !== undefined && `(${count})`}</h2></div>
-        </div>
+        <div className="flex items-center gap-4"><div className="bg-[#FF6B00]/10 rounded-lg p-3"><Icon className="w-6 h-6 text-[#FF6B00]" /></div><div className="text-left"><h2 className="headline-font text-2xl text-white">{title} {count !== undefined && `(${count})`}</h2></div></div>
         {isOpen ? <ChevronUp className="w-6 h-6 text-gray-400" /> : <ChevronDown className="w-6 h-6 text-gray-400" />}
       </button>
       <AnimatePresence>
-        {isOpen && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
-            <div className="p-6 border-t border-white/10">{children}</div>
-          </motion.div>
-        )}
+        {isOpen && (<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden"><div className="p-6 border-t border-white/10">{children}</div></motion.div>)}
       </AnimatePresence>
     </motion.div>
   );
@@ -58,18 +51,25 @@ export default function AdminDashboard() {
   const [teamBId, setTeamBId] = useState("");
   const [isCreatingGame, setIsCreatingGame] = useState(false);
 
+  // --- THIS IS THE CORRECT, FULL loadData FUNCTION ---
   const loadData = async () => {
     try {
       setLoading(true);
       const [regData, reelData, allTournaments] = await Promise.all([
-        Registration.list(), FeaturedReel.list(), Tournament.getAll(),
+        Registration.list(), 
+        FeaturedReel.list(), 
+        Tournament.getAll(), // Use getAll to fetch all tournaments at once
       ]);
       setRegistrations(regData);
       setReels(reelData);
       setCompletedTournaments(allTournaments.filter(t => t.status === 'completed'));
       setOngoingTournaments(allTournaments.filter(t => t.status === 'ongoing'));
-    } catch (error) { console.error("Failed to load dashboard data", error); } 
-    finally { setLoading(false); }
+    } catch (error) { 
+      console.error("Failed to load dashboard data", error);
+    } 
+    finally { 
+      setLoading(false); 
+    }
   };
   useEffect(() => { loadData(); }, []);
 
@@ -86,6 +86,7 @@ export default function AdminDashboard() {
     loadScoreData();
   }, [selectedScoreTournamentId]);
 
+  // --- ALL CORRECT HANDLER FUNCTIONS ---
   const handleLogout = async () => { await supabase.auth.signOut(); navigate('/admin'); };
   const handleFileChange = (e) => { setSelectedFiles(Array.from(e.target.files)); setUploadMessage({ type: "", text: "" }); };
   const getStatusBadge = (status) => (status === 'paid' ? <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">Paid</span> : <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Unpaid</span>);
@@ -97,7 +98,7 @@ export default function AdminDashboard() {
     const results = await Promise.all(uploadPromises);
     const failedUploads = results.filter(result => result.error);
     if (failedUploads.length > 0) { setUploadMessage({ type: "error", text: `${failedUploads.length} out of ${selectedFiles.length} files failed to upload.` }); } 
-    else { setUploadMessage({ type: "success", text: "All files uploaded successfully!" }); setSelectedFiles([]); document.getElementById('file-upload').value = ""; setTimeout(() => setUploadMessage({ type: "", text: "" }), 5000); }
+    else { setUploadMessage({ type: "success", text: "All files uploaded successfully!" }); setSelectedFiles([]); if(document.getElementById('file-upload')) document.getElementById('file-upload').value = ""; setTimeout(() => setUploadMessage({ type: "", text: "" }), 5000); }
     setUploading(false);
   };
   
@@ -114,7 +115,7 @@ export default function AdminDashboard() {
     if (window.confirm("Are you sure?")) {
       const { error } = await FeaturedReel.deleteById(reelId);
       if (error) { setReelMessage({ type: "error", text: `Failed to delete reel: ${error.message}` }); }
-      else { setReelMessage({ type: "success", text: "Reel deleted."}); setReels(reels.filter(r => r.id !== reelId)); setTimeout(() => setReelMessage({ type: "", text: "" }), 3000); }
+      else { setReelMessage({ type: "success", text: "Reel deleted."}); await loadData(); setTimeout(() => setReelMessage({ type: "", text: "" }), 3000); }
     }
   };
 
@@ -129,6 +130,7 @@ export default function AdminDashboard() {
 
   const handleScoreChange = async (gameId, field, increment) => {
     const game = games.find(g => g.id === gameId);
+    if (!game) return;
     const currentScore = game[field] || 0;
     const newScore = Math.max(0, currentScore + (increment ? 1 : -1));
     const { data: updatedGame } = await Game.update(gameId, { [field]: newScore });
@@ -138,7 +140,10 @@ export default function AdminDashboard() {
   const handleStatusChange = async (gameId, currentStatus) => {
     const newStatus = currentStatus === "SCHEDULED" ? "LIVE" : "FINAL";
     const { data: updatedGame } = await Game.update(gameId, { status: newStatus });
-    if (updatedGame) setGames(games.map(g => g.id === gameId ? updatedGame : g).sort((a, b) => a.start_time - b.start_time));
+    if (updatedGame) {
+      const updatedGames = games.map(g => g.id === gameId ? updatedGame : g).sort((a,b) => new Date(a.start_time) - new Date(b.start_time));
+      setGames(updatedGames);
+    }
   };
 
   const getTeamName = (teamId) => teams.find(t => t.id === teamId)?.name || "Unknown Team";
@@ -147,6 +152,7 @@ export default function AdminDashboard() {
   const scheduledGames = games.filter(g => g.status === "SCHEDULED");
   const finalGames = games.filter(g => g.status === "FINAL");
 
+  // --- THE REST OF THE JSX IS BELOW ---
   if (loading) { return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><Loader2 className="w-12 h-12 text-[#FF6B00] animate-spin" /></div>; }
 
   return (
@@ -207,8 +213,58 @@ export default function AdminDashboard() {
             </div>
           </Section>
           
-          <Section icon={Upload} title="MANAGE TOURNAMENT GALLERY">{/* ... Gallery upload form ... */}</Section>
-          <Section icon={Film} title="MANAGE FEATURED REELS" count={reels.length}>{/* ... Reels management ... */}</Section>
+          <Section icon={Upload} title="MANAGE TOURNAMENT GALLERY">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm">1. SELECT A TOURNAMENT</label>
+                <Select value={selectedTournamentId} onValueChange={setSelectedTournamentId}>
+                  <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] h-12"><SelectValue placeholder="Choose a completed tournament" /></SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-white/10">
+                    {completedTournaments.length === 0 ? <div className="p-4 text-gray-500 text-center">No completed tournaments</div> : completedTournaments.map((t) => (<SelectItem key={t.id} value={String(t.id)} className="text-white hover:bg-white/5">{t.name}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm">2. UPLOAD FILES</label>
+                <div className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center hover:border-[#FF6B00]/50 transition-colors">
+                  <input type="file" multiple accept="image/*,video/*" onChange={handleFileChange} className="hidden" id="file-upload" />
+                  <label htmlFor="file-upload" className="cursor-pointer"><div className="flex flex-col items-center gap-4"><div className="flex gap-4"><div className="bg-[#FF6B00]/10 rounded-lg p-4"><ImageIcon className="w-8 h-8 text-[#FF6B00]" /></div><div className="bg-[#FF6B00]/10 rounded-lg p-4"><Video className="w-8 h-8 text-[#FF6B00]" /></div></div><div><p className="text-white font-semibold mb-1">Click to upload or drag and drop</p><p className="text-gray-400 text-sm">Images and videos accepted</p></div></div></label>
+                </div>
+                {selectedFiles.length > 0 && <div className="mt-4 text-gray-400 text-sm">Selected {selectedFiles.length} file(s).</div>}
+              </div>
+              {uploadMessage.text && <div className={`text-sm ${uploadMessage.type === "success" ? "text-green-400" : "text-red-400"}`}>{uploadMessage.text}</div>}
+              <StyledButton onClick={handleGallerySubmit} disabled={uploading}>
+                {uploading ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> UPLOADING...</> : <><Upload className="w-5 h-5 mr-2" /> UPLOAD MEDIA</>}
+              </StyledButton>
+            </div>
+          </Section>
+
+          <Section icon={Film} title="MANAGE FEATURED REELS" count={reels.length}>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-white mb-2 headline-font text-sm">ADD NEW REEL</label>
+                <p className="text-gray-400 text-sm mb-3">On Instagram, click the three dots on a Reel → Embed → Copy the embed code and paste it below</p>
+                <StyledTextarea value={newReelEmbedCode} onChange={(e) => setNewReelEmbedCode(e.target.value)} placeholder='<blockquote class="instagram-media"...></blockquote>' />
+              </div>
+              {reelMessage.text && <div className={`text-sm ${reelMessage.type === "success" ? "text-green-400" : "text-red-400"}`}>{reelMessage.text}</div>}
+              <StyledButton onClick={handleAddReel} disabled={submittingReel}>
+                {submittingReel ? <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> ADDING...</> : <><Film className="w-5 h-5 mr-2" /> ADD REEL</>}
+              </StyledButton>
+              {reels.length > 0 && (
+                <StyledTable headers={["Preview", "Added On", "Actions"]}>
+                  {reels.map((reel) => (
+                    <StyledTableRow key={reel.id}>
+                      <StyledTableCell className="font-mono text-xs max-w-md truncate">{reel.embed_html}</StyledTableCell>
+                      <StyledTableCell>{format(new Date(reel.created_at), "MMM d, yyyy")}</StyledTableCell>
+                      <StyledTableCell className="text-right">
+                        <button onClick={() => handleDeleteReel(reel.id)} className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md"><Trash2 className="w-4 h-4" /></button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </StyledTable>
+              )}
+            </div>
+          </Section>
         </div>
       </div>
     </div>
