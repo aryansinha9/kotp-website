@@ -6,3 +6,5 @@ export * from './MediaItem.js';
 export * from './Registration.js';
 export * from './FeaturedReel.js';
 export * from './YouTubeVideo.js';
+export * from './Team.js';
+export * from './Game.js';
