@@ -24,10 +24,7 @@ const HolidayProgramForm = () => (
     </div>
 );
 
-// Basic implementation for the 3D card effect container
-const CardContainer = ({ children, className }) => <div className={`perspective-1000 ${className}`}>{children}</div>;
-const CardBody = ({ children, className }) => <div className={className}>{children}</div>;
-const CardItem = ({ children, className, translateZ }) => <div style={{ transform: `translateZ(${translateZ}px)` }} className={className}>{children}</div>;
+import { CardContainer, CardBody, CardItem } from "@/Components/ui/3d-card";
 
 
 const FeatureCard = ({ icon: Icon, title, description, delay }) => {
