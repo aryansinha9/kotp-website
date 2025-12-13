@@ -133,9 +133,11 @@ export default function Tournaments() {
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_2q2yk2q2yk2q2yk2-Photoroom.svg" alt="Trophy" className="w-20 h-20 mx-auto mb-6" />
-            <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-center justify-center gap-4">
+            <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-baseline justify-center gap-2">
               <span>BECOME A</span>
-              <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#fff">LEGEND</FuzzyText>
+              <span style={{ filter: 'drop-shadow(0 0 20px rgba(255, 107, 0, 0.5))' }}>
+                <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#fff">LEGEND</FuzzyText>
+              </span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>
           </motion.div>
