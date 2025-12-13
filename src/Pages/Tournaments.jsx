@@ -132,7 +132,7 @@ export default function Tournaments() {
         <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000" alt="Tournament" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <Trophy className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
+            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_2q2yk2q2yk2q2yk2-Photoroom.svg" alt="Trophy" className="w-20 h-20 mx-auto mb-6" />
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-center justify-center gap-4">
               <span>BECOME A</span>
               <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#fff">LEGEND</FuzzyText>
