@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Mail, Phone, Clock, Send, MessageSquare } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Textarea } from "@/Components/ui/textarea";
+import { Button } from "@/Components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useRef } from "react";

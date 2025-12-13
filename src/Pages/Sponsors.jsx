@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Eye, Heart, Star, Send, Building2, Users } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Textarea } from "@/Components/ui/textarea";
+import { Button } from "@/Components/ui/button";
 
 const ValueCard = ({ icon: Icon, title, description, delay }) => {
   const ref = useRef(null);

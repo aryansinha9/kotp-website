@@ -6,14 +6,14 @@ import {
     Trophy, Target, Users, Award, ChevronRight, Check,
     Mail, Phone, MapPin, Calendar, Clock, Star, Play
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import HolidayProgramForm from "@/components/HolidayProgramForm";
-import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
+import HolidayProgramForm from "@/Components/HolidayProgramForm";
+import { CardContainer, CardBody, CardItem } from "@/Components/ui/3d-card";
 
 const FeatureCard = ({ icon: Icon, title, description, delay }) => {
     const ref = useRef(null);

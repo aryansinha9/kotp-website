@@ -3,9 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import PartnerBanner from "@/components/PartnerBanner";
-import ShinyText from "@/components/ShinyText";
-import UnderConstructionBanner from "@/components/UnderConstructionBanner";
+import PartnerBanner from "@/Components/PartnerBanner";
+import ShinyText from "@/Components/ShinyText";
+import UnderConstructionBanner from "@/Components/UnderConstructionBanner";
 
 export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

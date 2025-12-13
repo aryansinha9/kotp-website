@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion, useInView } from "framer-motion";
 import { Calendar, MapPin, Users, Crown, Medal, Award } from "lucide-react";
-import FuzzyText from "@/components/FuzzyText";
+import FuzzyText from "@/Components/FuzzyText";
 
 const TournamentCard = ({ tournament, index }) => {
   const ref = useRef(null);

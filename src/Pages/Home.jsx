@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Users, ArrowRight, Star } from "lucide-react";
-import CircularText from "@/components/CircularText";
-import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
+import CircularText from "@/Components/CircularText";
+import { InfiniteMovingCards } from "@/Components/ui/infinite-moving-cards";
 
 const ServiceCard = ({ title, description, image, size, icon: Icon, delay }) => {
   const ref = useRef(null);

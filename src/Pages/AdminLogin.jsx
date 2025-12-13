@@ -4,9 +4,9 @@ import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Crown, Mail, Lock, Loader2, AlertCircle, ArrowLeft, Shield } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Alert, AlertDescription } from "@/Components/ui/alert";
 
 export default function AdminLogin() {
   const [loading, setLoading] = useState(false);

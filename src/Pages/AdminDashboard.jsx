@@ -21,11 +21,11 @@ import {
   Plus,
   Minus
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Textarea } from "@/Components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import { Alert, AlertDescription } from "@/Components/ui/alert";
 import {
   Table,
   TableBody,
@@ -33,8 +33,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+} from "@/Components/ui/table";
+import { Badge } from "@/Components/ui/badge";
 import { format } from "date-fns";
 
 const Section = ({ icon: Icon, title, count, defaultOpen = false, children }) => {
