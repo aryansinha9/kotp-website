@@ -34,7 +34,7 @@ const LiveGameCard = ({ game, teams }) => {
             <ScoreDisplay score={game.team_a_score} />
           </div>
           <div className="text-center">
-            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Screenshot%202025-12-09%20at%203.34.34%20pm-Photoroom.svg" alt="VS" className="w-12 h-12 mx-auto mb-4" />
+            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Screenshot%202025-12-09%20at%203.34.34%20pm-Photoroom.svg" alt="VS" className="w-12 h-12 mx-auto mb-4 animate-spin" style={{ animationDuration: '8s' }} />
             <p className="text-4xl headline-font text-gray-500">VS</p>
           </div>
           <div className="text-center md:text-left">
