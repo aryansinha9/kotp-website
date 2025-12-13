@@ -1,0 +1,47 @@
+{
+    "name": "Registration",
+    "type": "object",
+    "properties": {
+        "team_name": {
+            "type": "string",
+            "description": "Name of the team"
+        },
+        "tournament": {
+            "type": "string",
+            "description": "Tournament name they registered for"
+        },
+        "contact_person": {
+            "type": "string",
+            "description": "Contact person name"
+        },
+        "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Contact email"
+        },
+        "phone": {
+            "type": "string",
+            "description": "Contact phone number"
+        },
+        "division": {
+            "type": "string",
+            "description": "Division they signed up for"
+        },
+        "payment_status": {
+            "type": "string",
+            "enum": [
+                "paid",
+                "unpaid"
+            ],
+            "default": "unpaid",
+            "description": "Payment status"
+        }
+    },
+    "required": [
+        "team_name",
+        "tournament",
+        "contact_person",
+        "email",
+        "division"
+    ]
+}

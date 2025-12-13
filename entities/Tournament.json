@@ -1,0 +1,58 @@
+{
+    "name": "Tournament",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Tournament name"
+        },
+        "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Tournament date"
+        },
+        "location": {
+            "type": "string",
+            "description": "Tournament location"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "upcoming",
+                "ongoing",
+                "completed"
+            ],
+            "default": "upcoming",
+            "description": "Tournament status"
+        },
+        "gallery_media": {
+            "type": "array",
+            "description": "Media files for tournament gallery",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "image",
+                            "video"
+                        ]
+                    },
+                    "uploaded_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "name",
+        "date",
+        "location",
+        "status"
+    ]
+}

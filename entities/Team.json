@@ -1,0 +1,22 @@
+{
+    "name": "Team",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Team name"
+        },
+        "logo_url": {
+            "type": "string",
+            "description": "Team logo URL (optional)"
+        },
+        "tournament_id": {
+            "type": "string",
+            "description": "Associated tournament ID"
+        }
+    },
+    "required": [
+        "name",
+        "tournament_id"
+    ]
+}

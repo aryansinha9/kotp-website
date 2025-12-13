@@ -1,0 +1,22 @@
+{
+    "name": "FeaturedReel",
+    "type": "object",
+    "properties": {
+        "embed_code": {
+            "type": "string",
+            "description": "Instagram embed code"
+        },
+        "preview_url": {
+            "type": "string",
+            "description": "Instagram URL for preview"
+        },
+        "added_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date when reel was added"
+        }
+    },
+    "required": [
+        "embed_code"
+    ]
+}

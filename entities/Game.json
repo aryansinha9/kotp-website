@@ -1,0 +1,48 @@
+{
+    "name": "Game",
+    "type": "object",
+    "properties": {
+        "tournament_id": {
+            "type": "string",
+            "description": "Associated tournament ID"
+        },
+        "team_a_id": {
+            "type": "string",
+            "description": "First team ID"
+        },
+        "team_b_id": {
+            "type": "string",
+            "description": "Second team ID"
+        },
+        "team_a_score": {
+            "type": "integer",
+            "default": 0,
+            "description": "Score for team A"
+        },
+        "team_b_score": {
+            "type": "integer",
+            "default": 0,
+            "description": "Score for team B"
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "SCHEDULED",
+                "LIVE",
+                "FINAL"
+            ],
+            "default": "SCHEDULED",
+            "description": "Game status"
+        },
+        "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Scheduled start time"
+        }
+    },
+    "required": [
+        "tournament_id",
+        "team_a_id",
+        "team_b_id"
+    ]
+}
