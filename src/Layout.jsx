@@ -1,9 +1,12 @@
-// src/Layout.jsx (with Live Scores + Admin Login)
+// src/Layout.jsx (New Redesigned Version - COMPLETE AND UNABBREVIATED)
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Crown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import PartnerBanner from "@/Components/PartnerBanner";
+import ShinyText from "@/Components/ShinyText";
+import UnderConstructionBanner from "@/Components/UnderConstructionBanner";
 
 export default function Layout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,155 +23,85 @@ export default function Layout({ children }) {
     setMobileMenuOpen(false);
   }, [location]);
 
-  // --- Updated navItems: includes LIVE link ---
   const navItems = [
     { name: "HOME", path: "/" },
     { name: "TOURNAMENTS", path: "/tournaments" },
-    { name: "LIVE", path: "/live-scores" },
+    { name: "ACADEMY", path: "/about" },
+    { name: "LIVE SCORES", path: "/live-scores" },
     { name: "MOMENTS", path: "/moments" },
     { name: "ABOUT", path: "/about" },
     { name: "SPONSORS", path: "/sponsors" },
+    { name: "CONTACT", path: "/contact" },
   ];
+
+  if (location.pathname.startsWith('/admin')) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
-        :root { 
-          --kotp-orange: #FF6B00; 
-          --kotp-dark: #0a0a0a; 
-          --kotp-charcoal: #1a1a1a; 
-          --kotp-grey: #2a2a2a; 
-        }
-        body { 
-          font-family: 'Inter', sans-serif; 
-          background: var(--kotp-dark); 
-          color: #E5E7EB; 
-          overflow-x: hidden; 
-        }
+        :root { --kotp-orange: #FF6B00; --kotp-dark: #0a0a0a; --kotp-charcoal: #1a1a1a; --kotp-grey: #2a2a2a; }
+        body { font-family: 'Inter', sans-serif; background: var(--kotp-dark); overflow-x: hidden; }
         .headline-font { font-family: 'Bebas Neue', cursive; letter-spacing: 0.05em; }
         .glow-orange { box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); }
         .glow-orange-hover:hover { box-shadow: 0 0 30px rgba(255, 107, 0, 0.6); }
         .text-glow { text-shadow: 0 0 20px rgba(255, 107, 0, 0.5); }
         .kotp-button { position: relative; overflow: hidden; transition: all 0.3s ease; }
-        .kotp-button::before { 
-          content: ''; position: absolute; top: 50%; left: 50%; 
-          width: 0; height: 0; border-radius: 50%; 
-          background: rgba(255, 255, 255, 0.1); 
-          transform: translate(-50%, -50%); 
-          transition: width 0.6s, height 0.6s; 
-        }
+        .kotp-button::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.1); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
         .kotp-button:hover::before { width: 300px; height: 300px; }
         .parallax-bg { background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover; }
-        @keyframes pulse-glow { 
-          0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); } 
-          50% { box-shadow: 0 0 40px rgba(255, 107, 0, 0.8); } 
-        }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); } 50% { box-shadow: 0 0 40px rgba(255, 107, 0, 0.8); } }
         .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* --- NEW: subtle red glow for LIVE link --- */
-        .live-glow {
-          text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
-        }
+        .animate-scroll { animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite; }
+        @keyframes scroll { to { transform: translate(calc(-50% - 0.5rem)); } }
+        /* LogoLoop Styles */
+        .logoloop { position: relative; --logoloop-gap: 32px; --logoloop-logoHeight: 28px; --logoloop-fadeColorAuto: #0a0a0a; }
+        .logoloop__track { display: flex; width: max-content; will-change: transform; user-select: none; position: relative; z-index: 0; }
+        .logoloop__list { display: flex; align-items: center; }
+        .logoloop__item { flex: 0 0 auto; margin-right: var(--logoloop-gap); font-size: var(--logoloop-logoHeight); line-height: 1; }
+        .logoloop__item:last-child { margin-right: var(--logoloop-gap); }
+        .logoloop__node { display: inline-flex; align-items: center; }
+        .logoloop__item img { height: var(--logoloop-logoHeight); width: auto; display: block; object-fit: contain; image-rendering: -webkit-optimize-contrast; -webkit-user-drag: none; pointer-events: none; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .logoloop--fade::before, .logoloop--fade::after { content: ''; position: absolute; top: 0; bottom: 0; width: clamp(24px, 8%, 120px); pointer-events: none; z-index: 10; }
+        .logoloop--fade::before { left: 0; background: linear-gradient(to right, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, rgba(0, 0, 0, 0) 100%); }
+        .logoloop--fade::after { right: 0; background: linear-gradient(to left, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, rgba(0, 0, 0, 0) 100%); }
       `}</style>
 
-      {/* Navbar */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg shadow-black/20"
-            : "bg-transparent"
-        }`}
-      >
+      <motion.nav initial={{ y: -100 }} animate={{ y: 0 }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-                <Crown className="w-7 h-7 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="headline-font text-2xl text-white leading-none">
-                  KING OF THE PITCH
-                </div>
-                <div className="text-xs text-gray-400 tracking-wider">
-                  WESTERN SYDNEY
-                </div>
-              </div>
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-20 w-auto transform group-hover:scale-110 transition-transform duration-300" />
             </Link>
-
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const isLive = item.name === "LIVE";
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className={`headline-font text-sm tracking-wider transition-all duration-300 relative group ${
-                      isActive
-                        ? "text-[#FF6B00]"
-                        : "text-white hover:text-[#FF6B00]"
-                    } ${isLive && "live-glow text-red-400 hover:text-red-300"}`}
-                  >
-                    {item.name}
-                    <span
-                      className={`absolute -bottom-1 left-0 h-0.5 bg-[#FF6B00] transition-all duration-300 ${
-                        isActive ? "w-full" : "w-0 group-hover:w-full"
-                      }`}
-                    ></span>
-                  </Link>
-                );
-              })}
-              <Link to="/tournaments">
-                <button className="kotp-button bg-[#FF6B00] text-white px-6 py-2 rounded-md headline-font text-sm tracking-wider glow-orange-hover transition-all duration-300">
-                  REGISTER NOW
-                </button>
+              {navItems.map((item) => (
+                <Link key={item.name} to={item.path} className={`headline-font text-sm tracking-wider transition-all duration-300 relative group ${location.pathname === item.path ? "text-[#FF6B00]" : "text-white hover:text-[#FF6B00]"}`}>
+                  {item.name === "ACADEMY" ? <ShinyText text={item.name} /> : item.name}
+                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#FF6B00] transition-all duration-300 ${location.pathname === item.path ? "w-full" : "w-0 group-hover:w-full"}`}></span>
+                </Link>
+              ))}
+              <Link to="/register">
+                <button className="kotp-button bg-[#FF6B00] text-white px-6 py-2 rounded-md headline-font text-sm tracking-wider glow-orange-hover transition-all duration-300">REGISTER NOW</button>
               </Link>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
-            >
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-[#1a1a1a] border-t border-white/10"
-            >
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="md:hidden bg-[#1a1a1a] border-t border-white/10">
               <div className="px-4 py-6 space-y-4">
                 {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className={`block headline-font text-lg tracking-wider py-2 transition-colors ${
-                      location.pathname === item.path
-                        ? "text-[#FF6B00]"
-                        : "text-white hover:text-[#FF6B00]"
-                    } ${item.name === "LIVE" && "text-red-400"}`}
-                  >
+                  <Link key={item.name} to={item.path} className={`block headline-font text-lg tracking-wider py-2 transition-colors ${location.pathname === item.path ? "text-[#FF6B00]" : "text-white hover:text-[#FF6B00]"}`}>
                     {item.name}
                   </Link>
                 ))}
-                <Link to="/tournaments" className="block">
-                  <button className="w-full kotp-button bg-[#FF6B00] text-white px-6 py-3 rounded-md headline-font text-sm tracking-wider glow-orange">
-                    REGISTER NOW
-                  </button>
+                <Link to="/register" className="block">
+                  <button className="w-full kotp-button bg-[#FF6B00] text-white px-6 py-3 rounded-md headline-font text-sm tracking-wider glow-orange">REGISTER NOW</button>
                 </Link>
               </div>
             </motion.div>
@@ -176,84 +109,49 @@ export default function Layout({ children }) {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Page Content */}
+      <div className="mt-20"><UnderConstructionBanner /></div>
       <main className="relative">{children}</main>
+      <PartnerBanner />
 
-      {/* Footer (with Admin Login link) */}
       <footer className="bg-[#0a0a0a] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Branding */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] rounded-lg flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-white" />
-                </div>
-                <div className="headline-font text-xl text-white">
-                  KING OF THE PITCH
-                </div>
+                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-20 w-auto" />
               </div>
-              <p className="text-gray-400 text-sm mb-4">
-                Western Sydney's premier street football experience. Building legends
-                from the streets.
-              </p>
-              <div className="text-[#FF6B00] headline-font text-lg">
-                RULE THE PITCH.
-              </div>
+              <p className="text-gray-400 text-sm mb-4">Western Sydney's premier street football experience. Building legends from the streets.</p>
+              <div className="text-[#FF6B00] headline-font text-lg">RULE THE PITCH.</div>
             </div>
-
-            {/* Quick Links */}
             <div>
               <h3 className="headline-font text-white text-lg mb-4">QUICK LINKS</h3>
               <div className="space-y-2">
                 {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors"
-                  >
-                    {item.name}
-                  </Link>
+                  <Link key={item.name} to={item.path} className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors">{item.name}</Link>
                 ))}
               </div>
             </div>
-
-            {/* Legal & Info */}
             <div>
-              <h3 className="headline-font text-white text-lg mb-4">
-                LEGAL & INFO
-              </h3>
-              <div className="space-y-2">
-                <Link
-                  to="/privacy-policy"
-                  className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors"
-                >
-                  PRIVACY POLICY
-                </Link>
-                <Link
-                  to="/terms-and-conditions"
-                  className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors"
-                >
-                  TERMS & CONDITIONS
-                </Link>
-                <Link
-                  to="/contact"
-                  className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors"
-                >
-                  CONTACT US
-                </Link>
-                <Link
-                  to="/admin"
-                  className="block text-gray-400 text-sm hover:text-[#FF6B00] transition-colors"
-                >
-                  ADMIN LOGIN
-                </Link>
+              <h3 className="headline-font text-white text-lg mb-4">CONNECT</h3>
+              <div className="space-y-2 text-gray-400 text-sm">
+                <p>Western Sydney, NSW</p>
+                <p>info@kingofthepitch.com.au</p>
+                <div className="flex gap-4 mt-4">
+                  <a href="#" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
+                  <a href="#" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-500 text-sm">
-            <p>&copy; 2025 King of the Pitch. All rights reserved.</p>
+          <div className="border-t border-white/10 mt-8 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-gray-500 text-sm text-center md:text-left">&copy; 2025 King of the Pitch. All rights reserved.</p>
+              <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
+                <Link to="/privacy-policy" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Privacy Policy</Link>
+                <Link to="/terms-and-conditions" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Terms & Conditions</Link>
+                <Link to="/admin" className="text-gray-500 hover:text-[#FF6B00] transition-colors flex items-center gap-1"><span>Admin</span></Link>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
