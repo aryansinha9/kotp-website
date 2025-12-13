@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Trophy, Calendar, MapPin, Users, Crown, Medal, Award, Loader2 } from "lucide-react";
 import { Tournament } from "@/Entities/all"; // <-- IMPORT our Tournament entity
 import { format } from "date-fns"; // <-- IMPORT date-fns for formatting dates
+import FuzzyText from "@/Components/FuzzyText";
 
 // --- Construct the base URL for your Supabase storage ---
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -132,7 +133,10 @@ export default function Tournaments() {
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <Trophy className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
-            <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">BECOME A LEGEND.</h1>
+            <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-center justify-center gap-4">
+              <span>BECOME A</span>
+              <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#FF6B00">LEGEND</FuzzyText>
+            </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>
           </motion.div>
         </div>
