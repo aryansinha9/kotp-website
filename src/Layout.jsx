@@ -26,7 +26,7 @@ export default function Layout({ children }) {
   const navItems = [
     { name: "HOME", path: "/" },
     { name: "TOURNAMENTS", path: "/tournaments" },
-    { name: "ACADEMY", path: "/about" },
+    { name: "ACADEMY", path: "/academy" },
     { name: "LIVE SCORES", path: "/live-scores" },
     { name: "MOMENTS", path: "/moments" },
     { name: "ABOUT", path: "/about" },

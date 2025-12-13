@@ -12,6 +12,7 @@ import Home from './Pages/Home';
 import Tournaments from './Pages/Tournaments';
 import Sponsors from './Pages/Sponsors';
 import About from './Pages/About';
+import Academy from './Pages/Academy';
 import Contact from './Pages/Contact';
 import Moments from './Pages/Moments';
 // --- NEW: Import the LiveScores page ---
@@ -34,9 +35,9 @@ const PublicLayout = () => (
 
 // We need to update the AdminLayout to match the new dark theme
 const AdminLayout = () => (
-    <div className="bg-[#0a0a0a] min-h-screen">
-        <Outlet />
-    </div>
+  <div className="bg-[#0a0a0a] min-h-screen">
+    <Outlet />
+  </div>
 );
 
 const ComingSoon = () => (
@@ -59,14 +60,15 @@ export default function App() {
           <Route path="/register/:tournamentId" element={<Register />} />
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />
+          <Route path="/academy" element={<Academy />} />
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-          
+
           {/* --- NEW: Add the route for the Live Scores page --- */}
           <Route path="/live-scores" element={<LiveScores />} />
-          
+
           <Route path="/faq" element={<ComingSoon />} />
           <Route path="/volunteers" element={<ComingSoon />} />
           <Route path="/shop" element={<ComingSoon />} />
@@ -79,14 +81,14 @@ export default function App() {
         {/* Group 2: Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
         <Route element={<AdminLayout />}>
-             <Route 
-                path="/admin/dashboard" 
-                element={
-                    <ProtectedRoute>
-                        <AdminDashboard />
-                    </ProtectedRoute>
-                } 
-            />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>
