@@ -73,7 +73,7 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center gap-3 group">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-12 w-auto transform group-hover:scale-110 transition-transform duration-300" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-16 w-auto transform group-hover:scale-110 transition-transform duration-300" />
               <div className="flex flex-col">
                 <span className="headline-font text-xl text-white leading-none">KING OF THE PITCH</span>
                 <span className="text-xs text-gray-400 tracking-wider">WESTERN SYDNEY</span>
