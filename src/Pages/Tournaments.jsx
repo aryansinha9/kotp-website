@@ -135,7 +135,7 @@ export default function Tournaments() {
             <Trophy className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-center justify-center gap-4">
               <span>BECOME A</span>
-              <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#FF6B00">LEGEND</FuzzyText>
+              <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#fff">LEGEND</FuzzyText>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>
           </motion.div>
