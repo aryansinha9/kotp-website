@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import PartnerBanner from "@/Components/PartnerBanner";
 import ShinyText from "@/Components/ShinyText";
 import UnderConstructionBanner from "@/Components/UnderConstructionBanner";
+import ShapeBlur from "@/Components/ShapeBlur";
 
 export default function Layout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -150,6 +151,10 @@ export default function Layout({ children }) {
           <div className="border-t border-white/10 mt-8 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-500 text-sm text-center md:text-left">&copy; 2025 King of the Pitch. All rights reserved.</p>
+
+              <div className="w-full md:w-64 h-24">
+                <ShapeBlur />
+              </div>
               <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
                 <Link to="/privacy-policy" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Privacy Policy</Link>
                 <Link to="/terms-and-conditions" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Terms & Conditions</Link>
