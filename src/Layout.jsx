@@ -9,14 +9,7 @@ import ShapeBlur from "@/Components/ShapeBlur";
 
 export default function Layout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -77,17 +70,17 @@ export default function Layout({ children }) {
         .logoloop--fade::after { right: 0; background: linear-gradient(to left, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, rgba(0, 0, 0, 0) 100%); }
       `}</style>
 
-      {/* Scroll Progress Bar - Optional addition for modern feel */}
+      {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-[#FF6B00] origin-left z-[60]"
         style={{ scaleX: window.scrollY / (document.body.scrollHeight - window.innerHeight) }}
       />
 
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg" : "bg-transparent"}`}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center gap-3 group relative z-50">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-16 w-auto transform group-hover:scale-110 transition-transform duration-300" />
+              <img src="/kotp_new_logo.png" alt="King of the Pitch" className="h-16 w-auto transform group-hover:scale-110 transition-transform duration-300" />
               <div className="flex flex-col">
                 <span className="headline-font text-xl text-white leading-none">KING OF THE PITCH</span>
                 <span className="text-xs text-gray-400 tracking-wider">WESTERN SYDNEY</span>
@@ -170,16 +163,16 @@ export default function Layout({ children }) {
         )}
       </AnimatePresence>
 
-      <div className="mt-20"><UnderConstructionBanner /></div>
       <main className="relative">{children}</main>
       <PartnerBanner />
+      <UnderConstructionBanner />
 
       <footer className="bg-[#0a0a0a] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-20 w-auto" />
+                <img src="/kotp_new_logo.png" alt="King of the Pitch" className="h-20 w-auto" />
               </div>
               <p className="text-gray-400 text-sm mb-4">Western Sydney's premier street football experience. Building legends from the streets.</p>
               <div className="text-[#FF6B00] headline-font text-lg">RULE THE PITCH.</div>
