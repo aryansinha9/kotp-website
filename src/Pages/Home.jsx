@@ -126,9 +126,7 @@ export default function Home() {
             )}
           </motion.div>
         </div>
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <CircularText text="KING*OF*THE*PITCH*" onHover="speedUp" spinDuration={20} className="circular-text-home" />
-        </div>
+
       </motion.section>
 
       <section className="relative py-24 px-4 bg-[#0a0a0a]">
