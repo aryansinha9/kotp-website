@@ -1,8 +1,6 @@
-// src/Layout.jsx (New Redesigned Version - COMPLETE AND UNABBREVIATED)
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PartnerBanner from "@/Components/PartnerBanner";
 import ShinyText from "@/Components/ShinyText";
@@ -23,6 +21,15 @@ export default function Layout({ children }) {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [mobileMenuOpen]);
 
   const navItems = [
     { name: "HOME", path: "/" },
@@ -70,49 +77,98 @@ export default function Layout({ children }) {
         .logoloop--fade::after { right: 0; background: linear-gradient(to left, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, rgba(0, 0, 0, 0) 100%); }
       `}</style>
 
-      <motion.nav initial={{ y: -100 }} animate={{ y: 0 }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg" : "bg-transparent"}`}>
+      {/* Scroll Progress Bar - Optional addition for modern feel */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-[#FF6B00] origin-left z-[60]"
+        style={{ scaleX: window.scrollY / (document.body.scrollHeight - window.innerHeight) }}
+      />
+
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <Link to="/" className="flex items-center gap-3 group">
+            <Link to="/" className="flex items-center gap-3 group relative z-50">
               <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6906f278f7a7157d0cc591bf/59f910615_kotplogo.png" alt="King of the Pitch" className="h-16 w-auto transform group-hover:scale-110 transition-transform duration-300" />
               <div className="flex flex-col">
                 <span className="headline-font text-xl text-white leading-none">KING OF THE PITCH</span>
                 <span className="text-xs text-gray-400 tracking-wider">WESTERN SYDNEY</span>
               </div>
             </Link>
-            <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
-                <Link key={item.name} to={item.path} className={`headline-font text-sm tracking-wider transition-all duration-300 relative group ${location.pathname === item.path ? "text-[#FF6B00]" : "text-white hover:text-[#FF6B00]"}`}>
-                  {item.name === "ACADEMY" ? <ShinyText text={item.name} /> : item.name}
-                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#FF6B00] transition-all duration-300 ${location.pathname === item.path ? "w-full" : "w-0 group-hover:w-full"}`}></span>
-                </Link>
-              ))}
-              <Link to="/register">
-                <button className="kotp-button bg-[#FF6B00] text-white px-6 py-2 rounded-md headline-font text-sm tracking-wider glow-orange-hover transition-all duration-300">REGISTER NOW</button>
-              </Link>
-            </div>
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors group relative z-50"
+              aria-label="Open Menu"
+            >
+              <div className="flex flex-col gap-1.5 items-end">
+                <span className="w-8 h-0.5 bg-white group-hover:bg-[#FF6B00] transition-colors"></span>
+                <span className="w-6 h-0.5 bg-white group-hover:bg-[#FF6B00] transition-colors"></span>
+                <span className="w-4 h-0.5 bg-white group-hover:bg-[#FF6B00] transition-colors"></span>
+              </div>
             </button>
           </div>
         </div>
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="md:hidden bg-[#1a1a1a] border-t border-white/10">
-              <div className="px-4 py-6 space-y-4">
+      </nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
+
+            {/* Side Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-[#0a0a0a] border-l border-white/10 z-[60] flex flex-col shadow-2xl"
+            >
+              <div className="flex justify-between items-center p-6 border-b border-white/5">
+                <span className="headline-font text-xl text-white tracking-wider">MENU</span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors group"
+                >
+                  <X className="w-8 h-8 text-white group-hover:text-[#FF6B00] transition-colors" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto py-8 px-6 space-y-6">
                 {navItems.map((item) => (
-                  <Link key={item.name} to={item.path} className={`block headline-font text-lg tracking-wider py-2 transition-colors ${location.pathname === item.path ? "text-[#FF6B00]" : "text-white hover:text-[#FF6B00]"}`}>
-                    {item.name}
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`group flex items-center justify-between py-2 border-b border-white/5 hover:border-[#FF6B00]/30 transition-colors ${location.pathname === item.path ? "text-[#FF6B00]" : "text-white hover:text-[#FF6B00]"}`}
+                  >
+                    <span className="headline-font text-2xl tracking-wide">
+                      {item.name === "ACADEMY" ? <ShinyText text={item.name} /> : item.name}
+                    </span>
+                    <ChevronRight className={`w-5 h-5 transition-transform duration-300 ${location.pathname === item.path ? "text-[#FF6B00] translate-x-1" : "text-gray-600 group-hover:text-[#FF6B00] group-hover:translate-x-1"}`} />
                   </Link>
                 ))}
+              </div>
+
+              <div className="p-6 border-t border-white/10 bg-[#111]">
                 <Link to="/register" className="block">
-                  <button className="w-full kotp-button bg-[#FF6B00] text-white px-6 py-3 rounded-md headline-font text-sm tracking-wider glow-orange">REGISTER NOW</button>
+                  <button className="w-full kotp-button bg-[#FF6B00] text-white py-4 rounded-md headline-font text-xl tracking-wider glow-orange-hover">
+                    REGISTER NOW
+                  </button>
                 </Link>
+                <div className="mt-6 flex justify-center gap-6">
+                  <a href="#" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">INSTAGRAM</a>
+                  <a href="#" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">FACEBOOK</a>
+                </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
 
       <div className="mt-20"><UnderConstructionBanner /></div>
       <main className="relative">{children}</main>
