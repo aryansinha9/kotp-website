@@ -148,7 +148,7 @@ export default function Layout({ children }) {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-8 pt-8">
+          <div className="border-t border-white/10 mt-6 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-500 text-sm text-center md:text-left">&copy; 2025 King of the Pitch. All rights reserved.</p>
 
@@ -156,7 +156,7 @@ export default function Layout({ children }) {
                 href="https://anantasystems.com.au/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:block w-32 h-32 opacity-50 hover:opacity-80 transition-opacity"
+                className="hidden md:block w-20 h-20 opacity-50 hover:opacity-80 transition-opacity"
               >
                 <ShapeBlur
                   variation={0}
