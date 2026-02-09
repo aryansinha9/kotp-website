@@ -156,7 +156,7 @@ export default function Layout({ children }) {
                 href="https://anantasystems.com.au/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:block absolute left-1/2 top-[80%] -translate-x-1/2 -translate-y-1/2 w-32 h-32 opacity-50 hover:opacity-80 transition-opacity"
+                className="hidden md:block w-32 h-32 opacity-50 hover:opacity-80 transition-opacity"
               >
                 <ShapeBlur
                   variation={0}
