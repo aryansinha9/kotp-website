@@ -132,7 +132,7 @@ export default function Home() {
       <section className="relative py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
-            <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">RULE THE PITCH.</h2>
+            <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">EXPERIENCE KOTP.</h2>
             <div className="w-24 h-1 bg-[#FF6B00] mx-auto"></div>
           </motion.div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
