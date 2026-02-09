@@ -152,11 +152,22 @@ export default function Layout({ children }) {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-500 text-sm text-center md:text-left">&copy; 2025 King of the Pitch. All rights reserved.</p>
 
-              <div className="w-full md:w-64 h-24">
-                <a href="https://anantasystems.com.au/" target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
-                  <ShapeBlur />
-                </a>
-              </div>
+              <a
+                href="https://anantasystems.com.au/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:block absolute left-1/2 top-[80%] -translate-x-1/2 -translate-y-1/2 w-32 h-32 opacity-50 hover:opacity-80 transition-opacity"
+              >
+                <ShapeBlur
+                  variation={0}
+                  pixelRatioProp={2}
+                  shapeSize={1.2}
+                  roundness={0.4}
+                  borderSize={0.15}
+                  circleSize={0.2}
+                  circleEdge={0.5}
+                />
+              </a>
               <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
                 <Link to="/privacy-policy" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Privacy Policy</Link>
                 <Link to="/terms-and-conditions" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Terms & Conditions</Link>

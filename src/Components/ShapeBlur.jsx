@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
@@ -111,10 +109,6 @@ void main() {
     float circleSize = u_circleSize;
     float circleEdge = u_circleEdge;
 
-    // Use specific colors from the user request
-    // COLOR CHANGE: #9CA3AF (approx vec3(0.61, 0.64, 0.69))
-    vec3 color = vec3(0.611, 0.639, 0.686);
-
     float sdfCircle = fill(
         sdCircle(st, posMouse),
         circleSize,
@@ -126,6 +120,9 @@ void main() {
     sdf = sdInfinity(vec2(p.x * 1.1, p.y), size);
     
     sdf = strokeAA(sdf, 0.0, borderSize, sdfCircle * 0.3) * 4.0;
+
+    // COLOR CHANGE: White (1.0)
+    vec3 color = vec3(1.0);
     
     // TRANSLUCENCY CHANGE: Multiply alpha by 0.3 for 30% opacity
     float alpha = sdf * 0.3;
@@ -230,8 +227,7 @@ const ShapeBlur = ({
             const dt = time - lastTime;
             lastTime = time;
 
-            ['x', 'y'].forEach(k => {
-                // @ts-ignore
+            (['x', 'y']).forEach(k => {
                 vMouseDamp[k] = THREE.MathUtils.damp(vMouseDamp[k], vMouse[k], 8, dt);
             });
 
