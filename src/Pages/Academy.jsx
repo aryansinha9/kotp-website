@@ -16,13 +16,6 @@ import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
 
-const HolidayProgramForm = () => (
-    <div className="text-center bg-[#1a1a1a] border border-white/10 rounded-lg p-8">
-        <h2 className="headline-font text-4xl text-white mb-4">Holiday Program Registration</h2>
-        {/* Placeholder form area or instructions can go here in the future */}
-    </div>
-);
-
 import { CardContainer, CardBody, CardItem } from "@/Components/ui/3d-card";
 
 
@@ -49,36 +42,34 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo })
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
-    return (
+    const content = (
         <motion.div
             ref={ref}
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay }}
-            className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group"
+            className={`bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group ${linkTo ? 'cursor-pointer' : ''} h-full flex flex-col`}
         >
             <div className="flex items-start justify-between mb-4">
                 <h3 className="headline-font text-2xl text-white">{title}</h3>
             </div>
-            <div className="space-y-3 mb-6">
+            <div className="space-y-3 mb-6 flex-grow">
                 <div className="flex items-center gap-2 text-gray-300"><Users className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{ageGroup}</span></div>
                 <div className="flex items-center gap-2 text-gray-300"><Calendar className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{schedule}</span></div>
                 <div className="flex items-center gap-2 text-gray-300"><Target className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{focus}</span></div>
             </div>
-            <div className="border-t border-white/10 pt-4">
+            <div className="border-t border-white/10 pt-4 mt-auto">
                 <div className="flex items-center justify-between">
                     <span className="headline-font text-xl text-white">{price}</span>
-                    {linkTo ? (
-                        <Link to={linkTo}>
-                            <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white">Learn More</Button>
-                        </Link>
-                    ) : (
-                        <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white">Learn More</Button>
-                    )}
+                    <Button type="button" className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white pointer-events-none">
+                        Learn More
+                    </Button>
                 </div>
             </div>
         </motion.div>
     );
+
+    return linkTo ? <Link to={linkTo} className="block h-full">{content}</Link> : <div className="h-full">{content}</div>;
 };
 
 const CoachCard = ({ name, role, bio, quote, image, delay }) => {
@@ -117,7 +108,7 @@ const CoachCard = ({ name, role, bio, quote, image, delay }) => {
 };
 
 export default function Academy() {
-    const [quizData, setQuizData] = useState({ playerName: "", age: "", skillLevel: "", goals: "", parentName: "", parentEmail: "" });
+    const [quizData, setQuizData] = useState({ age: "", skillLevel: "", goals: "" });
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [showQuizResults, setShowQuizResults] = useState(false);
@@ -126,17 +117,11 @@ export default function Academy() {
         e.preventDefault();
         setSubmitting(true);
         setError('');
-        const messageBody = `New Academy Program Recommendation Request:\nPlayer Name: ${quizData.playerName}\nAge Group: ${quizData.age}\nSkill Level: ${quizData.skillLevel}\nGoals: ${quizData.goals}\nParent Name: ${quizData.parentName}\nParent Email: ${quizData.parentEmail}`;
-        const payload = { name: quizData.parentName, email: quizData.parentEmail, message: messageBody, subject: "Academy Program Inquiry" };
 
-        const { error: invokeError } = await supabase.functions.invoke('contact-form-handler', { body: JSON.stringify(payload) });
-
-        if (invokeError) {
-            setError('Could not submit your request. Please try again later.');
-        } else {
+        setTimeout(() => {
             setShowQuizResults(true);
-        }
-        setSubmitting(false);
+            setSubmitting(false);
+        }, 600);
     };
 
     const features = [
@@ -148,7 +133,7 @@ export default function Academy() {
 
     const programs = [
         { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "Time: N/A", focus: "Focus: N/A", price: "Coming Soon" },
-        { title: "PARKLEA Development Program", ageGroup: "Age: N/A", schedule: "Time: N/A", focus: "Focus: N/A", price: "Coming Soon", linkTo: "/academy/parklea" }
+        { title: "Parklea Development Program", ageGroup: "Age: N/A", schedule: "Time: N/A", focus: "Focus: N/A", price: "$15 per week", linkTo: "/academy/parklea" }
     ];
 
     const coaches = [
@@ -256,10 +241,6 @@ export default function Academy() {
                 </div>
             </section>
 
-            <section id="holiday-program" className="py-24 px-4 bg-[#0a0a0a]">
-                <div className="max-w-5xl mx-auto"><HolidayProgramForm /></div>
-            </section>
-
             <section id="onboarding-quiz" className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]">
                 <div className="max-w-3xl mx-auto">
                     <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-12">
@@ -271,29 +252,48 @@ export default function Academy() {
                         <div className="bg-[#1a1a1a] border border-white/10 rounded-lg p-8">
                             <form onSubmit={handleQuizSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><Label className="text-white mb-2 block">Player Name *</Label><Input required value={quizData.playerName} onChange={(e) => setQuizData({ ...quizData, playerName: e.target.value })} className="bg-[#0a0a0a] border-white/10 text-white" placeholder="Full name" /></div>
-                                    <div><Label className="text-white mb-2 block">Age *</Label><Select value={quizData.age} onValueChange={(value) => setQuizData({ ...quizData, age: value })}><SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white"><SelectValue placeholder="Select age" /></SelectTrigger><SelectContent><SelectItem value="4-7">4-7</SelectItem><SelectItem value="8-12">8-12</SelectItem><SelectItem value="13-16">13-16</SelectItem><SelectItem value="16+">16+</SelectItem></SelectContent></Select></div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white mb-2 block">Age group *</Label>
+                                        <Select required value={quizData.age} onValueChange={(value) => setQuizData({ ...quizData, age: value })}>
+                                            <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white"><SelectValue placeholder="Select age" /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="4-7">4-7</SelectItem>
+                                                <SelectItem value="8-12">8-12</SelectItem>
+                                                <SelectItem value="13-16">13-16</SelectItem>
+                                                <SelectItem value="16+">16+</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white mb-2 block">Goals / Focus areas (Optional)</Label>
+                                        <Input value={quizData.goals || ""} onChange={(e) => setQuizData({ ...quizData, goals: e.target.value })} className="bg-[#0a0a0a] border-white/10 text-white" placeholder="e.g. Shooting, Fitness" />
+                                    </div>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <Label className="text-white mb-2 block">Skill Level *</Label>
-                                    <RadioGroup value={quizData.skillLevel} onValueChange={(value) => setQuizData({ ...quizData, skillLevel: value })} className="flex space-x-4"><div className="flex items-center space-x-2"><RadioGroupItem value="beginner" id="beginner" /><Label htmlFor="beginner" className="text-gray-300">Beginner</Label></div><div className="flex items-center space-x-2"><RadioGroupItem value="intermediate" id="intermediate" /><Label htmlFor="intermediate" className="text-gray-300">Intermediate</Label></div><div className="flex items-center space-x-2"><RadioGroupItem value="advanced" id="advanced" /><Label htmlFor="advanced" className="text-gray-300">Advanced</Label></div></RadioGroup>
+                                    <RadioGroup required value={quizData.skillLevel} onValueChange={(value) => setQuizData({ ...quizData, skillLevel: value })} className="flex flex-wrap gap-6">
+                                        <div className="flex items-center space-x-2"><RadioGroupItem value="beginner" id="beginner" /><Label htmlFor="beginner" className="text-gray-300">Beginner</Label></div>
+                                        <div className="flex items-center space-x-2"><RadioGroupItem value="intermediate" id="intermediate" /><Label htmlFor="intermediate" className="text-gray-300">Intermediate</Label></div>
+                                        <div className="flex items-center space-x-2"><RadioGroupItem value="advanced" id="advanced" /><Label htmlFor="advanced" className="text-gray-300">Advanced</Label></div>
+                                    </RadioGroup>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><Label className="text-white mb-2 block">Parent/Guardian Name *</Label><Input required value={quizData.parentName} onChange={(e) => setQuizData({ ...quizData, parentName: e.target.value })} className="bg-[#0a0a0a] border-white/10 text-white" placeholder="Full name" /></div>
-                                    <div><Label className="text-white mb-2 block">Email *</Label><Input required type="email" value={quizData.parentEmail} onChange={(e) => setQuizData({ ...quizData, parentEmail: e.target.value })} className="bg-[#0a0a0a] border-white/10 text-white" placeholder="your@email.com" /></div>
-                                </div>
-                                <Button type="submit" disabled={submitting} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-6 headline-font text-lg">{submitting ? 'SUBMITTING...' : 'GET RECOMMENDATION'}<ChevronRight className="w-5 h-5 ml-2" /></Button>
+                                <Button type="submit" disabled={submitting} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-6 headline-font text-lg">{submitting ? 'PROCESSING...' : 'GET RECOMMENDATION'}<ChevronRight className="w-5 h-5 ml-2" /></Button>
                                 {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
                             </form>
                         </div>
                     ) : (
-                        <div className="bg-[#1a1a1a] border border-[#FF6B00] rounded-lg p-8">
-                            <h3 className="headline-font text-3xl text-white mb-6 text-center">YOUR RECOMMENDATION</h3>
-                            <div className="bg-[#0a0a0a] rounded-lg p-6 mb-6">
-                                <h4 className="headline-font text-2xl text-[#FF6B00] mb-4">Thank You!</h4>
-                                <p className="text-gray-300">Our team has received your details. We will email you at <span className="font-semibold text-white">{quizData.parentEmail}</span> with our official program recommendation shortly.</p>
+                        <div className="bg-[#1a1a1a] border border-[#FF6B00] rounded-lg p-8 text-center flex flex-col items-center">
+                            <h3 className="headline-font text-3xl text-white mb-6">YOUR RECOMMENDATION</h3>
+                            <div className="bg-[#0a0a0a] rounded-lg p-6 mb-8 max-w-lg w-full">
+                                <h4 className="headline-font text-2xl text-[#FF6B00] mb-4">Parklea Development Program</h4>
+                                <p className="text-gray-300 mb-6 font-medium">Based on your answers, we recommend our elite development program tailored for technical and tactical growth.</p>
+                                <Link to="/academy/parklea" className="block w-full">
+                                    <Button className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-6 headline-font text-lg shadow-[0_0_15px_rgba(255,107,0,0.5)]">
+                                        VIEW PROGRAM DETAILS
+                                    </Button>
+                                </Link>
                             </div>
-                            <Button variant="outline" className="w-full border-[#FF6B00] text-[#FF6B00] hover:bg-[#FF6B00]/10 py-6 headline-font" onClick={() => setShowQuizResults(false)}>START OVER</Button>
+                            <Button variant="outline" className="border-white/10 text-gray-400 hover:text-white hover:bg-white/5 py-4 px-8 headline-font" onClick={() => setShowQuizResults(false)}>START OVER</Button>
                         </div>
                     )}
                 </div>

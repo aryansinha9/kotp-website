@@ -282,7 +282,7 @@ export default function ParkleaProgram() {
                                     className="mt-1 w-5 h-5 rounded border-gray-600 bg-[#0a0a0a] text-[#FF6B00] focus:ring-[#FF6B00] focus:ring-offset-0 transition-all cursor-pointer"
                                 />
                                 <Label htmlFor="agreedToTerms" className="text-gray-300 leading-relaxed cursor-pointer font-normal">
-                                    I acknowledge that I have read and agree to the <Link to="/terms-and-conditions" target="_blank" className="text-[#FF6B00] hover:underline font-semibold">Terms and Conditions</Link>, including the liability waiver and medical consent. Let it be known that I am the authorized parent or legal guardian of the athlete. *
+                                    I acknowledge that I have read and agree to both the <Link to="/terms-and-conditions" target="_blank" className="text-[#FF6B00] hover:underline font-semibold">Terms and Conditions</Link> and the <Link to="/privacy-policy" target="_blank" className="text-[#FF6B00] hover:underline font-semibold">Privacy Policy</Link>, including the liability waiver and medical consent. Let it be known that I am the authorized parent or legal guardian of the athlete. *
                                 </Label>
                             </div>
 
@@ -298,7 +298,7 @@ export default function ParkleaProgram() {
                             </div>
                         </section>
 
-                        <Button type="submit" disabled={submitting} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto">
+                        <Button type="submit" disabled={submitting || !formData.agreedToTerms} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto disabled:cursor-not-allowed">
                             {submitting ? "SECURING PAYMENT PORTAL..." : <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT ($15/WK)</>}
                         </Button>
                         {errorMsg && (
