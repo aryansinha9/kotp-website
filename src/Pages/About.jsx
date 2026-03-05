@@ -38,18 +38,11 @@ const TeamMember = ({ member, index }) => {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative"
     >
-      <div className="relative overflow-hidden rounded-lg">
-        <img
-          src={member.image}
-          alt={member.name}
-          className="w-full h-96 object-cover transform group-hover:scale-110 transition-transform duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+      <div className="relative overflow-hidden rounded-lg bg-[#1a1a1a] h-64 border border-white/5 flex flex-col justify-end p-6 group-hover:border-[#FF6B00]/50 transition-colors duration-300">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div className="relative z-10 transform group-hover:-translate-y-2 transition-transform duration-300">
           <h3 className="headline-font text-2xl text-white mb-1">{member.name}</h3>
-          <p className="text-[#FF6B00] mb-2">{member.role}</p>
-          <p className="text-gray-300 text-sm">{member.bio}</p>
+          <p className="text-[#FF6B00]">{member.role}</p>
         </div>
       </div>
     </motion.div>
@@ -64,10 +57,12 @@ export default function About() {
   ];
 
   const team = [
-    { name: "MARCUS JOHNSON", role: "Founder & Head Coach", bio: "Built KOTP from the streets of Western Sydney", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2000" },
-    { name: "SARAH WILLIAMS", role: "Academy Director", bio: "Former professional player, developing next gen talent", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2000" },
-    { name: "DAVID NGUYEN", role: "Tournament Director", bio: "Creating unforgettable competitive experiences", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2000" },
-    { name: "EMILY PATEL", role: "Youth Development Coach", bio: "Nurturing talent from grassroots to glory", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2000" }
+    { name: "ASH", role: "Founder & Director" },
+    { name: "ANTONY", role: "Co-Director" },
+    { name: "ARYAN", role: "Head of Digital Operations" },
+    { name: "ADRIANO", role: "Tournament Operations Manager" },
+    { name: "BISHOY", role: "Fixtures & Competition Manager" },
+    { name: "ALI", role: "Head of Media & Social strategy" }
   ];
 
   return (
@@ -90,7 +85,7 @@ export default function About() {
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="mb-16">
             <h2 className="headline-font text-5xl md:text-6xl text-white mb-6">OUR MISSION</h2>
             <div className="w-32 h-1 bg-[#FF6B00] mb-8"></div>
-            <p className="text-gray-300 text-xl leading-relaxed max-w-4xl">King of the Pitch exists to provide a world-class platform for Western Sydney's football talent. We combine the raw energy of street football with professional-level competition, creating an environment where discipline, flair, and greatness aren't just values—they're a way of life. From our elite academy to our legendary tournaments, we're building the next generation of football champions.</p>
+            <p className="text-gray-300 text-xl leading-relaxed max-w-4xl">At King of the Pitch, our mission is to elevate grassroots football by creating elite opportunities and experiences for the next generation of players. We are committed to building a strong football culture that connects athletes and communities while providing a platform where talent is seen, celebrated, and developed. Through high-energy events and media exposure, we empower players to grow in confidence, character, and skill — redefining what is possible at the grassroots level.</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {values.map((value, index) => (<ValueCard key={index} {...value} delay={index * 0.2} />))}
@@ -105,7 +100,7 @@ export default function About() {
             <div className="w-32 h-1 bg-[#FF6B00] mx-auto mb-6"></div>
             <p className="text-gray-400 text-xl max-w-3xl mx-auto">Led by passionate individuals who live and breathe football</p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((member, index) => (<TeamMember key={index} member={member} index={index} />))}
           </div>
         </div>
