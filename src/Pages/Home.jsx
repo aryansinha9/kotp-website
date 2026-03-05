@@ -139,7 +139,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0 w-full h-full opacity-70">
           <GradientBlinds
             gradientColors={['#ffca00', '#ff8a00']}
-            angle={0}
+            angle={-45}
             noise={0.3}
             blindCount={12}
             blindMinWidth={50}
