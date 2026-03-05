@@ -86,11 +86,9 @@ const HallOfFameCard = ({ winner, index }) => {
       <div className="relative h-80 overflow-hidden">
         <img src={winner.image} alt={winner.tournament} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
-        <div className="absolute top-4 left-4"><div className="bg-[#FF6B00] rounded-full p-3"><Crown className="w-6 h-6 text-white" /></div></div>
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="text-xs text-gray-400 mb-1">{winner.year}</div>
-          <h3 className="headline-font text-2xl text-white mb-2">{winner.tournament}</h3>
-          <div className="flex items-center gap-2"><Medal className="w-5 h-5 text-[#FF6B00]" /><span className="text-gray-300">{winner.team}</span></div>
+          <h3 className="headline-font text-2xl text-white">{winner.tournament}</h3>
         </div>
       </div>
     </motion.div>
@@ -104,10 +102,23 @@ export default function Tournaments() {
 
   // --- STATIC DATA: This is from your new design, we'll keep it for now ---
   const hallOfFame = [
-    { tournament: "2024 Summer Crown", team: "Western Warriors", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
-    { tournament: "2024 Spring Classic", team: "Sydney Strikers", year: "2024", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
-    { tournament: "2023 Championship", team: "Parramatta Kings", year: "2023", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
-    { tournament: "2023 Winter Cup", team: "Blacktown Legends", year: "2023", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" }
+    { tournament: "KOTP I", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
+    { tournament: "KOTP II", year: "2024", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
+    { tournament: "QOTP I", year: "2024", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
+    { tournament: "KOTP EUROS", year: "2024", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
+    { tournament: "QOTP Copa America", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
+    { tournament: "KOTP PREMIER LEAGUE", year: "2024", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
+    { tournament: "KOTP CHAMPIONS OF CHAMPIONS", year: "2024", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
+    { tournament: "KOTP U18S RISING STARS", year: "2024", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
+    { tournament: "KOTP NATIONS CUP", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
+    { tournament: "KOTP RETRO RUMBLE", year: "2025", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
+    { tournament: "KOTP CHAMPIONS LEAGUE", year: "2025", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
+    { tournament: "KOTP EUROPA LEAGUE", year: "2025", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
+    { tournament: "KOTP WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
+    { tournament: "QOTP WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
+    { tournament: "KOTP U18S WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
+    { tournament: "KOTP ULTIMATE SOCCER 10 YEAR ANNIVERSARY", year: "2025", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
+    { tournament: "KOTP LEGACY CUP", year: "2025", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" }
   ];
 
   // --- TRANSPLANTED LOGIC: Fetching live tournament data ---
@@ -144,7 +155,7 @@ export default function Tournaments() {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section id="upcoming-tournaments" className="py-24 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="mb-12">
             <h2 className="headline-font text-5xl md:text-6xl text-white mb-4">UPCOMING TOURNAMENTS</h2>
@@ -169,9 +180,8 @@ export default function Tournaments() {
       <section className="py-24 px-4 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a]">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-12">
-            <Award className="w-16 h-16 text-[#FF6B00] mx-auto mb-6" />
-            <h2 className="headline-font text-5xl md:text-6xl text-white mb-4">HALL OF FAME</h2>
-            <p className="text-gray-400 text-xl">Celebrating our champions</p>
+            <h2 className="headline-font text-5xl md:text-6xl text-white mb-4">PREVIOUS TOURNAMENTS</h2>
+            <p className="headline-font text-gray-400 text-2xl tracking-wide">Looking back at our historic competitions</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {hallOfFame.map((winner, index) => (<HallOfFameCard key={index} winner={winner} index={index} />))}
@@ -184,11 +194,14 @@ export default function Tournaments() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <h2 className="headline-font text-5xl md:text-7xl text-white mb-6">YOUR TIME IS NOW</h2>
             <p className="text-gray-400 text-xl mb-8">Don't miss your chance to compete against the best</p>
-            <Link to="/tournaments">
+            <a href="#upcoming-tournaments" onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('upcoming-tournaments')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               <button className="kotp-button bg-[#FF6B00] text-white px-12 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
                 REGISTER FOR NEXT TOURNAMENT
               </button>
-            </Link>
+            </a>
           </motion.div>
         </div>
       </section>
