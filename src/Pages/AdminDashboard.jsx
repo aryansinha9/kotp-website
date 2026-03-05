@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
 import { Registration, FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList } from "lucide-react";
+import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy } from "lucide-react";
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
@@ -168,11 +168,50 @@ export default function AdminDashboard() {
     if (window.confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
       const { error } = await supabase.from('parklea_registrations').delete().eq('id', id);
       if (error) {
-        alert(`Failed to delete registration: ${error.message}`);
+        alert(`Failed to delete registration: ${error.message} (You may need to enable DELETE policies in Supabase RLS).`);
       } else {
         await loadData();
       }
     }
+  };
+
+  const ActionMenu = ({ reg }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const copyInfo = () => {
+      const info = `Name: ${reg.participant_name}
+Age: ${reg.age_turning_2026}
+Parent: ${reg.parent_name}
+Email: ${reg.parent_email}
+Phone: ${reg.parent_phone}
+Size: Jersey(${reg.jersey_size}) Hoodie(${reg.hoodie_size}) Shorts(${reg.shorts_size}) Socks(${reg.socks_size})
+Medical: ${reg.has_medical_condition === 'yes' ? reg.medical_description : 'None'}
+Status: ${reg.payment_status}`;
+      navigator.clipboard.writeText(info);
+      setIsOpen(false);
+      alert("Information copied to clipboard!");
+    };
+
+    return (
+      <div className="relative">
+        <button onClick={() => setIsOpen(!isOpen)} className="text-gray-400 hover:text-white p-2 rounded hover:bg-white/5 transition-colors">
+          <MoreVertical className="w-5 h-5" />
+        </button>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
+            <div className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-md shadow-lg z-20 overflow-hidden">
+              <button onClick={copyInfo} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                <Copy className="w-4 h-4" /> Copy Information
+              </button>
+              <button onClick={() => { setIsOpen(false); handleDeleteParkleaRegistration(reg.id); }} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2 border-t border-white/5">
+                <Trash2 className="w-4 h-4" /> Delete
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
   };
 
   const handleDeleteReel = async (reelId) => {
@@ -245,9 +284,7 @@ export default function AdminDashboard() {
                     <StyledTableCell><a href={`tel:${reg.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-4 h-4" />Call</a></StyledTableCell>
                     <StyledTableCell>{getStatusBadge(reg.payment_status)}</StyledTableCell>
                     <StyledTableCell>
-                      <button onClick={() => handleDeleteParkleaRegistration(reg.id)} className="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/10 transition-colors" title="Delete Registration">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <ActionMenu reg={reg} />
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
