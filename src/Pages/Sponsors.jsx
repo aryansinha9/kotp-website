@@ -159,7 +159,6 @@ export default function Sponsors() {
         </div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_2q2yk2q2yk2q2yk2-Photoroom.svg" alt="Trophy" className="w-20 h-20 mx-auto mb-6" />
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">JOIN THE KINGDOM.</h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Partner with Western Sydney's most dynamic football movement</p>
           </motion.div>
