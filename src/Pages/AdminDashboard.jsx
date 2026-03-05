@@ -64,7 +64,7 @@ export default function AdminDashboard() {
         Registration.list(),
         FeaturedReel.list(),
         Tournament.list('start_date'),
-        supabase.from('parklea_registrations').select('*').order('created_at', { ascending: false }).then(res => res.data || [])
+        supabase.from('parklea_registrations').select('*').eq('payment_status', 'successful').order('created_at', { ascending: false }).then(res => res.data || [])
       ]);
       setRegistrations(regData);
       setParkleaRegistrations(parkleaData);
