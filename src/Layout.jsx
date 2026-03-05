@@ -216,8 +216,9 @@ export default function Layout({ children }) {
                 <p>Western Sydney, NSW</p>
                 <p>kotp.football@gmail.com</p>
                 <div className="flex gap-4 mt-4">
-                  <a href="#" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
-                  <a href="#" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
+                  <a href="https://www.instagram.com/kotp.football/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
+                  <a href="https://www.youtube.com/@kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">YouTube</a>
+                  <a href="https://www.facebook.com/kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
                 </div>
               </div>
             </div>
