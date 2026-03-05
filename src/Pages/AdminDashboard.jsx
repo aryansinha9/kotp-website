@@ -164,6 +164,17 @@ export default function AdminDashboard() {
     setSubmittingReel(false);
   };
 
+  const handleDeleteParkleaRegistration = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
+      const { error } = await supabase.from('parklea_registrations').delete().eq('id', id);
+      if (error) {
+        alert(`Failed to delete registration: ${error.message}`);
+      } else {
+        await loadData();
+      }
+    }
+  };
+
   const handleDeleteReel = async (reelId) => {
     if (window.confirm("Are you sure?")) {
       const { error } = await FeaturedReel.deleteById(reelId);
@@ -223,7 +234,7 @@ export default function AdminDashboard() {
               </Button>
             </div>
             {parkleaRegistrations.length === 0 ? <p className="text-center text-gray-500 py-8">No program registrations yet</p> : (
-              <StyledTable headers={["Date", "Participant", "Age", "Parent", "Email", "Phone", "Status"]}>
+              <StyledTable headers={["Date", "Participant", "Age", "Parent", "Email", "Phone", "Status", "Actions"]}>
                 {parkleaRegistrations.map((reg) => (
                   <StyledTableRow key={reg.id}>
                     <StyledTableCell>{new Date(reg.created_at).toLocaleDateString()}</StyledTableCell>
@@ -233,6 +244,11 @@ export default function AdminDashboard() {
                     <StyledTableCell><a href={`mailto:${reg.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-4 h-4" />Email</a></StyledTableCell>
                     <StyledTableCell><a href={`tel:${reg.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-4 h-4" />Call</a></StyledTableCell>
                     <StyledTableCell>{getStatusBadge(reg.payment_status)}</StyledTableCell>
+                    <StyledTableCell>
+                      <button onClick={() => handleDeleteParkleaRegistration(reg.id)} className="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/10 transition-colors" title="Delete Registration">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </StyledTableCell>
                   </StyledTableRow>
                 ))}
               </StyledTable>
