@@ -107,6 +107,8 @@ export default function Contact() {
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
               <div className="mb-8"><h2 className="headline-font text-4xl md:text-5xl text-white mb-4">SEND US A MESSAGE</h2><div className="w-24 h-1 bg-[#FF6B00]"></div></div>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Web3Forms honeypot field for spam protection */}
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-white mb-2 headline-font text-sm">YOUR NAME *</label>

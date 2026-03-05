@@ -95,6 +95,6 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error(`Webhook handler error: ${err.message}`)
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 })
+    return new Response('Webhook processing error', { status: 400 })
   }
 })

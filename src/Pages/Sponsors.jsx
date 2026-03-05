@@ -223,6 +223,8 @@ export default function Sponsors() {
               <p className="text-gray-400 text-xl">Ready to join the kingdom? Let's discuss how we can create greatness together.</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Web3Forms honeypot field for spam protection */}
+              <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-white mb-2 headline-font text-sm">YOUR NAME *</label>

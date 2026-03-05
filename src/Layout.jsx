@@ -233,7 +233,7 @@ export default function Layout({ children }) {
           </div>
           <div className="border-t border-white/10 mt-6 pt-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-gray-500 text-sm text-center md:text-left">&copy; 2025 King of the Pitch. All rights reserved.</p>
+              <p className="text-gray-500 text-sm text-center md:text-left">&copy; {new Date().getFullYear()} King of the Pitch. All rights reserved.</p>
 
               <a
                 href="https://anantasystems.com.au/"

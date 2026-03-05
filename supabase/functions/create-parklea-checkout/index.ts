@@ -40,7 +40,32 @@ serve(async (req: Request) => {
       agreedToTerms, signature, signatureDate
     } = registrationData
 
-    if (!participantName || !parentEmail) throw new Error("Missing required registration fields.")
+    // --- Server-side input validation ---
+    if (!participantName || typeof participantName !== 'string' || participantName.trim().length < 2) 
+      throw new Error("Invalid participant name.")
+    if (!parentEmail || typeof parentEmail !== 'string' || !parentEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) 
+      throw new Error("Invalid email format.")
+    if (!parentName || typeof parentName !== 'string' || parentName.trim().length < 2) 
+      throw new Error("Invalid parent name.")
+    
+    const ageNum = parseInt(ageTurning2026, 10)
+    if (isNaN(ageNum) || ageNum < 3 || ageNum > 25) 
+      throw new Error("Invalid age.")
+
+    const validSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"]
+    if (!validSizes.includes(jerseySize)) throw new Error("Invalid jersey size.")
+    if (!validSizes.includes(hoodieSize)) throw new Error("Invalid hoodie size.")
+    if (!validSizes.includes(shortsSize)) throw new Error("Invalid shorts size.")
+    if (!validSizes.includes(socksSize)) throw new Error("Invalid socks size.")
+
+    if (!parentPhone || typeof parentPhone !== 'string' || parentPhone.trim().length < 8) 
+      throw new Error("Invalid phone number.")
+    if (!homeAddress || typeof homeAddress !== 'string' || homeAddress.trim().length < 5) 
+      throw new Error("Invalid home address.")
+    if (!agreedToTerms) 
+      throw new Error("Terms must be agreed to.")
+    if (!signature || typeof signature !== 'string' || signature.trim().length < 2) 
+      throw new Error("Signature is required.")
 
     // 1. Insert into Supabase as "pending"
     const { data: record, error: dbError } = await supabaseAdmin
