@@ -75,6 +75,7 @@ export default function Sponsors() {
   // --- TRANSPLANTED LOGIC: State for the contact form ---
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   // --- TRANSPLANTED LOGIC: State for live sponsor data ---
@@ -112,21 +113,34 @@ export default function Sponsors() {
     loadSponsors();
   }, []);
 
-  // --- TRANSPLANTED LOGIC: The working contact form handler ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const payload = { ...formData, subject: "New Sponsorship Inquiry" };
+    setSubmitting(true);
 
-    const { error: invokeError } = await supabase.functions.invoke('contact-form-handler', {
-      body: JSON.stringify(payload),
-    });
+    const formDataObj = new FormData(e.target);
+    formDataObj.append("access_key", "1f42cf31-382b-4c17-903a-0401f3f9364a");
+    formDataObj.append("subject", "New Sponsorship Inquiry");
 
-    if (invokeError) {
-      setError('Message could not be sent. Please try again later.');
-    } else {
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 5000); // Reset after 5 seconds
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formDataObj
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", message: "" }); // Clear form
+        setTimeout(() => setSubmitted(false), 5000); // Reset after 5 seconds
+      } else {
+        setError(data.message || 'Message could not be sent. Please try again later.');
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -223,8 +237,8 @@ export default function Sponsors() {
                 <label className="block text-white mb-2 headline-font text-sm">MESSAGE *</label>
                 <Textarea name="message" value={formData.message} onChange={handleChange} required className="bg-[#1a1a1a] border-white/10 text-white focus:border-[#FF6B00] min-h-[150px]" placeholder="Tell us about your partnership goals..." />
               </div>
-              <Button type="submit" className="w-full kotp-button bg-[#FF6B00] text-white py-6 rounded-md headline-font text-lg tracking-wider hover:scale-105 transition-transform duration-300">
-                {submitted ? "MESSAGE SENT!" : <><Send className="w-5 h-5 mr-2" /> SEND MESSAGE</>}
+              <Button type="submit" disabled={submitting || submitted} className="w-full kotp-button bg-[#FF6B00] text-white py-6 rounded-md headline-font text-lg tracking-wider hover:scale-105 transition-transform duration-300 disabled:opacity-50">
+                {submitted ? "MESSAGE SENT!" : submitting ? "SENDING..." : <><Send className="w-5 h-5 mr-2" /> SEND MESSAGE</>}
               </Button>
               {error && <p className="text-red-500 text-sm text-center mt-4">{error}</p>}
             </form>

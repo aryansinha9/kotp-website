@@ -45,23 +45,35 @@ export default function Contact() {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // --- TRANSPLANTED LOGIC: The working handleSubmit function ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
-    const payload = { ...formData, subject: `KOTP Contact Form Inquiry: ${formData.name}` };
 
-    const { error: invokeError } = await supabase.functions.invoke('contact-form-handler', { body: JSON.stringify(payload) });
+    const formDataObj = new FormData(e.target);
+    formDataObj.append("access_key", "1f42cf31-382b-4c17-903a-0401f3f9364a");
+    formDataObj.append("subject", `KOTP Contact Form Inquiry: ${formData.name}`);
 
-    if (invokeError) {
-      setError('Your message could not be sent. Please try again later.');
-    } else {
-      setSubmitted(true);
-      setFormData({ name: "", email: "", message: "" }); // Clear form on success
-      setTimeout(() => setSubmitted(false), 5000); // Reset after 5 seconds
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formDataObj
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", message: "" }); // Clear form on success
+        setTimeout(() => setSubmitted(false), 5000); // Reset after 5 seconds
+      } else {
+        setError(data.message || 'Your message could not be sent. Please try again later.');
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   const position = [-33.8665, 150.9573];
