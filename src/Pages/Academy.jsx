@@ -203,7 +203,7 @@ export default function Academy() {
                     <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
                         <h2 className="headline-font text-5xl md:text-6xl text-white mb-6">WHY CHOOSE KOTP ACADEMY?</h2>
                         <div className="w-32 h-1 bg-[#FF6B00] mx-auto mb-8"></div>
-                        <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-12">Founded to nurture talent from Western Sydney, our academy combines professional coaching, data-driven training methods, and a proven pathway to representative football. We develop not just skilled players, but confident, disciplined athletes ready for the next level.</p>
+                        <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-12">Founded to nurture talent from Sydney, our academy combines professional coaching, data-driven training methods, and a proven pathway to representative football. We develop not just skilled players, but confident, disciplined athletes ready for the next level.</p>
                     </motion.div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, index) => (<FeatureCard key={index} {...feature} delay={index * 0.1} />))}

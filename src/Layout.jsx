@@ -199,7 +199,7 @@ export default function Layout({ children }) {
               <div className="flex items-center gap-3 mb-4">
                 <img src="/kotp_footer_logo.png" alt="King of the Pitch" className="h-20 w-auto" />
               </div>
-              <p className="text-gray-400 text-sm mb-4">Western Sydney's premier street football experience. Building legends from the streets.</p>
+              <p className="text-gray-400 text-sm mb-4">Sydney's premier football experience. Building legends from the streets.</p>
               <div className="text-[#FF6B00] headline-font text-lg">RULE THE PITCH.</div>
             </div>
             <div>
@@ -215,7 +215,11 @@ export default function Layout({ children }) {
               <div className="space-y-2 text-gray-400 text-sm">
                 <p>Sydney, NSW</p>
                 <p>kotp.football@gmail.com</p>
-                <div className="flex gap-4 mt-4">
+                <div className="mt-4 space-y-2 flex flex-col">
+                  <a href="https://billing.stripe.com/p/login/9B68wQggR5TC6tf1xuenS00" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Manage Payments</a>
+                  <Link to="/admin" className="hover:text-[#FF6B00] transition-colors">Admin Dashboard</Link>
+                </div>
+                <div className="flex gap-4 mt-6">
                   <a href="https://www.instagram.com/kotp.football/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
                   <a href="https://www.youtube.com/@kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">YouTube</a>
                   <a href="https://www.facebook.com/kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
@@ -244,10 +248,8 @@ export default function Layout({ children }) {
                 />
               </a>
               <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
-                <a href="https://billing.stripe.com/p/login/9B68wQggR5TC6tf1xuenS00" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Manage Payments</a>
                 <Link to="/privacy-policy" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Privacy Policy</Link>
                 <Link to="/terms-and-conditions" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Terms & Conditions</Link>
-                <Link to="/admin" className="text-gray-500 hover:text-[#FF6B00] transition-colors flex items-center gap-1"><span>Admin</span></Link>
               </div>
             </div>
           </div>

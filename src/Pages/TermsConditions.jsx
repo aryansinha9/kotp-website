@@ -283,7 +283,7 @@ export default function TermsConditions() {
               <p className="text-white font-semibold mb-2">King of the Pitch</p>
               <p>Email: kotp.football@gmail.com</p>
               <p>Phone: +61 2 9999 8888</p>
-              <p>Address: Parramatta Park, Western Sydney, NSW 2150</p>
+              <p>Address: Parramatta Park, Sydney, NSW 2150</p>
             </div>
           </Section>
 

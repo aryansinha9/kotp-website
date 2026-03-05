@@ -149,7 +149,7 @@ export default function Tournaments() {
                 <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'KOTP Font', sans-serif" color="#fff">LEGEND</FuzzyText>
               </span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Sydney's most prestigious street football tournaments</p>
           </motion.div>
         </div>
       </section>

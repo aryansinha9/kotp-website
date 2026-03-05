@@ -75,7 +75,7 @@ export default function About() {
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-6 text-glow">BUILT FROM THE STREETS.</h1>
-            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">We're not just a football organization. We're a movement that transforms raw talent into greatness, giving Western Sydney's athletes the platform they deserve.</p>
+            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">We're not just a football organization. We're a movement that transforms raw talent into greatness, giving Sydney's athletes the platform they deserve.</p>
           </motion.div>
         </div>
       </section>
