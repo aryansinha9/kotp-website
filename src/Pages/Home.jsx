@@ -138,7 +138,7 @@ export default function Home() {
       <section className="relative py-24 bg-[#0a0a0a] overflow-hidden min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 z-0 w-full h-full opacity-70">
           <GradientBlinds
-            gradientColors={['#FF9FFC', '#5227FF']}
+            gradientColors={['#ffca00', '#ff8a00']}
             angle={0}
             noise={0.3}
             blindCount={12}
