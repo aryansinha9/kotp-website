@@ -67,10 +67,9 @@ export default function Layout({ children }) {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         @font-face {
           font-family: 'KOTP Font';
-          src: url('/Kotp_font-Regular.otf') format('opentype'),
-               url('/Kotp_font-Regular.ttf') format('truetype');
-          font-weight: normal;
-          font-style: normal;
+          src: url('/BarlowCondensed-ExtraBoldItalic.ttf') format('truetype');
+          font-weight: 800;
+          font-style: italic;
           font-display: swap;
         }
         :root { --kotp-orange: #FF6B00; --kotp-dark: #0a0a0a; --kotp-charcoal: #1a1a1a; --kotp-grey: #2a2a2a; }
