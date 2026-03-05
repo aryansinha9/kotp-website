@@ -34,7 +34,7 @@ export default function ParkleaProgram() {
     });
 
     const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -48,39 +48,39 @@ export default function ParkleaProgram() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+        setErrorMsg('');
 
-        // Placeholder for actual Backend/Supabase submission
-        setTimeout(() => {
+        try {
+            // Supabase Edge Function handles the form data and creates a secure Stripe session URL
+            // Assuming 'supabase' client is available in this scope
+            const { data, error } = await supabase.functions.invoke('create-parklea-checkout', {
+                body: formData,
+            });
+
+            if (error) throw error;
+            if (data?.url) {
+                // Redirect standard window location to the secure Stripe Checkout portal
+                window.location.href = data.url;
+            } else if (data?.error) {
+                throw new Error(data.error);
+            } else {
+                throw new Error("Failed to generate checkout session.");
+            }
+        } catch (err) {
+            console.error(err);
+            setErrorMsg(err.message || 'An unexpected error occurred. Please try again.');
             setSubmitting(false);
-            setSubmitted(true);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 1500);
+        }
     };
 
     // Generate size options
     const apparelSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"];
 
-    if (submitted) {
-        return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-12 max-w-2xl w-full text-center">
-                    <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="w-12 h-12 text-green-500" />
-                    </div>
-                    <h2 className="headline-font text-5xl text-white mb-4">REGISTRATION RECEIVED</h2>
-                    <p className="text-gray-400 text-lg mb-8">Thank you, {formData.parentName}. The registration for {formData.participantName} to the PARKLEA Development Program has been recorded successfully. We will be in touch with next steps soon.</p>
-                    <Link to="/academy">
-                        <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white headline-font text-xl py-6 px-12 h-auto">
-                            RETURN TO ACADEMY
-                        </Button>
-                    </Link>
-                </motion.div>
-            </div>
-        );
-    }
+    // The 'submitted' state and its conditional rendering block were removed as per the instruction's diff.
+    // If you intended to keep the 'submitted' state and its display, please provide a new instruction.
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] py-24 px-4">
@@ -298,8 +298,11 @@ export default function ParkleaProgram() {
                         </section>
 
                         <Button type="submit" disabled={submitting} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto">
-                            {submitting ? "PROCESSING..." : <><Send className="w-6 h-6 mr-3" /> SUBMIT REGISTRATION</>}
+                            {submitting ? "SECURING PAYMENT PORTAL..." : <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT ($15/WK)</>}
                         </Button>
+                        {errorMsg && (
+                            <p className="text-red-500 text-center mt-4 bg-red-500/10 py-3 px-4 rounded border border-red-500/20">{errorMsg}</p>
+                        )}
                     </form>
                 </motion.div>
             </div>

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
 import { Registration, FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus } from "lucide-react";
+import { ChevronDown, ChevronUp, LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList } from "lucide-react";
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
@@ -39,6 +39,7 @@ const StyledTextarea = ({ value, onChange, placeholder }) => <Textarea value={va
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [registrations, setRegistrations] = useState([]);
+  const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
   const [reels, setReels] = useState([]);
   const [completedTournaments, setCompletedTournaments] = useState([]);
   const [selectedTournamentId, setSelectedTournamentId] = useState('');
@@ -59,12 +60,14 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [regData, reelData, allTournaments] = await Promise.all([
+      const [regData, reelData, allTournaments, parkleaData] = await Promise.all([
         Registration.list(),
         FeaturedReel.list(),
         Tournament.list('start_date'),
+        supabase.from('parklea_registrations').select('*').order('created_at', { ascending: false }).then(res => res.data || [])
       ]);
       setRegistrations(regData);
+      setParkleaRegistrations(parkleaData);
       setReels(reelData);
       setCompletedTournaments(allTournaments.filter(t => t.status === 'completed'));
       setOngoingTournaments(allTournaments.filter(t => t.status === 'ongoing'));
@@ -92,7 +95,36 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => { await supabase.auth.signOut(); navigate('/admin'); };
   const handleFileChange = (e) => { setSelectedFiles(Array.from(e.target.files)); setUploadMessage({ type: "", text: "" }); };
-  const getStatusBadge = (status) => (status === 'paid' ? <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">Paid</span> : <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Unpaid</span>);
+  const getStatusBadge = (status) => (status === 'paid' || status === 'successful' ? <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">Paid</span> : <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Pending</span>);
+
+  const downloadParkleaCSV = () => {
+    if (parkleaRegistrations.length === 0) return;
+    const headers = [
+      'Date', 'Status', 'Participant', 'Age', 'DOB', 'Position',
+      'Parent Name', 'Parent Phone', 'Parent Email', 'Emergency Contact', 'Address',
+      'Jersey', 'Hoodie', 'Shorts', 'Socks', 'Medical Condition?', 'Medical Details',
+      'Medication?', 'Medication Details', 'Signature'
+    ];
+
+    const rows = parkleaRegistrations.map(r => [
+      new Date(r.created_at).toLocaleDateString(), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.position,
+      r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, `"${(r.home_address || '').replace(/"/g, '""')}"`,
+      r.jersey_size, r.hoodie_size, r.shorts_size, r.socks_size,
+      r.has_medical_condition, `"${(r.medical_description || '').replace(/"/g, '""')}"`,
+      r.has_medication, `"${(r.medication_details || '').replace(/"/g, '""')}"`, r.signature
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + [headers.join(','), ...rows.map(e => e.join(','))].join("\\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Parklea_Registrations_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleGallerySubmit = async () => {
     if (!selectedTournamentId || selectedFiles.length === 0) { setUploadMessage({ type: "error", text: "Please select a tournament and at least one file." }); return; }
@@ -166,7 +198,30 @@ export default function AdminDashboard() {
         </div>
 
         <div className="space-y-6">
-          <Section icon={Users} title="REGISTRATIONS" count={registrations.length} defaultOpen={true}>
+          <Section icon={ClipboardList} title="PROGRAM REGISTRATIONS (PARKLEA)" count={parkleaRegistrations.length} defaultOpen={true}>
+            <div className="flex justify-end mb-4">
+              <Button onClick={downloadParkleaCSV} disabled={parkleaRegistrations.length === 0} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                <Download className="w-4 h-4 mr-2" /> EXPORT TO CSV
+              </Button>
+            </div>
+            {parkleaRegistrations.length === 0 ? <p className="text-center text-gray-500 py-8">No program registrations yet</p> : (
+              <StyledTable headers={["Date", "Participant", "Age", "Parent", "Email", "Phone", "Status"]}>
+                {parkleaRegistrations.map((reg) => (
+                  <StyledTableRow key={reg.id}>
+                    <StyledTableCell>{new Date(reg.created_at).toLocaleDateString()}</StyledTableCell>
+                    <StyledTableCell className="font-semibold text-white">{reg.participant_name}</StyledTableCell>
+                    <StyledTableCell>{reg.age_turning_2026}</StyledTableCell>
+                    <StyledTableCell>{reg.parent_name}</StyledTableCell>
+                    <StyledTableCell><a href={`mailto:${reg.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-4 h-4" />Email</a></StyledTableCell>
+                    <StyledTableCell><a href={`tel:${reg.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-4 h-4" />Call</a></StyledTableCell>
+                    <StyledTableCell>{getStatusBadge(reg.payment_status)}</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </StyledTable>
+            )}
+          </Section>
+
+          <Section icon={Users} title="TOURNAMENT REGISTRATIONS" count={registrations.length} defaultOpen={false}>
             {registrations.length === 0 ? <p className="text-center text-gray-500 py-8">No registrations yet</p> : (
               <StyledTable headers={["Team Name", "Tournament", "Contact Person", "Email", "Phone", "Division", "Payment"]}>
                 {registrations.map((reg) => (
