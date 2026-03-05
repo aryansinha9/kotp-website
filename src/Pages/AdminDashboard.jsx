@@ -64,7 +64,25 @@ export default function AdminDashboard() {
         Registration.list(),
         FeaturedReel.list(),
         Tournament.list('start_date'),
-        supabase.from('parklea_registrations').select('*').eq('payment_status', 'successful').order('created_at', { ascending: false }).then(res => res.data || [])
+        supabase.from('parklea_registrations').select('*').order('created_at', { ascending: false }).then(res => {
+          let data = res.data || [];
+          const successfulKeys = new Set(
+            data.filter(r => r.payment_status === 'successful' || r.payment_status === 'paid')
+              .map(r => `${(r.participant_name || '').toLowerCase()}-${(r.parent_email || '').toLowerCase()}`)
+          );
+          data = data.filter(r => {
+            const key = `${(r.participant_name || '').toLowerCase()}-${(r.parent_email || '').toLowerCase()}`;
+            return !((r.payment_status === 'pending') && successfulKeys.has(key));
+          });
+          data.sort((a, b) => {
+            const aIsPaid = (a.payment_status === 'successful' || a.payment_status === 'paid');
+            const bIsPaid = (b.payment_status === 'successful' || b.payment_status === 'paid');
+            if (aIsPaid && !bIsPaid) return -1;
+            if (!aIsPaid && bIsPaid) return 1;
+            return 0;
+          });
+          return data;
+        })
       ]);
       setRegistrations(regData);
       setParkleaRegistrations(parkleaData);
