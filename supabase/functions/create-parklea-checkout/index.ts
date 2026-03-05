@@ -84,10 +84,7 @@ serve(async (req: Request) => {
         {
           price_data: {
             currency: 'aud',
-            product_data: {
-              name: `PARKLEA Development Program`,
-              description: `Athlete: ${participantName} (Includes $1.50 GST)`,
-            },
+            product: 'prod_U5hSL9gqZ7F3TV',
             unit_amount: priceInCents,
             recurring: {
               interval: 'week',
