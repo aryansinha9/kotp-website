@@ -5,9 +5,8 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Users, ArrowRight, Star } from "lucide-react";
 import { Tournament } from "@/Entities/all";
-import CircularText from "@/Components/CircularText";
 import { InfiniteMovingCards } from "@/Components/ui/infinite-moving-cards";
-
+import GradientBlinds from "@/Components/ui/GradientBlinds";
 const ServiceCard = ({ title, description, image, size, icon: Icon, delay, linkTo }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -136,9 +135,25 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-24 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
+      <section className="relative py-24 bg-[#0a0a0a] overflow-hidden min-h-[600px] flex items-center justify-center">
+        <div className="absolute inset-0 z-0 w-full h-full opacity-70">
+          <GradientBlinds
+            gradientColors={['#FF9FFC', '#5227FF']}
+            angle={0}
+            noise={0.3}
+            blindCount={12}
+            blindMinWidth={50}
+            spotlightRadius={0.5}
+            spotlightSoftness={1}
+            spotlightOpacity={1}
+            mouseDampening={0.15}
+            distortAmount={0}
+            shineDirection="left"
+            mixBlendMode="lighten"
+          />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 w-full">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center">
             <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">TRAIN LIKE A CHAMPION.</h2>
             <p className="text-gray-400 text-xl mb-8">Elite coaching. Real development. Real results.</p>
             <Link to="/academy">
