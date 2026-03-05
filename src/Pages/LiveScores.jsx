@@ -131,7 +131,6 @@ export default function LiveScores() {
     <div className="min-h-screen bg-[#0a0a0a] py-24 px-4">
       <div className="max-w-7xl mx-auto mb-12">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
-          <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_2q2yk2q2yk2q2yk2-Photoroom.svg" alt="Trophy" className="w-40 h-40 mx-auto mb-6" />
           <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">LIVE SCORES</h1>
           <p className="text-gray-400 text-xl">Follow the action in real-time</p>
         </motion.div>

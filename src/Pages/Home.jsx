@@ -7,23 +7,24 @@ import { Users, ArrowRight, Star } from "lucide-react";
 import { Tournament } from "@/Entities/all";
 import { InfiniteMovingCards } from "@/Components/ui/infinite-moving-cards";
 import GradientBlinds from "@/Components/ui/GradientBlinds";
-const ServiceCard = ({ title, description, image, size, icon: Icon, delay, linkTo }) => {
+const ServiceCard = ({ title, description, image, size, delay, linkTo }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   return (
-    <Link to={linkTo}>
-      <motion.div ref={ref} initial={{ opacity: 0, y: 50 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }} transition={{ duration: 0.6, delay }} className={`relative group overflow-hidden rounded-lg ${size === "large" ? "col-span-full lg:col-span-2 lg:row-span-2" : "col-span-full lg:col-span-1"}`}>
-        <div className="relative h-full min-h-[300px] lg:min-h-[400px]">
-          <img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
-          <div className="absolute inset-0 flex flex-col justify-end p-8">
-            <div className="transform transition-transform duration-300 group-hover:translate-y-[-10px]">
-              <Icon className="w-12 h-12 text-[#FF6B00] mb-4" />
-              <h3 className="headline-font text-4xl md:text-5xl text-white mb-3">{title}</h3>
-              <p className="text-gray-300 text-lg mb-4 max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">{description}</p>
-              <div className="flex items-center gap-2 text-[#FF6B00] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="headline-font text-lg">LEARN MORE</span>
-                <ArrowRight className="w-5 h-5" />
+    <Link to={linkTo} className="block h-full">
+      <motion.div ref={ref} initial={{ opacity: 0, y: 50 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }} transition={{ duration: 0.6, delay }} className={`relative group overflow-hidden rounded-lg h-full ${size === "large" ? "col-span-full lg:col-span-2 lg:row-span-2" : "col-span-full lg:col-span-1"}`}>
+        <div className="relative h-full min-h-[400px] lg:min-h-[500px]">
+          <img src={image} alt={title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+          <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end">
+            <div className="transform transition-transform duration-500 translate-y-8 group-hover:translate-y-0">
+              <h3 className="headline-font text-5xl md:text-6xl text-white mb-2">{title}</h3>
+              <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
+                <p className="text-gray-300 text-lg mb-4 max-w-md">{description}</p>
+                <div className="flex items-center gap-2 text-[#FF6B00] font-medium uppercase tracking-wider text-sm">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" />
+                </div>
               </div>
             </div>
           </div>
@@ -128,9 +129,9 @@ export default function Home() {
             <div className="w-24 h-1 bg-[#FF6B00] mx-auto"></div>
           </motion.div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <ServiceCard title="TOURNAMENTS" description="Compete against the best. Show your skills. Claim your crown." image="/Tournaments.jpg" size="large" icon={() => <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_2q2yk2q2yk2q2yk2-Photoroom.svg" alt="Trophy" className="w-20 h-20" />} delay={0.2} linkTo="/tournaments" />
-            <ServiceCard title="ACADEMY" description="Train with the best. Develop your game. Become unstoppable." image="/Academy.jpg" size="small" icon={() => <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_61vkm061vkm061vk-Photoroom.svg" alt="Academy" className="w-16 h-16" />} delay={0.4} linkTo="/academy" />
-            <ServiceCard title="MOMENTS" description="Epic plays. Legendary celebrations. Captured forever." image="/Moments.jpg" size="small" icon={() => <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_ps4ibups4ibups4i-Photoroom.svg" alt="Camera" className="w-16 h-16" />} delay={0.6} linkTo="/moments" />
+            <ServiceCard title="TOURNAMENTS" description="Compete against the best. Show your skills. Claim your crown." image="/Tournaments.jpg" size="large" delay={0.2} linkTo="/tournaments" />
+            <ServiceCard title="ACADEMY" description="Train with the best. Develop your game. Become unstoppable." image="/Academy.jpg" size="small" delay={0.4} linkTo="/academy" />
+            <ServiceCard title="MOMENTS" description="Epic plays. Legendary celebrations. Captured forever." image="/Moments.jpg" size="small" delay={0.6} linkTo="/moments" />
           </div>
         </div>
       </section>

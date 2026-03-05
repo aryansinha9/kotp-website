@@ -85,7 +85,6 @@ export default function Moments() {
         </div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <Camera className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">CULTURE & VIBE</h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Capturing the energy, passion, and greatness of KOTP</p>
           </motion.div>

@@ -60,7 +60,6 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay }) => {
         >
             <div className="flex items-start justify-between mb-4">
                 <h3 className="headline-font text-2xl text-white">{title}</h3>
-                <Trophy className="w-8 h-8 text-[#FF6B00] group-hover:scale-110 transition-transform" />
             </div>
             <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-gray-300"><Users className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{ageGroup}</span></div>
@@ -91,7 +90,7 @@ const CoachCard = ({ name, role, bio, quote, image, delay }) => {
         >
             <div className="w-full h-80 relative bg-[#2a2a2a]">
                 {image ? (
-                    <img src={image} alt={name} className="w-full h-full object-cover object-top" />
+                    <img src={image} alt={name} className={`w-full h-full object-cover ${name === "ASH OLUMEE" ? "object-[center_15%]" : "object-top"}`} />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
                         <Users className="w-12 h-12 text-[#FF6B00]" />
@@ -105,8 +104,7 @@ const CoachCard = ({ name, role, bio, quote, image, delay }) => {
                     <p className="text-gray-300 text-sm leading-relaxed mb-6">{bio}</p>
                 </div>
                 <div className="mt-auto pt-6 border-t border-white/10 relative">
-                    <Quote className="absolute top-4 left-0 w-8 h-8 text-[#FF6B00]/20" />
-                    <p className="text-gray-400 italic text-sm relative z-10 pl-4">"{quote}"</p>
+                    <p className="text-gray-400 italic text-sm relative z-10">"{quote}"</p>
                 </div>
             </div>
         </motion.div>
