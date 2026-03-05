@@ -58,23 +58,23 @@ export default function TermsConditions() {
         >
           <div className="mb-12">
             <p className="text-gray-300 text-lg leading-relaxed">
-              Welcome to King of the Pitch ("KOTP," "we," "us," or "our"). These Terms and Conditions 
-              ("Terms") govern your access to and use of our website, programs, tournaments, and services. 
-              By accessing or using our services, you agree to be bound by these Terms. If you do not agree, 
+              Welcome to King of the Pitch ("KOTP," "we," "us," or "our"). These Terms and Conditions
+              ("Terms") govern your access to and use of our website, programs, tournaments, and services.
+              By accessing or using our services, you agree to be bound by these Terms. If you do not agree,
               please do not use our services.
             </p>
           </div>
 
           <Section icon={FileText} title="ACCEPTANCE OF TERMS">
             <p>
-              By registering for any KOTP tournament, academy program, or event, or by using our website, 
-              you acknowledge that you have read, understood, and agree to be bound by these Terms and our 
-              Privacy Policy. If you are under 18 years of age, your parent or legal guardian must review 
+              By registering for any KOTP tournament, academy program, or event, or by using our website,
+              you acknowledge that you have read, understood, and agree to be bound by these Terms and our
+              Privacy Policy. If you are under 18 years of age, your parent or legal guardian must review
               and accept these Terms on your behalf.
             </p>
             <p>
-              We reserve the right to modify these Terms at any time. Changes will be effective immediately 
-              upon posting to our website. Your continued use of our services constitutes acceptance of the 
+              We reserve the right to modify these Terms at any time. Changes will be effective immediately
+              upon posting to our website. Your continued use of our services constitutes acceptance of the
               modified Terms.
             </p>
           </Section>
@@ -94,8 +94,8 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Account Responsibility</h3>
               <p>
-                You are responsible for maintaining the confidentiality of your account credentials and for 
-                all activities that occur under your account. You agree to notify us immediately of any 
+                You are responsible for maintaining the confidentiality of your account credentials and for
+                all activities that occur under your account. You agree to notify us immediately of any
                 unauthorized use of your account.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Late Payments</h3>
               <p>
-                Failure to pay fees by the specified deadline may result in cancellation of your registration 
+                Failure to pay fees by the specified deadline may result in cancellation of your registration
                 without refund. We reserve the right to refuse services to those with outstanding balances.
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function TermsConditions() {
               <li>Respect venue property and facilities</li>
             </ul>
             <p className="mt-3 text-[#FF6B00]">
-              Violation of the Code of Conduct may result in immediate disqualification, removal from the 
+              Violation of the Code of Conduct may result in immediate disqualification, removal from the
               event, and ban from future KOTP programs without refund.
             </p>
           </Section>
@@ -153,8 +153,8 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Assumption of Risk</h3>
               <p>
-                Participation in football activities involves inherent risks, including but not limited to 
-                physical injury, illness, or death. By participating, you acknowledge these risks and voluntarily 
+                Participation in football activities involves inherent risks, including but not limited to
+                physical injury, illness, or death. By participating, you acknowledge these risks and voluntarily
                 assume all responsibility for any injuries or damages that may occur.
               </p>
             </div>
@@ -162,8 +162,8 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Release of Liability</h3>
               <p>
-                To the fullest extent permitted by law, you release and hold harmless KOTP, its officers, 
-                directors, employees, volunteers, sponsors, and affiliates from any and all claims, demands, 
+                To the fullest extent permitted by law, you release and hold harmless KOTP, its officers,
+                directors, employees, volunteers, sponsors, and affiliates from any and all claims, demands,
                 damages, or liability arising from your participation in our programs, including but not limited to:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 mt-2">
@@ -177,8 +177,8 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Insurance</h3>
               <p>
-                KOTP maintains general liability insurance for our events. However, participants are strongly 
-                encouraged to maintain their own personal health and accident insurance. KOTP is not responsible 
+                KOTP maintains general liability insurance for our events. However, participants are strongly
+                encouraged to maintain their own personal health and accident insurance. KOTP is not responsible
                 for medical expenses incurred due to injuries sustained during participation.
               </p>
             </div>
@@ -186,8 +186,8 @@ export default function TermsConditions() {
             <div>
               <h3 className="text-white font-semibold mb-2">Medical Emergencies</h3>
               <p>
-                In the event of a medical emergency, you authorize KOTP staff to seek medical treatment on 
-                your behalf (or your child's behalf). You agree to be financially responsible for all medical 
+                In the event of a medical emergency, you authorize KOTP staff to seek medical treatment on
+                your behalf (or your child's behalf). You agree to be financially responsible for all medical
                 expenses incurred.
               </p>
             </div>
@@ -195,8 +195,8 @@ export default function TermsConditions() {
 
           <Section icon={FileText} title="MEDIA RIGHTS">
             <p>
-              By participating in KOTP events, you grant us the irrevocable right to use, reproduce, and 
-              distribute photographs, videos, audio recordings, and other media featuring your likeness or 
+              By participating in KOTP events, you grant us the irrevocable right to use, reproduce, and
+              distribute photographs, videos, audio recordings, and other media featuring your likeness or
               performance for promotional, marketing, and educational purposes, including but not limited to:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -206,20 +206,20 @@ export default function TermsConditions() {
               <li>Print publications and press releases</li>
             </ul>
             <p className="mt-3">
-              If you wish to opt out of media usage, you must submit a written request to 
-              media@kingofthepitch.com.au prior to the event.
+              If you wish to opt out of media usage, you must submit a written request to
+              kotp.football@gmail.com prior to the event.
             </p>
           </Section>
 
           <Section icon={Scale} title="INTELLECTUAL PROPERTY">
             <p>
-              All content on our website and materials, including but not limited to logos, designs, text, 
-              graphics, software, and images, are the property of KOTP or our licensors and are protected by 
+              All content on our website and materials, including but not limited to logos, designs, text,
+              graphics, software, and images, are the property of KOTP or our licensors and are protected by
               copyright, trademark, and other intellectual property laws.
             </p>
             <p>
-              You may not reproduce, distribute, modify, or create derivative works from our content without 
-              our express written permission. The KOTP name, logo, and all related marks are trademarks of 
+              You may not reproduce, distribute, modify, or create derivative works from our content without
+              our express written permission. The KOTP name, logo, and all related marks are trademarks of
               King of the Pitch.
             </p>
           </Section>
@@ -234,43 +234,43 @@ export default function TermsConditions() {
               <li>Eject participants for violations of these Terms or the Code of Conduct</li>
             </ul>
             <p className="mt-3">
-              In the event of KOTP-initiated cancellation, registered participants will receive a full refund 
-              or credit toward a future event. We are not responsible for travel, accommodation, or other 
+              In the event of KOTP-initiated cancellation, registered participants will receive a full refund
+              or credit toward a future event. We are not responsible for travel, accommodation, or other
               expenses incurred by participants.
             </p>
           </Section>
 
           <Section icon={Shield} title="LIMITATION OF LIABILITY">
             <p>
-              To the maximum extent permitted by law, KOTP's total liability for any claims arising from or 
-              related to our services shall not exceed the amount of fees paid by you for the specific event 
+              To the maximum extent permitted by law, KOTP's total liability for any claims arising from or
+              related to our services shall not exceed the amount of fees paid by you for the specific event
               or service giving rise to the claim.
             </p>
             <p>
-              KOTP shall not be liable for any indirect, incidental, consequential, special, or punitive 
-              damages, including but not limited to loss of profits, data, or goodwill, whether in contract, 
+              KOTP shall not be liable for any indirect, incidental, consequential, special, or punitive
+              damages, including but not limited to loss of profits, data, or goodwill, whether in contract,
               tort, or otherwise, even if advised of the possibility of such damages.
             </p>
           </Section>
 
           <Section icon={FileText} title="GOVERNING LAW & DISPUTES">
             <p>
-              These Terms shall be governed by and construed in accordance with the laws of New South Wales, 
-              Australia, without regard to conflict of law principles. Any disputes arising from these Terms 
-              or your use of our services shall be subject to the exclusive jurisdiction of the courts of 
+              These Terms shall be governed by and construed in accordance with the laws of New South Wales,
+              Australia, without regard to conflict of law principles. Any disputes arising from these Terms
+              or your use of our services shall be subject to the exclusive jurisdiction of the courts of
               New South Wales.
             </p>
             <p>
-              In the event of any dispute, you agree to first attempt to resolve the matter informally by 
-              contacting us directly. If informal resolution is unsuccessful, you agree to submit to binding 
+              In the event of any dispute, you agree to first attempt to resolve the matter informally by
+              contacting us directly. If informal resolution is unsuccessful, you agree to submit to binding
               arbitration in accordance with Australian arbitration law.
             </p>
           </Section>
 
           <Section icon={Users} title="SEVERABILITY">
             <p>
-              If any provision of these Terms is found to be invalid, illegal, or unenforceable, the remaining 
-              provisions shall continue in full force and effect. The invalid provision shall be modified to 
+              If any provision of these Terms is found to be invalid, illegal, or unenforceable, the remaining
+              provisions shall continue in full force and effect. The invalid provision shall be modified to
               the minimum extent necessary to make it valid and enforceable.
             </p>
           </Section>
@@ -281,7 +281,7 @@ export default function TermsConditions() {
             </p>
             <div className="bg-[#0a0a0a] border border-white/10 rounded-lg p-6 mt-4">
               <p className="text-white font-semibold mb-2">King of the Pitch</p>
-              <p>Email: legal@kingofthepitch.com.au</p>
+              <p>Email: kotp.football@gmail.com</p>
               <p>Phone: +61 2 9999 8888</p>
               <p>Address: Parramatta Park, Western Sydney, NSW 2150</p>
             </div>
@@ -294,9 +294,9 @@ export default function TermsConditions() {
                 <div>
                   <p className="text-white font-semibold mb-2">Important Notice</p>
                   <p className="text-gray-400 text-sm">
-                    By registering for any KOTP event or using our services, you acknowledge that you have 
-                    read, understood, and agree to be bound by these Terms and Conditions in their entirety. 
-                    If you are registering a minor, you represent that you are their parent or legal guardian 
+                    By registering for any KOTP event or using our services, you acknowledge that you have
+                    read, understood, and agree to be bound by these Terms and Conditions in their entirety.
+                    If you are registering a minor, you represent that you are their parent or legal guardian
                     and have the authority to agree to these Terms on their behalf.
                   </p>
                 </div>

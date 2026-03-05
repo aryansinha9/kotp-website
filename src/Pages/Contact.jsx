@@ -64,7 +64,7 @@ export default function Contact() {
     setSubmitting(false);
   };
 
-  const position = [-33.8141, 151.0043];
+  const position = [-33.8665, 150.9573];
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
@@ -74,7 +74,6 @@ export default function Contact() {
         <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?q=80&w=2000" alt="Contact" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <MessageSquare className="w-20 h-20 text-[#FF6B00] mx-auto mb-6" />
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">GET IN TOUCH</h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Have questions? Want to partner with us? We'd love to hear from you.</p>
           </motion.div>
@@ -83,11 +82,9 @@ export default function Contact() {
 
       <section className="py-16 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <InfoCard icon={MapPin} title="LOCATION" content="Parramatta Park, Western Sydney, NSW 2150" delay={0} />
-            <InfoCard icon={Mail} title="EMAIL" content={<a href="mailto:info@kingofthepitch.com.au" className="hover:underline">info@kingofthepitch.com.au</a>} delay={0.1} />
-            <InfoCard icon={Phone} title="PHONE" content={<a href="tel:+61299998888" className="hover:underline">+61 2 9999 8888</a>} delay={0.2} />
-            <InfoCard icon={Clock} title="HOURS" content="Mon-Fri: 9am-6pm | Sat-Sun: 10am-4pm" delay={0.3} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <InfoCard icon={MapPin} title="LOCATION" content="405 The Horsley Dr, Fairfield NSW 2165" delay={0} />
+            <InfoCard icon={Mail} title="EMAIL" content={<a href="mailto:kotp.football@gmail.com" className="hover:underline">kotp.football@gmail.com</a>} delay={0.1} />
           </div>
         </div>
       </section>
@@ -123,7 +120,7 @@ export default function Contact() {
               <div className="relative h-[500px] rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#FF6B00]/50 transition-all duration-300">
                 <MapContainer center={position} zoom={15} style={{ height: "100%", width: "100%" }} scrollWheelZoom={false}>
                   <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Marker position={position} icon={customIcon}><Popup><div className="p-2"><p className="headline-font text-[#FF6B00] text-lg mb-1">KING OF THE PITCH</p><p className="text-sm text-gray-300">Parramatta Park<br />Western Sydney, NSW</p></div></Popup></Marker>
+                  <Marker position={position} icon={customIcon}><Popup><div className="p-2"><p className="headline-font text-[#FF6B00] text-lg mb-1">KING OF THE PITCH</p><p className="text-sm text-gray-300">405 The Horsley Dr<br />Fairfield NSW 2165</p></div></Popup></Marker>
                 </MapContainer>
               </div>
             </motion.div>

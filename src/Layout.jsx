@@ -214,7 +214,7 @@ export default function Layout({ children }) {
               <h3 className="headline-font text-white text-lg mb-4">CONNECT</h3>
               <div className="space-y-2 text-gray-400 text-sm">
                 <p>Western Sydney, NSW</p>
-                <p>info@kingofthepitch.com.au</p>
+                <p>kotp.football@gmail.com</p>
                 <div className="flex gap-4 mt-4">
                   <a href="#" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
                   <a href="#" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
