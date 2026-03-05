@@ -4,7 +4,7 @@ import { Menu, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PartnerBanner from "@/Components/PartnerBanner";
 import ShinyText from "@/Components/ShinyText";
-import UnderConstructionBanner from "@/Components/UnderConstructionBanner";
+
 import ShapeBlur from "@/Components/ShapeBlur";
 
 export default function Layout({ children }) {
@@ -190,7 +190,7 @@ export default function Layout({ children }) {
 
       <main className="relative">{children}</main>
       <PartnerBanner />
-      <UnderConstructionBanner />
+
 
       <footer className="bg-[#0a0a0a] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
