@@ -86,7 +86,17 @@ const CoachCard = ({ name, role, bio, quote, image, delay }) => {
         >
             <div className="w-full h-80 relative bg-[#2a2a2a]">
                 {image ? (
-                    <img src={image} alt={name} className={`w-full h-full object-cover ${name === "ASH OLUMEE" ? "object-[center_15%]" : "object-top"}`} />
+                    <img
+                        src={image}
+                        alt={name}
+                        /* 
+                         * To manually adjust Ash's image position in the future:
+                         * Change the "object-[center_30%]" below. 
+                         * 0% = top of image, 50% = middle, 100% = bottom. 
+                         * Increase the number to pull more of the body up into frame.
+                         */
+                        className={`w-full h-full object-cover ${name === "ASH OLUMEE" ? "object-[center_30%]" : "object-top"}`}
+                    />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
                         <Users className="w-12 h-12 text-[#FF6B00]" />
