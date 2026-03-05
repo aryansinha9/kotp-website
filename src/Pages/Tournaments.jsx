@@ -136,7 +136,7 @@ export default function Tournaments() {
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-baseline justify-center gap-2">
               <span>BECOME A</span>
               <span style={{ filter: 'drop-shadow(0 0 20px rgba(255, 107, 0, 0.5))' }}>
-                <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'Bebas Neue', cursive" color="#fff">LEGEND</FuzzyText>
+                <FuzzyText fontSize="clamp(3rem, 8vw, 8rem)" fontFamily="'KOTP Font', sans-serif" color="#fff">LEGEND</FuzzyText>
               </span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">Compete in Western Sydney's most prestigious street football tournaments</p>

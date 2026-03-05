@@ -64,10 +64,18 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @font-face {
+          font-family: 'KOTP Font';
+          src: url('/Kotp_font-Regular.otf') format('opentype'),
+               url('/Kotp_font-Regular.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
         :root { --kotp-orange: #FF6B00; --kotp-dark: #0a0a0a; --kotp-charcoal: #1a1a1a; --kotp-grey: #2a2a2a; }
         body { font-family: 'Inter', sans-serif; background: var(--kotp-dark); overflow-x: hidden; }
-        .headline-font { font-family: 'Bebas Neue', cursive; letter-spacing: 0.05em; }
+        .headline-font { font-family: 'KOTP Font', sans-serif; letter-spacing: 0.05em; }
         .glow-orange { box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); }
         .glow-orange-hover:hover { box-shadow: 0 0 30px rgba(255, 107, 0, 0.6); }
         .text-glow { text-shadow: 0 0 20px rgba(255, 107, 0, 0.5); }

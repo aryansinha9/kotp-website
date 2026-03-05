@@ -155,7 +155,7 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 w-full">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center">
             <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">TRAIN LIKE A CHAMPION.</h2>
-            <p className="text-gray-400 text-xl mb-8">Elite coaching. Real development. Real results.</p>
+            <p className="headline-font text-gray-400 text-2xl tracking-wide mb-8">Elite coaching. Real development. Real results.</p>
             <Link to="/academy">
               <button className="kotp-button bg-[#FF6B00] text-white px-8 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
                 JOIN THE ACADEMY
