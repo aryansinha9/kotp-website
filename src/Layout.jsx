@@ -212,17 +212,22 @@ export default function Layout({ children }) {
             </div>
             <div>
               <h3 className="headline-font text-white text-lg mb-4">CONNECT</h3>
-              <div className="space-y-2 text-gray-400 text-sm">
-                <p>Sydney, NSW</p>
-                <p>kotp.football@gmail.com</p>
-                <div className="mt-4 space-y-2 flex flex-col">
-                  <a href="https://billing.stripe.com/p/login/9B68wQggR5TC6tf1xuenS00" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Manage Payments</a>
-                  <Link to="/admin" className="hover:text-[#FF6B00] transition-colors">Admin Dashboard</Link>
+              <div className="space-y-4 text-gray-400 text-sm">
+                <div className="space-y-1">
+                  <p><span className="text-white">Location:</span> Sydney, New South Wales</p>
+                  <p><span className="text-white">Organization:</span> KTP Football</p>
+                  <p><span className="text-white">Email:</span> kotp.football@gmail.com</p>
                 </div>
-                <div className="flex gap-4 mt-6">
+
+                <div className="flex gap-4">
                   <a href="https://www.instagram.com/kotp.football/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Instagram</a>
                   <a href="https://www.youtube.com/@kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">YouTube</a>
                   <a href="https://www.facebook.com/kotp.football" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors">Facebook</a>
+                </div>
+
+                <div className="pt-4 space-y-2 flex flex-col border-t border-white/5">
+                  <a href="https://billing.stripe.com/p/login/9B68wQggR5TC6tf1xuenS00" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF6B00] transition-colors text-xs uppercase tracking-wider">Manage Payments</a>
+                  <Link to="/admin" className="hover:text-[#FF6B00] transition-colors text-xs uppercase tracking-wider">Admin Dashboard</Link>
                 </div>
               </div>
             </div>
