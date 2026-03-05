@@ -77,7 +77,7 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay }) => {
     );
 };
 
-const CoachCard = ({ name, role, qualifications, experience, quote, delay }) => {
+const CoachCard = ({ name, role, bio, quote, image, delay }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
@@ -87,16 +87,28 @@ const CoachCard = ({ name, role, qualifications, experience, quote, delay }) => 
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay }}
-            className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300"
+            className="bg-[#1a1a1a] border border-white/10 rounded-lg overflow-hidden hover:border-[#FF6B00]/50 transition-all duration-300 flex flex-col h-full"
         >
-            <div className="w-24 h-24 bg-[#2a2a2a] rounded-full flex items-center justify-center mb-4 mx-auto"><Users className="w-12 h-12 text-[#FF6B00]" /></div>
-            <h3 className="headline-font text-xl text-white text-center mb-1">{name}</h3>
-            <p className="text-[#FF6B00] text-sm text-center mb-3">{role}</p>
-            <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-gray-400 text-sm"><Award className="w-4 h-4 text-[#FF6B00]" /><span>{qualifications}</span></div>
-                <div className="flex items-center gap-2 text-gray-400 text-sm"><Clock className="w-4 h-4 text-[#FF6B00]" /><span>{experience}</span></div>
+            <div className="w-full h-80 relative bg-[#2a2a2a]">
+                {image ? (
+                    <img src={image} alt={name} className="w-full h-full object-cover object-top" />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <Users className="w-12 h-12 text-[#FF6B00]" />
+                    </div>
+                )}
             </div>
-            <p className="text-gray-400 text-sm italic text-center">"{quote}"</p>
+            <div className="p-6 flex flex-col flex-grow">
+                <h3 className="headline-font text-3xl text-white mb-1">{name}</h3>
+                <p className="text-[#FF6B00] font-medium mb-4">{role}</p>
+                <div className="flex-grow">
+                    <p className="text-gray-300 text-sm leading-relaxed mb-6">{bio}</p>
+                </div>
+                <div className="mt-auto pt-6 border-t border-white/10 relative">
+                    <Quote className="absolute top-4 left-0 w-8 h-8 text-[#FF6B00]/20" />
+                    <p className="text-gray-400 italic text-sm relative z-10 pl-4">"{quote}"</p>
+                </div>
+            </div>
         </motion.div>
     );
 };
