@@ -139,9 +139,20 @@ export default function Academy() {
     ];
 
     const coaches = [
-        { name: "DAVID MARTINEZ", role: "Head Coach", qualifications: "FFA B-License, Sports Science Degree", experience: "12 years coaching", quote: "Every player has the potential to be great with the right guidance." },
-        { name: "SARAH CHEN", role: "Technical Director", qualifications: "AFC A-License, Former Pro Player", experience: "8 years elite coaching", quote: "We focus on developing the complete player, not just skills." },
-        { name: "JAMES WILSON", role: "Goalkeeper Coach", qualifications: "GK Specialist Certification", experience: "10 years GK coaching", quote: "Goalkeepers are game-changers. We train them to be leaders." }
+        {
+            name: "ASH OLUMEE",
+            role: "Technical Director",
+            bio: "Ash Olumee is a footballer with 16 years of playing experience, having competed at NPL1 level and overseas in England. With 7 years of coaching experience, he is the Technical Director at Parklea SFC, overseeing the development of more than 800 junior players. His core goal is to create a high-performance, player-first development environment that maximises technical ability, game intelligence, and long-term potential.",
+            quote: "Develop the player first, and the results will always follow.",
+            image: "/Ash.png"
+        },
+        {
+            name: "ANTONY GABALLAH",
+            role: "Assistant Technical Director",
+            bio: "Antony Gaballah has 9 years of playing experience, including time spent developing and competing in England and Spain. With 4 years of coaching experience, he serves as Assistant Technical Director at Parklea SFC. His focus is on strengthening core fundamentals, elevating training standards, and guiding players to build strong character, tactical intelligence, and consistency in their performance.",
+            quote: "Strong foundations, strong habits, and the confidence to express yourself—that's real development.",
+            image: "/Anto.png"
+        }
     ];
 
     const faqs = [
@@ -226,7 +237,7 @@ export default function Academy() {
                         <h2 className="headline-font text-5xl md:text-6xl text-white mb-6">MEET THE COACHES</h2>
                         <div className="w-32 h-1 bg-[#FF6B00] mx-auto"></div>
                     </motion.div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto gap-12">
                         {coaches.map((coach, index) => (<CoachCard key={index} {...coach} delay={index * 0.1} />))}
                     </div>
                 </div>
