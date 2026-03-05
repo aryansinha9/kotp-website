@@ -16,11 +16,10 @@ import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
 
-// Placeholder for missing HolidayProgramForm component
 const HolidayProgramForm = () => (
     <div className="text-center bg-[#1a1a1a] border border-white/10 rounded-lg p-8">
         <h2 className="headline-font text-4xl text-white mb-4">Holiday Program Registration</h2>
-        <p className="text-gray-400">This feature is coming soon. Please check back later!</p>
+        {/* Placeholder form area or instructions can go here in the future */}
     </div>
 );
 
@@ -46,7 +45,7 @@ const FeatureCard = ({ icon: Icon, title, description, delay }) => {
     );
 };
 
-const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay }) => {
+const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
@@ -69,7 +68,13 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay }) => {
             <div className="border-t border-white/10 pt-4">
                 <div className="flex items-center justify-between">
                     <span className="headline-font text-xl text-white">{price}</span>
-                    <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white">Learn More</Button>
+                    {linkTo ? (
+                        <Link to={linkTo}>
+                            <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white">Learn More</Button>
+                        </Link>
+                    ) : (
+                        <Button className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white">Learn More</Button>
+                    )}
                 </div>
             </div>
         </motion.div>
@@ -142,10 +147,8 @@ export default function Academy() {
     ];
 
     const programs = [
-        { title: "Mini Kickers", ageGroup: "Ages 4-7", schedule: "Saturdays 9am-10am", focus: "Fun, fundamentals, coordination", price: "$120/term" },
-        { title: "Development Squad", ageGroup: "Ages 8-12", schedule: "Mon & Wed 4pm-5:30pm", focus: "Technical skills, teamwork", price: "$280/term" },
-        { title: "High-Performance Academy", ageGroup: "Ages 13-16", schedule: "Tue & Thu 5pm-7pm", focus: "Advanced tactics, conditioning", price: "$350/term" },
-        { title: "Elite Pathway", ageGroup: "Ages 16+", schedule: "Custom schedule", focus: "Rep preparation, college pathway", price: "Contact us" }
+        { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "Time: N/A", focus: "Focus: N/A", price: "Coming Soon" },
+        { title: "PARKLEA Development Program", ageGroup: "Age: N/A", schedule: "Time: N/A", focus: "Focus: N/A", price: "Coming Soon", linkTo: "/academy/parklea" }
     ];
 
     const coaches = [
