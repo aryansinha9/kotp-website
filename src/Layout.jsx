@@ -243,6 +243,7 @@ export default function Layout({ children }) {
                 />
               </a>
               <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
+                <a href="https://billing.stripe.com/p/login/9B68wQggR5TC6tf1xuenS00" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Manage Subscription</a>
                 <Link to="/privacy-policy" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Privacy Policy</Link>
                 <Link to="/terms-and-conditions" className="text-gray-500 hover:text-[#FF6B00] transition-colors">Terms & Conditions</Link>
                 <Link to="/admin" className="text-gray-500 hover:text-[#FF6B00] transition-colors flex items-center gap-1"><span>Admin</span></Link>
