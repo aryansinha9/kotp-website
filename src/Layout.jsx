@@ -68,13 +68,13 @@ export default function Layout({ children }) {
         @font-face {
           font-family: 'KOTP Font';
           src: url('/BarlowCondensed-ExtraBoldItalic.ttf') format('truetype');
-          font-weight: 800;
-          font-style: italic;
+          font-weight: normal;
+          font-style: normal;
           font-display: swap;
         }
         :root { --kotp-orange: #FF6B00; --kotp-dark: #0a0a0a; --kotp-charcoal: #1a1a1a; --kotp-grey: #2a2a2a; }
         body { font-family: 'Inter', sans-serif; background: var(--kotp-dark); overflow-x: hidden; }
-        .headline-font { font-family: 'KOTP Font', sans-serif; letter-spacing: 0.05em; }
+        .headline-font { font-family: 'KOTP Font', sans-serif; letter-spacing: 0.05em; font-weight: normal; font-style: normal; }
         .glow-orange { box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); }
         .glow-orange-hover:hover { box-shadow: 0 0 30px rgba(255, 107, 0, 0.6); }
         .text-glow { text-shadow: 0 0 20px rgba(255, 107, 0, 0.5); }
@@ -101,20 +101,20 @@ export default function Layout({ children }) {
 
       {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-[#FF6B00] origin-left z-[60]"
+        className="fixed top-0 left-0 right-0 h-1 bg-[#FF6B00] origin-left z-[10000]"
         style={{ scaleX: window.scrollY / (document.body.scrollHeight - window.innerHeight) }}
       />
 
-      <nav className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500 transform ${visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-[9999] bg-transparent transition-all duration-500 transform ${visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <Link to="/" className="flex items-center gap-3 group relative z-50">
+            <Link to="/" className="flex items-center gap-3 group relative z-[9999]">
               <img src="/kotp_new_logo.png" alt="King of the Pitch" className="h-20 w-auto transform group-hover:scale-110 transition-transform duration-300" />
             </Link>
 
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors group relative z-50"
+              className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors group relative z-[9999]"
               aria-label="Open Menu"
             >
               <div className="flex flex-col gap-1.5 items-end">
@@ -136,7 +136,7 @@ export default function Layout({ children }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
             />
 
             {/* Side Drawer */}
@@ -145,7 +145,7 @@ export default function Layout({ children }) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-[#0a0a0a] border-l border-white/10 z-[60] flex flex-col shadow-2xl"
+              className="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-[#0a0a0a] border-l border-white/10 z-[9999] flex flex-col shadow-2xl"
             >
               <div className="flex justify-between items-center p-6 border-b border-white/5">
                 <span className="headline-font text-xl text-white tracking-wider">MENU</span>
