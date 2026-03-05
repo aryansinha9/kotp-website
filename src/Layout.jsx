@@ -214,9 +214,8 @@ export default function Layout({ children }) {
               <h3 className="headline-font text-white text-lg mb-4">CONNECT</h3>
               <div className="space-y-4 text-gray-400 text-sm">
                 <div className="space-y-1">
-                  <p><span className="text-white">Location:</span> Sydney, New South Wales</p>
-                  <p><span className="text-white">Organization:</span> KTP Football</p>
-                  <p><span className="text-white">Email:</span> kotp.football@gmail.com</p>
+                  <p>Sydney, NSW</p>
+                  <p>kotp.football@gmail.com</p>
                 </div>
 
                 <div className="flex gap-4">
