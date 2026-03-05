@@ -74,13 +74,6 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 1.1]);
 
-  const testimonials = [
-    { quote: "KOTP gave me the platform to showcase my skills. Now I'm playing at the next level.", name: "MARCUS T.", role: "2024 Tournament Champion" },
-    { quote: "The energy here is unmatched. This is where champions are made.", name: "SARAH K.", role: "Academy Graduate" },
-    { quote: "From the streets to the spotlight. KOTP is the real deal.", name: "ALEX R.", role: "U18 Division Winner" },
-    { quote: "An experience like no other. The competition is fierce and the community is real.", name: "JESSICA L.", role: "Spectator & Parent" },
-  ];
-
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const BUCKET_NAME = 'tournament-gallery';
   const STORAGE_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/`;
@@ -146,10 +139,14 @@ export default function Home() {
       <section className="relative py-24 bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
-            <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">THE HYPE IS REAL.</h2>
-            <p className="text-gray-400 text-xl">Hear from our champions</p>
+            <h2 className="headline-font text-5xl md:text-7xl text-white mb-4">TRAIN LIKE A CHAMPION.</h2>
+            <p className="text-gray-400 text-xl mb-8">Elite coaching. Real development. Real results.</p>
+            <Link to="/academy">
+              <button className="kotp-button bg-[#FF6B00] text-white px-8 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
+                JOIN THE ACADEMY
+              </button>
+            </Link>
           </motion.div>
-          <InfiniteMovingCards items={testimonials.map(t => <TestimonialCard {...t} />)} direction="right" speed="slow" />
         </div>
       </section>
 
