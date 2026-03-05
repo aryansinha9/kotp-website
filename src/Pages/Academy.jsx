@@ -6,7 +6,7 @@ import { motion, useInView } from "framer-motion";
 import { supabase } from "@/supabaseClient";
 import {
     Trophy, Target, Users, Award, ChevronRight, Check,
-    Mail, Phone, MapPin, Calendar, Clock, Star, Play, AlertCircle
+    Mail, Phone, MapPin, Calendar, Clock, Star, Play, AlertCircle, Quote
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
