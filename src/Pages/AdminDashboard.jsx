@@ -75,11 +75,18 @@ export default function AdminDashboard() {
             return !((r.payment_status === 'pending') && successfulKeys.has(key));
           });
           data.sort((a, b) => {
-            const aIsPaid = (a.payment_status === 'successful' || a.payment_status === 'paid');
-            const bIsPaid = (b.payment_status === 'successful' || b.payment_status === 'paid');
-            if (aIsPaid && !bIsPaid) return -1;
-            if (!aIsPaid && bIsPaid) return 1;
-            return 0;
+            const getSortWeight = (reg) => {
+              const isPaid = (reg.payment_status === 'successful' || reg.payment_status === 'paid');
+              const isStandard = (!reg.package_type || reg.package_type === 'standard');
+              
+              if (isPaid && isStandard) return 1;
+              if (isPaid && !isStandard) return 2;
+              if (!isPaid && isStandard) return 3;
+              if (!isPaid && !isStandard) return 4;
+              return 5;
+            };
+
+            return getSortWeight(a) - getSortWeight(b);
           });
           return data;
         })
@@ -118,14 +125,14 @@ export default function AdminDashboard() {
   const downloadParkleaCSV = () => {
     if (parkleaRegistrations.length === 0) return;
     const headers = [
-      'Date', 'Status', 'Participant', 'Age', 'DOB', 'Position',
+      'Date', 'Package', 'Status', 'Participant', 'Age', 'DOB', 'Position',
       'Parent Name', 'Parent Phone', 'Parent Email', 'Emergency Contact', 'Address',
       'Jersey', 'Hoodie', 'Shorts', 'Socks', 'Medical Condition?', 'Medical Details',
       'Medication?', 'Medication Details', 'Signature'
     ];
 
     const rows = parkleaRegistrations.map(r => [
-      new Date(r.created_at).toLocaleDateString(), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.position,
+      new Date(r.created_at).toLocaleDateString(), (r.package_type || 'standard').charAt(0).toUpperCase() + (r.package_type || 'standard').slice(1), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.position,
       r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, `"${(r.home_address || '').replace(/"/g, '""')}"`,
       r.jersey_size, r.hoodie_size, r.shorts_size, r.socks_size,
       r.has_medical_condition, `"${(r.medical_description || '').replace(/"/g, '""')}"`,
@@ -273,10 +280,11 @@ Status: ${reg.payment_status}`;
               </Button>
             </div>
             {parkleaRegistrations.length === 0 ? <p className="text-center text-gray-500 py-8">No program registrations yet</p> : (
-              <StyledTable headers={["Date", "Participant", "Age", "Parent", "Email", "Phone", "Status", "Actions"]}>
+              <StyledTable headers={["Date", "Package", "Participant", "Age", "Parent", "Email", "Phone", "Status", "Actions"]}>
                 {parkleaRegistrations.map((reg) => (
                   <StyledTableRow key={reg.id}>
                     <StyledTableCell>{new Date(reg.created_at).toLocaleDateString()}</StyledTableCell>
+                    <StyledTableCell className="capitalize text-gray-400">{reg.package_type || 'standard'}</StyledTableCell>
                     <StyledTableCell className="font-semibold text-white">{reg.participant_name}</StyledTableCell>
                     <StyledTableCell>{reg.age_turning_2026}</StyledTableCell>
                     <StyledTableCell>{reg.parent_name}</StyledTableCell>

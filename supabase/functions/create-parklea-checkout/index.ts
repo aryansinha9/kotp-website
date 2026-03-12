@@ -37,7 +37,7 @@ serve(async (req: Request) => {
       parentName, parentPhone, parentEmail, emergencyContact, homeAddress,
       jerseySize, hoodieSize, shortsSize, socksSize,
       hasMedicalCondition, medicalDescription, hasMedication, medicationDetails,
-      agreedToTerms, signature, signatureDate
+      agreedToTerms, signature, signatureDate, packageType
     } = registrationData
 
     // --- Server-side input validation ---
@@ -91,51 +91,62 @@ serve(async (req: Request) => {
         agreed_to_terms: agreedToTerms,
         signature,
         signature_date: signatureDate,
-        payment_status: 'pending' // Default state
+        payment_status: 'pending', // Default state
+        package_type: packageType || 'standard'
       }])
       .select('id')
       .single()
 
     if (dbError) throw dbError
 
-    // 2. Create Stripe Checkout Session
-    // $15 + 10% GST = $16.50 AUD
-    const priceInCents = 1650 
+    let sessionUrl = '';
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      customer_email: parentEmail,
-      line_items: [
-        {
-          price_data: {
-            currency: 'aud',
-            product: 'prod_U5hSL9gqZ7F3TV',
-            unit_amount: priceInCents,
-            recurring: {
-              interval: 'week',
-            },
+    if (packageType === 'trial') {
+      // Return the hardcoded Stripe payment link for trials with client_reference_id
+      sessionUrl = `https://buy.stripe.com/14AeVefcN1Dmg3Pcc8enS01?prefilled_email=${encodeURIComponent(parentEmail)}&client_reference_id=${record.id}`;
+      
+      // Still want to link this back to the registration if possible, but payment links handles it differently.
+      // We will just update status to pending and the webhook will need to somehow match the email or we rely on manual reconciliation for now.
+    } else {
+      const priceInCents = 1650 
+      const priceData: any = {
+        currency: 'aud',
+        product: 'prod_U5hSL9gqZ7F3TV',
+        unit_amount: priceInCents,
+        recurring: { interval: 'week' }
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        customer_email: parentEmail,
+        line_items: [
+          {
+            price_data: priceData,
+            quantity: 1,
           },
-          quantity: 1,
+        ],
+        mode: 'subscription',
+        allow_promotion_codes: true,
+        success_url: `${SITE_URL}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${SITE_URL}/academy/parklea?status=cancelled`,
+        metadata: {
+          registration_id: record.id,
+          participant_name: participantName,
+          parent_email: parentEmail,
+          package_type: packageType || 'standard'
         },
-      ],
-      mode: 'subscription',
-      allow_promotion_codes: true,
-      success_url: `${SITE_URL}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/academy/parklea?status=cancelled`,
-      metadata: {
-        registration_id: record.id,
-        participant_name: participantName,
-        parent_email: parentEmail
-      },
-    })
+      })
 
-    // 3. Optional: Store the stripe session ID in the database back here, but usually metadata is sufficient
-    await supabaseAdmin
-      .from('parklea_registrations')
-      .update({ stripe_session_id: session.id })
-      .eq('id', record.id)
+      sessionUrl = session.url;
 
-    return new Response(JSON.stringify({ url: session.url }), {
+      // 3. Optional: Store the stripe session ID in the database back here, but usually metadata is sufficient
+      await supabaseAdmin
+        .from('parklea_registrations')
+        .update({ stripe_session_id: session.id })
+        .eq('id', record.id)
+    }
+
+    return new Response(JSON.stringify({ url: sessionUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })

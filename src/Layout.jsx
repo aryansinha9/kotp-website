@@ -179,8 +179,8 @@ export default function Layout({ children }) {
                   </button>
                 </Link>
                 <div className="mt-6 flex justify-center gap-6">
-                  <a href="#" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">INSTAGRAM</a>
-                  <a href="#" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">FACEBOOK</a>
+                  <a href="https://www.instagram.com/kotp.football/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">INSTAGRAM</a>
+                  <a href="https://www.facebook.com/kotp.football" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF6B00] transition-colors text-sm">FACEBOOK</a>
                 </div>
               </div>
             </motion.div>

@@ -31,7 +31,8 @@ export default function ParkleaProgram() {
         medicationDetails: "",
         agreedToTerms: false,
         signature: "",
-        signatureDate: ""
+        signatureDate: "",
+        packageType: "standard"
     });
 
     const [submitting, setSubmitting] = useState(false);
@@ -269,7 +270,29 @@ export default function ParkleaProgram() {
                             </div>
                         </section>
 
-                        {/* 5. Consents & Signatures */}
+                        {/* 5. Package Selection */}
+                        <section className="space-y-6 pt-6 border-t border-white/10">
+                            <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider border-b border-[#FF6B00]/30 pb-2">Program Package</h3>
+                            <div className="space-y-4">
+                                <Label className="text-white text-base">Select your preferred registration package: *</Label>
+                                <RadioGroup name="packageType" value={formData.packageType} onValueChange={(val) => handleSelectChange("packageType", val)} className="flex flex-col gap-3">
+                                    <Label htmlFor="pkg-standard" className="flex items-center space-x-3 bg-white/5 p-4 rounded-lg border border-white/10 hover:border-[#FF6B00]/50 transition-colors cursor-pointer">
+                                        <RadioGroupItem value="standard" id="pkg-standard" className="border-white/30 text-[#FF6B00]" />
+                                        <div className="text-white font-medium flex-grow">
+                                            Standard Program <span className="text-gray-400 font-normal ml-2">($15/week subscription)</span>
+                                        </div>
+                                    </Label>
+                                    <Label htmlFor="pkg-trial" className="flex items-center space-x-3 bg-white/5 p-4 rounded-lg border border-white/10 hover:border-[#FF6B00]/50 transition-colors cursor-pointer">
+                                        <RadioGroupItem value="trial" id="pkg-trial" className="border-white/30 text-[#FF6B00]" />
+                                        <div className="text-white font-medium flex-grow">
+                                            Single Trial Lesson <span className="text-gray-400 font-normal ml-2">($15 one-time payment)</span>
+                                        </div>
+                                    </Label>
+                                </RadioGroup>
+                            </div>
+                        </section>
+
+                        {/* 6. Consents & Signatures */}
                         <section className="space-y-6 pt-6 border-t border-white/10">
                             <div className="flex items-start space-x-3 p-4 bg-[#FF6B00]/5 border border-[#FF6B00]/20 rounded-lg group">
                                 <input
@@ -299,7 +322,7 @@ export default function ParkleaProgram() {
                         </section>
 
                         <Button type="submit" disabled={submitting || !formData.agreedToTerms} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto disabled:cursor-not-allowed">
-                            {submitting ? "SECURING PAYMENT PORTAL..." : <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT ($15/WK)</>}
+                            {submitting ? "SECURING PAYMENT PORTAL..." : <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT</>}
                         </Button>
                         {errorMsg && (
                             <p className="text-red-500 text-center mt-4 bg-red-500/10 py-3 px-4 rounded border border-red-500/20">{errorMsg}</p>

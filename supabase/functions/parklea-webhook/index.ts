@@ -36,7 +36,8 @@ serve(async (req: Request) => {
   try {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any
-      const registrationId = session.metadata?.registration_id
+      // Trial payments use client_reference_id, standard subscriptions use metadata
+      const registrationId = session.metadata?.registration_id || session.client_reference_id
 
       if (registrationId) {
         console.log(`Processing successful checkout for parklea registration: ${registrationId}`)

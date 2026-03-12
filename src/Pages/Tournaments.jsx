@@ -102,23 +102,23 @@ export default function Tournaments() {
 
   // --- STATIC DATA: This is from your new design, we'll keep it for now ---
   const hallOfFame = [
-    { tournament: "KOTP I", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
-    { tournament: "KOTP II", year: "2024", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
-    { tournament: "QOTP I", year: "2024", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
-    { tournament: "KOTP EUROS", year: "2024", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
-    { tournament: "QOTP Copa America", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
-    { tournament: "KOTP PREMIER LEAGUE", year: "2024", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
-    { tournament: "KOTP CHAMPIONS OF CHAMPIONS", year: "2024", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
-    { tournament: "KOTP U18S RISING STARS", year: "2024", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
-    { tournament: "KOTP NATIONS CUP", year: "2024", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
-    { tournament: "KOTP RETRO RUMBLE", year: "2025", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
-    { tournament: "KOTP CHAMPIONS LEAGUE", year: "2025", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
-    { tournament: "KOTP EUROPA LEAGUE", year: "2025", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
-    { tournament: "KOTP WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" },
-    { tournament: "QOTP WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=2000" },
-    { tournament: "KOTP U18S WORLD CUP", year: "2025", image: "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?q=80&w=2000" },
-    { tournament: "KOTP ULTIMATE SOCCER 10 YEAR ANNIVERSARY", year: "2025", image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2000" },
-    { tournament: "KOTP LEGACY CUP", year: "2025", image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000" }
+    { tournament: "KOTP I", year: "2024", image: "/KOTP I.jpg" },
+    { tournament: "KOTP II", year: "2024", image: "/KOTP II.jpg" },
+    { tournament: "QOTP I", year: "2024", image: "/QOTP I 2024.jpg" },
+    { tournament: "KOTP EUROS", year: "2024", image: "/KOTP EUROS 2024.jpg" },
+    { tournament: "QOTP Copa America", year: "2024", image: "/QOTP Copa America 2024.jpg" },
+    { tournament: "KOTP PREMIER LEAGUE", year: "2024", image: "/KOTP PREMIER LEAGUE 2024.jpg" },
+    { tournament: "KOTP CHAMPIONS OF CHAMPIONS", year: "2024", image: "/KOTP Champions of Champions-22.jpg" },
+    { tournament: "KOTP U18S RISING STARS", year: "2024", image: "/KOTP U18S RISING STARS 2024.jpg" },
+    { tournament: "KOTP NATIONS CUP", year: "2024", image: "/KOTP NATIONS CUP 2024.jpg" },
+    { tournament: "KOTP RETRO RUMBLE", year: "2025", image: "/KOTP RETRO RUMBLE 2025.jpg" },
+    { tournament: "KOTP CHAMPIONS LEAGUE", year: "2025", image: "/KOTP CHAMPIONS LEAGUE 2025.jpg" },
+    { tournament: "KOTP EUROPA LEAGUE", year: "2025", image: "/KOTP EUROPA LEAGUE 2025.jpg" },
+    { tournament: "KOTP WORLD CUP", year: "2025", image: "/KOTP WORLD CUP 2025.jpg" },
+    { tournament: "QOTP WORLD CUP", year: "2025", image: "/QOTP WORLD CUP 2025.jpg" },
+    { tournament: "KOTP U18S WORLD CUP", year: "2025", image: "/KOTP U18S WORLD CUP 2025.jpg" },
+    { tournament: "KOTP ULTIMATE SOCCER 10 YEAR ANNIVERSARY", year: "2025", image: "/KOTP ULTIMATE SOCCER 10 YEAR ANNIVERSARY 2025.png" },
+    { tournament: "KOTP LEGACY CUP", year: "2025", image: "/KOTP LEGACY CUP 2025 .jpg" }
   ];
 
   // --- TRANSPLANTED LOGIC: Fetching live tournament data ---

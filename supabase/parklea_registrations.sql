@@ -35,7 +35,8 @@ CREATE TABLE public.parklea_registrations (
     -- Legal
     agreed_to_terms BOOLEAN NOT NULL,
     signature TEXT NOT NULL,
-    signature_date DATE NOT NULL
+    signature_date DATE NOT NULL,
+    package_type TEXT NOT NULL DEFAULT 'standard'
 );
 
 -- 2. Add Row Level Security (RLS) to restrict public access
