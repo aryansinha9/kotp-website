@@ -82,11 +82,6 @@ export default function ParkleaProgram() {
         }
     };
 
-    // Generate size options
-    const apparelSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"];
-
-    // The 'submitted' state and its conditional rendering block were removed as per the instruction's diff.
-    // If you intended to keep the 'submitted' state and its display, please provide a new instruction.
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] py-24 px-4">
