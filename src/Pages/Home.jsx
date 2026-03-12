@@ -174,9 +174,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <h2 className="headline-font text-6xl md:text-8xl text-white mb-8">READY TO BE KING?</h2>
             <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">Join the most competitive street football community in Sydney.</p>
-            <Link to="/register">
-              <button className="kotp-button bg-[#FF6B00] text-white px-12 py-5 rounded-md headline-font text-2xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">REGISTER NOW</button>
-            </Link>
+            <button type="button" onClick={(e) => e.preventDefault()} className="kotp-button bg-[#FF6B00]/80 text-white px-12 py-5 rounded-md headline-font text-2xl tracking-wider cursor-default">REGISTER NOW</button>
           </motion.div>
         </div>
       </section>

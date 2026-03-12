@@ -78,6 +78,15 @@ export default function Moments() {
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
+      
+      {/* --- COMING SOON OVERLAY --- */}
+      <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-auto">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center p-8 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl">
+            <h2 className="headline-font text-5xl md:text-7xl text-white mb-2 text-glow">COMING SOON</h2>
+            <div className="w-24 h-1 bg-[#FF6B00] mx-auto mb-4"></div>
+            <p className="text-gray-400 text-lg tracking-widest uppercase font-semibold">We're brewing something special.</p>
+        </motion.div>
+      </div>
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000" alt="Moments" className="w-full h-full object-cover" />
