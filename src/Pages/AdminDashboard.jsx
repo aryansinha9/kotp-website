@@ -127,14 +127,14 @@ export default function AdminDashboard() {
     const headers = [
       'Date', 'Package', 'Status', 'Participant', 'Age', 'DOB', 'Position',
       'Parent Name', 'Parent Phone', 'Parent Email', 'Emergency Contact', 'Address',
-      'Jersey', 'Hoodie', 'Shorts', 'Socks', 'Medical Condition?', 'Medical Details',
+      'Jersey', 'Shorts', 'Socks', 'Medical Condition?', 'Medical Details',
       'Medication?', 'Medication Details', 'Signature'
     ];
 
     const rows = parkleaRegistrations.map(r => [
       new Date(r.created_at).toLocaleDateString(), (r.package_type || 'standard').charAt(0).toUpperCase() + (r.package_type || 'standard').slice(1), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.position,
       r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, `"${(r.home_address || '').replace(/"/g, '""')}"`,
-      r.jersey_size, r.hoodie_size, r.shorts_size, r.socks_size,
+      r.jersey_size, r.shorts_size, r.socks_size,
       r.has_medical_condition, `"${(r.medical_description || '').replace(/"/g, '""')}"`,
       r.has_medication, `"${(r.medication_details || '').replace(/"/g, '""')}"`, r.signature
     ]);
@@ -191,7 +191,7 @@ Age: ${reg.age_turning_2026}
 Parent: ${reg.parent_name}
 Email: ${reg.parent_email}
 Phone: ${reg.parent_phone}
-Size: Jersey(${reg.jersey_size}) Hoodie(${reg.hoodie_size}) Shorts(${reg.shorts_size}) Socks(${reg.socks_size})
+Size: Jersey(${reg.jersey_size}) Shorts(${reg.shorts_size}) Socks(${reg.socks_size})
 Medical: ${reg.has_medical_condition === 'yes' ? reg.medical_description : 'None'}
 Status: ${reg.payment_status}`;
       navigator.clipboard.writeText(info);

@@ -22,7 +22,6 @@ CREATE TABLE public.parklea_registrations (
 
     -- Apparel Size Options
     jersey_size TEXT NOT NULL,
-    hoodie_size TEXT NOT NULL,
     shorts_size TEXT NOT NULL,
     socks_size TEXT NOT NULL,
 

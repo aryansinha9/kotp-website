@@ -35,7 +35,7 @@ serve(async (req: Request) => {
     const { 
       participantName, ageTurning2026, dob, position, 
       parentName, parentPhone, parentEmail, emergencyContact, homeAddress,
-      jerseySize, hoodieSize, shortsSize, socksSize,
+      jerseySize, shortsSize, socksSize,
       hasMedicalCondition, medicalDescription, hasMedication, medicationDetails,
       agreedToTerms, signature, signatureDate, packageType
     } = registrationData
@@ -54,7 +54,7 @@ serve(async (req: Request) => {
 
     const validSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"]
     if (!validSizes.includes(jerseySize)) throw new Error("Invalid jersey size.")
-    if (!validSizes.includes(hoodieSize)) throw new Error("Invalid hoodie size.")
+
     if (!validSizes.includes(shortsSize)) throw new Error("Invalid shorts size.")
     if (!validSizes.includes(socksSize)) throw new Error("Invalid socks size.")
 
@@ -81,7 +81,6 @@ serve(async (req: Request) => {
         emergency_contact: emergencyContact,
         home_address: homeAddress,
         jersey_size: jerseySize,
-        hoodie_size: hoodieSize,
         shorts_size: shortsSize,
         socks_size: socksSize,
         has_medical_condition: hasMedicalCondition,

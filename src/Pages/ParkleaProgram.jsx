@@ -22,7 +22,6 @@ export default function ParkleaProgram() {
         emergencyContact: "",
         homeAddress: "",
         jerseySize: "",
-        hoodieSize: "",
         shortsSize: "",
         socksSize: "",
         hasMedicalCondition: "no",
@@ -170,18 +169,6 @@ export default function ParkleaProgram() {
                                 <div className="space-y-2">
                                     <Label className="text-white">Jersey Size *</Label>
                                     <Select required onValueChange={(val) => handleSelectChange("jerseySize", val)}>
-                                        <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
-                                            <SelectValue placeholder="Select size" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
-                                            {apparelSizes.map(size => <SelectItem key={size} value={size}>{size}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-white">Hoodie Size *</Label>
-                                    <Select required onValueChange={(val) => handleSelectChange("hoodieSize", val)}>
                                         <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
                                             <SelectValue placeholder="Select size" />
                                         </SelectTrigger>

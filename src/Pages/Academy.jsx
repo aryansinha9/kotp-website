@@ -62,7 +62,7 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo })
                 <div className="flex items-center justify-between">
                     <span className="headline-font text-xl text-white">{price}</span>
                     <Button type="button" className="bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white pointer-events-none">
-                        Learn More
+                        Register
                     </Button>
                 </div>
             </div>
