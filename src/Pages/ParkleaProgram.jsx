@@ -133,6 +133,17 @@ export default function ParkleaProgram() {
                                     <Input type="number" name="ageTurning2026" required value={formData.ageTurning2026} onChange={handleChange} min="4" max="25" className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]" />
                                 </div>
                                 <div className="space-y-2">
+                                    <Label className="text-white">Team *</Label>
+                                    <Select required onValueChange={(val) => handleSelectChange("team", val)}>
+                                        <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
+                                            <SelectValue placeholder="Select team" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#1a1a1a] border-white/10 text-white max-h-60 overflow-y-auto">
+                                            {["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"].map(team => <SelectItem key={team} value={team}>{team}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
                                     <Label className="text-white">Primary Position *</Label>
                                     <Input name="position" required value={formData.position} onChange={handleChange} placeholder="e.g. Striker, Midfielder, Defender" className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]" />
                                 </div>
@@ -162,17 +173,6 @@ export default function ParkleaProgram() {
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-white">Home Address *</Label>
                                     <Textarea name="homeAddress" required value={formData.homeAddress} onChange={handleChange} className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] min-h-[80px]" />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <Label className="text-white">Team *</Label>
-                                    <Select required onValueChange={(val) => handleSelectChange("team", val)}>
-                                        <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
-                                            <SelectValue placeholder="Select team" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#1a1a1a] border-white/10 text-white max-h-60 overflow-y-auto">
-                                            {["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"].map(team => <SelectItem key={team} value={team}>{team}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
                                 </div>
                             </div>
                         </section>
