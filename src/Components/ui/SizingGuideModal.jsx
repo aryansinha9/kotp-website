@@ -117,13 +117,13 @@ export default function SizingGuideModal({ isOpen, onClose }) {
                   <div className="group w-full md:w-1/3 flex justify-center bg-white/5 rounded-lg p-6 border border-white/5">
                     <svg viewBox="0 0 100 100" className="w-48 h-48 transform transition-transform duration-500 group-hover:scale-105">
                       {/* T-Shirt Silhouette */}
-                      <path d="M25,20 L35,20 C40,25 60,25 65,20 L75,20 L95,45 L80,60 L75,50 L75,90 L25,90 L25,50 L20,60 L5,45 Z" fill="#1a1a1a" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round"/>
+                      <path d="M25,15 L35,15 C40,20 60,20 65,15 L75,15 L95,40 L80,55 L75,45 L75,85 L25,85 L25,45 L20,55 L5,40 Z" fill="#1a1a1a" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round"/>
                       {/* Chest Line (A) */}
-                      <line x1="25" y1="52" x2="75" y2="52" stroke="#FF6B00" strokeWidth="2" strokeDasharray="4" className="opacity-50 group-hover:opacity-100 transition-opacity" />
-                      <text x="50" y="48" fill="#FF6B00" fontSize="8" fontWeight="bold" textAnchor="middle" className="font-sans">A (Chest)</text>
+                      <line x1="25" y1="47" x2="75" y2="47" stroke="#FF6B00" strokeWidth="2" strokeDasharray="4" className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <text x="44" y="44" fill="#FF6B00" fontSize="8" fontWeight="bold" textAnchor="start" className="font-sans">A (Chest)</text>
                       {/* Length Line (B) */}
-                      <line x1="40" y1="23" x2="40" y2="87" stroke="#FF6B00" strokeWidth="2" strokeDasharray="4" className="opacity-50 group-hover:opacity-100 transition-opacity" />
-                      <text x="35" y="55" fill="#FF6B00" fontSize="8" fontWeight="bold" textAnchor="end" className="font-sans">B (Length)</text>
+                      <line x1="40" y1="18" x2="40" y2="85" stroke="#FF6B00" strokeWidth="2" strokeDasharray="4" className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <text x="50" y="97" fill="#FF6B00" fontSize="8" fontWeight="bold" textAnchor="middle" className="font-sans">B (Length)</text>
                     </svg>
                   </div>
 
