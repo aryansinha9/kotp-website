@@ -80,7 +80,7 @@ export default function Home() {
 
   const heroImageUrl = featuredTournament?.hero_image_path
     ? `${STORAGE_BASE_URL}${featuredTournament.hero_image_path}`
-    : "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2000";
+    : "/HOMEPAGE.jpeg";
 
   return (
     <div className="relative">
