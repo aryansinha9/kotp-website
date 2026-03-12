@@ -125,14 +125,14 @@ export default function AdminDashboard() {
   const downloadParkleaCSV = () => {
     if (parkleaRegistrations.length === 0) return;
     const headers = [
-      'Date', 'Package', 'Status', 'Participant', 'Age', 'DOB', 'Position',
+      'Date', 'Package', 'Status', 'Participant', 'Age', 'DOB', 'Team', 'Position',
       'Parent Name', 'Parent Phone', 'Parent Email', 'Emergency Contact', 'Address',
       'Jersey', 'Shorts', 'Socks', 'Medical Condition?', 'Medical Details',
       'Medication?', 'Medication Details', 'Signature'
     ];
 
     const rows = parkleaRegistrations.map(r => [
-      new Date(r.created_at).toLocaleDateString(), (r.package_type || 'standard').charAt(0).toUpperCase() + (r.package_type || 'standard').slice(1), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.position,
+      new Date(r.created_at).toLocaleDateString(), (r.package_type || 'standard').charAt(0).toUpperCase() + (r.package_type || 'standard').slice(1), r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.team, r.position,
       r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, `"${(r.home_address || '').replace(/"/g, '""')}"`,
       r.jersey_size, r.shorts_size, r.socks_size,
       r.has_medical_condition, `"${(r.medical_description || '').replace(/"/g, '""')}"`,
@@ -187,6 +187,7 @@ export default function AdminDashboard() {
 
     const copyInfo = () => {
       const info = `Name: ${reg.participant_name}
+Team: ${reg.team || 'N/A'}
 Age: ${reg.age_turning_2026}
 Parent: ${reg.parent_name}
 Email: ${reg.parent_email}
@@ -280,13 +281,14 @@ Status: ${reg.payment_status}`;
               </Button>
             </div>
             {parkleaRegistrations.length === 0 ? <p className="text-center text-gray-500 py-8">No program registrations yet</p> : (
-              <StyledTable headers={["Date", "Package", "Participant", "Age", "Parent", "Email", "Phone", "Status", "Actions"]}>
+              <StyledTable headers={["Date", "Package", "Participant", "Age", "Team", "Parent", "Email", "Phone", "Status", "Actions"]}>
                 {parkleaRegistrations.map((reg) => (
                   <StyledTableRow key={reg.id}>
                     <StyledTableCell>{new Date(reg.created_at).toLocaleDateString()}</StyledTableCell>
                     <StyledTableCell className="capitalize text-gray-400">{reg.package_type || 'standard'}</StyledTableCell>
                     <StyledTableCell className="font-semibold text-white">{reg.participant_name}</StyledTableCell>
                     <StyledTableCell>{reg.age_turning_2026}</StyledTableCell>
+                    <StyledTableCell>{reg.team || 'N/A'}</StyledTableCell>
                     <StyledTableCell>{reg.parent_name}</StyledTableCell>
                     <StyledTableCell><a href={`mailto:${reg.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-4 h-4" />Email</a></StyledTableCell>
                     <StyledTableCell><a href={`tel:${reg.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-4 h-4" />Call</a></StyledTableCell>

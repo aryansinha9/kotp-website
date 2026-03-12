@@ -21,6 +21,7 @@ export default function ParkleaProgram() {
         parentEmail: "",
         emergencyContact: "",
         homeAddress: "",
+        team: "",
         jerseySize: "",
         shortsSize: "",
         socksSize: "",
@@ -165,6 +166,18 @@ export default function ParkleaProgram() {
                         <section className="space-y-6">
                             <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider border-b border-[#FF6B00]/30 pb-2">Apparel Sizing</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                                <div className="space-y-2">
+                                    <Label className="text-white">Team *</Label>
+                                    <Select required onValueChange={(val) => handleSelectChange("team", val)}>
+                                        <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
+                                            <SelectValue placeholder="Select team" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#1a1a1a] border-white/10 text-white max-h-60 overflow-y-auto">
+                                            {["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"].map(team => <SelectItem key={team} value={team}>{team}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
                                 <div className="space-y-2">
                                     <Label className="text-white">Jersey Size *</Label>

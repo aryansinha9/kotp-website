@@ -21,6 +21,7 @@ CREATE TABLE public.parklea_registrations (
     home_address TEXT NOT NULL,
 
     -- Apparel Size Options
+    team TEXT NOT NULL,
     jersey_size TEXT NOT NULL,
     shorts_size TEXT NOT NULL,
     socks_size TEXT NOT NULL,

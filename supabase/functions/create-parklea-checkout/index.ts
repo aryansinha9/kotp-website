@@ -33,7 +33,7 @@ serve(async (req: Request) => {
 
     const registrationData = await req.json()
     const { 
-      participantName, ageTurning2026, dob, position, 
+      participantName, ageTurning2026, dob, position, team,
       parentName, parentPhone, parentEmail, emergencyContact, homeAddress,
       jerseySize, shortsSize, socksSize,
       hasMedicalCondition, medicalDescription, hasMedication, medicationDetails,
@@ -51,6 +51,9 @@ serve(async (req: Request) => {
     const ageNum = parseInt(ageTurning2026, 10)
     if (isNaN(ageNum) || ageNum < 3 || ageNum > 25) 
       throw new Error("Invalid age.")
+
+    const validTeams = ["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"]
+    if (!validTeams.includes(team)) throw new Error("Invalid team selected.")
 
     const validSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"]
     if (!validSizes.includes(jerseySize)) throw new Error("Invalid jersey size.")
@@ -74,6 +77,7 @@ serve(async (req: Request) => {
         participant_name: participantName,
         age_turning_2026: parseInt(ageTurning2026, 10),
         dob,
+        team,
         position,
         parent_name: parentName,
         parent_phone: parentPhone,
