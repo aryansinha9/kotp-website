@@ -55,11 +55,10 @@ serve(async (req: Request) => {
     const validTeams = ["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"]
     if (!validTeams.includes(team)) throw new Error("Invalid team selected.")
 
-    const validSizes = ["Youth XS", "Youth S", "Youth M", "Youth L", "Youth XL", "Adult S", "Adult M", "Adult L", "Adult XL"]
+    const validSizes = ["4Y", "6Y", "8Y", "10Y", "12Y", "14Y", "16Y"]
     if (!validSizes.includes(jerseySize)) throw new Error("Invalid jersey size.")
-
     if (!validSizes.includes(shortsSize)) throw new Error("Invalid shorts size.")
-    if (!validSizes.includes(socksSize)) throw new Error("Invalid socks size.")
+    if (socksSize !== "One Size Fits All") throw new Error("Invalid socks size.")
 
     if (!parentPhone || typeof parentPhone !== 'string' || parentPhone.trim().length < 8) 
       throw new Error("Invalid phone number.")

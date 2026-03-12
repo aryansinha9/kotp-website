@@ -10,6 +10,8 @@ import { Button } from "@/Components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { supabase } from "@/supabaseClient";
 
+const apparelSizes = ["4Y", "6Y", "8Y", "10Y", "12Y", "14Y", "16Y"];
+
 export default function ParkleaProgram() {
     const [formData, setFormData] = useState({
         participantName: "",
@@ -159,15 +161,7 @@ export default function ParkleaProgram() {
                                     <Label className="text-white">Home Address *</Label>
                                     <Textarea name="homeAddress" required value={formData.homeAddress} onChange={handleChange} className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] min-h-[80px]" />
                                 </div>
-                            </div>
-                        </section>
-
-                        {/* 3. Apparel */}
-                        <section className="space-y-6">
-                            <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider border-b border-[#FF6B00]/30 pb-2">Apparel Sizing</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                                <div className="space-y-2">
+                                <div className="space-y-2 md:col-span-2">
                                     <Label className="text-white">Team *</Label>
                                     <Select required onValueChange={(val) => handleSelectChange("team", val)}>
                                         <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]">
@@ -178,6 +172,20 @@ export default function ParkleaProgram() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                            </div>
+                        </section>
+
+                        {/* 3. Apparel */}
+                        <section className="space-y-6">
+                            <div className="flex items-center justify-between border-b border-[#FF6B00]/30 pb-2">
+                                <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider">Apparel Sizing</h3>
+                                <Link to="/sizing-guide" target="_blank" className="text-[#FF6B00] hover:text-white underline text-sm transition-colors">
+                                    Sizing Guide
+                                </Link>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+
 
                                 <div className="space-y-2">
                                     <Label className="text-white">Jersey Size *</Label>
@@ -210,7 +218,7 @@ export default function ParkleaProgram() {
                                             <SelectValue placeholder="Select size" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
-                                            {apparelSizes.map(size => <SelectItem key={size} value={size}>{size}</SelectItem>)}
+                                            <SelectItem value="One Size Fits All">One Size Fits All</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
