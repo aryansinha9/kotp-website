@@ -16,7 +16,6 @@ import Academy from './Pages/Academy';
 import ParkleaProgram from './Pages/ParkleaProgram';
 import Contact from './Pages/Contact';
 import Moments from './Pages/Moments';
-import SizingGuide from './Pages/SizingGuide';
 // --- NEW: Import the LiveScores page ---
 import LiveScores from './Pages/LiveScores';
 import Register from './Pages/Register';
@@ -71,7 +70,6 @@ export default function App() {
 
           {/* --- NEW: Add the route for the Live Scores page --- */}
           <Route path="/live-scores" element={<LiveScores />} />
-          <Route path="/sizing-guide" element={<SizingGuide />} />
 
           <Route path="/faq" element={<ComingSoon />} />
           <Route path="/volunteers" element={<ComingSoon />} />

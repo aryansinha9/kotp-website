@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import { Button } from "@/Components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { supabase } from "@/supabaseClient";
+import SizingGuideModal from "@/Components/ui/SizingGuideModal";
 
 const apparelSizes = ["4Y", "6Y", "8Y", "10Y", "12Y", "14Y", "16Y"];
 
@@ -39,6 +40,7 @@ export default function ParkleaProgram() {
 
     const [submitting, setSubmitting] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [isSizingModalOpen, setIsSizingModalOpen] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -179,9 +181,9 @@ export default function ParkleaProgram() {
                         <section className="space-y-6">
                             <div className="flex items-center justify-between border-b border-[#FF6B00]/30 pb-2">
                                 <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider">Apparel Sizing</h3>
-                                <Link to="/sizing-guide" target="_blank" className="text-[#FF6B00] hover:text-white underline text-sm transition-colors">
+                                <button type="button" onClick={() => setIsSizingModalOpen(true)} className="text-[#FF6B00] hover:text-white underline text-sm transition-colors cursor-pointer text-left">
                                     Sizing Guide
-                                </Link>
+                                </button>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
@@ -344,6 +346,7 @@ export default function ParkleaProgram() {
             cursor: pointer;
         }
       `}</style>
+            <SizingGuideModal isOpen={isSizingModalOpen} onClose={() => setIsSizingModalOpen(false)} />
         </div>
     );
 }
