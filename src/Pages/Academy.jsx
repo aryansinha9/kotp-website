@@ -156,8 +156,8 @@ export default function Academy() {
         },
         {
             name: "ANTONY GABALLAH",
-            role: "Assistant Technical Director",
-            bio: "Antony Gaballah has 9 years of playing experience, including time spent developing and competing in England and Spain. With 4 years of coaching experience, he serves as Assistant Technical Director at Parklea SFC. His focus is on strengthening core fundamentals, elevating training standards, and guiding players to build strong character, tactical intelligence, and consistency in their performance.",
+            role: "Technical Director",
+            bio: "Antony Gaballah has 9 years of playing experience, including time spent developing and competing in England and Spain. With 4 years of coaching experience, he serves as Technical Director at Parklea SFC. His focus is on strengthening core fundamentals, elevating training standards, and guiding players to build strong character, tactical intelligence, and consistency in their performance.",
             quote: "Strong foundations, strong habits, and the confidence to express yourself—that's real development.",
             image: "/Anto.png"
         }
