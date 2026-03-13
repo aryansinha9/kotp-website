@@ -140,7 +140,7 @@ export default function Tournaments() {
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000" alt="Tournament" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
+        <div className="absolute inset-0"><img src="/TOURNAMENTSPAGE.png" alt="Tournament" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow flex items-baseline justify-center gap-2">

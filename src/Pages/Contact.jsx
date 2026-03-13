@@ -83,7 +83,7 @@ export default function Contact() {
       <style>{` .leaflet-container { background: #0a0a0a; } .leaflet-tile { filter: grayscale(100%) invert(100%) contrast(80%) brightness(0.7); } .leaflet-popup-content-wrapper { background: #1a1a1a; color: white; border: 1px solid rgba(255, 107, 0, 0.3); } .leaflet-popup-tip { background: #1a1a1a; } .leaflet-control-attribution { background: rgba(26, 26, 26, 0.8) !important; color: #666 !important; } .leaflet-control-attribution a { color: #FF6B00 !important; } `}</style>
 
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?q=80&w=2000" alt="Contact" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
+        <div className="absolute inset-0"><img src="/CONTACTPAGE.jpeg" alt="Contact" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/70"></div></div>
         <div className="relative z-10 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">GET IN TOUCH</h1>

@@ -69,7 +69,7 @@ export default function About() {
     <div className="relative min-h-screen bg-[#0a0a0a]">
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000" alt="Team" className="w-full h-full object-cover" />
+          <img src="/ABOUTPAGE.jpeg" alt="Team" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/70"></div>
         </div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
