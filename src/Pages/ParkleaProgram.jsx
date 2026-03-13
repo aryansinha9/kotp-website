@@ -134,7 +134,7 @@ export default function ParkleaProgram() {
                                             <SelectValue placeholder="Select team" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-[#1a1a1a] border-white/10 text-white max-h-60 overflow-y-auto">
-                                            {["8A", "8B", "8C", "8D", "8E", "8F", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"].map(team => <SelectItem key={team} value={team}>{team}</SelectItem>)}
+                                            {["8A", "8B", "8C", "8D", "8E", "8F", "9A", "9B", "9C", "9D", "10A", "10B", "10C", "11A", "11B", "11C", "12A", "12B", "12C", "13A", "13B", "14A", "14B", "U15S", "16A", "16B", "10G", "12GA", "12GB", "14G"].map(team => <SelectItem key={team} value={team}>{team}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
