@@ -152,14 +152,14 @@ export default function Academy() {
             role: "Technical Director",
             bio: "Ash Olumee is a footballer with 16 years of playing experience, having competed at NPL1 level and overseas in England. With 7 years of coaching experience, he is the Technical Director at Parklea SFC, overseeing the development of more than 800 junior players. His core goal is to create a high-performance, player-first development environment that maximises technical ability, game intelligence, and long-term potential.",
             quote: "Develop the player first, and the results will always follow.",
-            image: "/Ash.png"
+            image: "/Ash.jpg"
         },
         {
             name: "ANTONY GABALLAH",
             role: "Technical Director",
             bio: "Antony Gaballah has 9 years of playing experience, including time spent developing and competing in England and Spain. With 4 years of coaching experience, he serves as Technical Director at Parklea SFC. His focus is on strengthening core fundamentals, elevating training standards, and guiding players to build strong character, tactical intelligence, and consistency in their performance.",
             quote: "Strong foundations, strong habits, and the confidence to express yourself—that's real development.",
-            image: "/Anto.png"
+            image: "/Anto.jpg"
         }
     ];
 
