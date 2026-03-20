@@ -38,9 +38,10 @@ const FeatureCard = ({ icon: Icon, title, description, delay }) => {
     );
 };
 
-const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo }) => {
+const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo, description }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
+    const [expanded, setExpanded] = useState(false);
 
     const content = (
         <motion.div
@@ -48,16 +49,30 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo })
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, delay }}
-            className={`bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group ${linkTo ? 'cursor-pointer' : ''} h-full flex flex-col`}
+            className={`bg-[#1a1a1a] border border-white/10 rounded-lg p-6 hover:border-[#FF6B00]/50 transition-all duration-300 group ${linkTo ? 'cursor-pointer' : ''} flex flex-col`}
         >
             <div className="flex items-start justify-between mb-4">
                 <h3 className="headline-font text-2xl text-white">{title}</h3>
             </div>
-            <div className="space-y-3 mb-6 flex-grow">
-                <div className="flex items-center gap-2 text-gray-300"><Users className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{ageGroup}</span></div>
-                <div className="flex items-center gap-2 text-gray-300"><Calendar className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{schedule}</span></div>
-                <div className="flex items-center gap-2 text-gray-300"><Target className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{focus}</span></div>
-            </div>
+            {description ? (
+                <div className="mb-6 flex-grow flex flex-col items-start">
+                    <p className={`text-gray-300 text-sm leading-relaxed ${expanded ? '' : 'line-clamp-3'}`}>
+                        {description}
+                    </p>
+                    <button 
+                        onClick={(e) => { e.preventDefault(); setExpanded(!expanded); }} 
+                        className="text-[#FF6B00] text-sm mt-2 font-medium hover:underline focus:outline-none"
+                    >
+                        {expanded ? 'Show Less' : 'Read More...'}
+                    </button>
+                </div>
+            ) : (
+                <div className="space-y-3 mb-6 flex-grow">
+                    <div className="flex items-center gap-2 text-gray-300"><Users className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{ageGroup}</span></div>
+                    <div className="flex items-center gap-2 text-gray-300"><Calendar className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{schedule}</span></div>
+                    <div className="flex items-center gap-2 text-gray-300"><Target className="w-4 h-4 text-[#FF6B00]" /><span className="text-sm">{focus}</span></div>
+                </div>
+            )}
             <div className="border-t border-white/10 pt-4 mt-auto">
                 <div className="flex items-center justify-between">
                     <span className="headline-font text-xl text-white">{price}</span>
@@ -69,7 +84,7 @@ const ProgramCard = ({ title, ageGroup, schedule, focus, price, delay, linkTo })
         </motion.div>
     );
 
-    return linkTo ? <Link to={linkTo} className="block h-full">{content}</Link> : <div className="h-full">{content}</div>;
+    return linkTo ? <Link to={linkTo} className="block">{content}</Link> : <div>{content}</div>;
 };
 
 const CoachCard = ({ name, role, bio, quote, image, delay }) => {
@@ -142,8 +157,13 @@ export default function Academy() {
     ];
 
     const programs = [
-        { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "Time: N/A", focus: "Focus: N/A", price: "Coming Soon" },
-        { title: "Parklea Development Program", ageGroup: "Age: N/A", schedule: "Time: N/A", focus: "Focus: N/A", price: "$15 per week", linkTo: "/academy/parklea" }
+        { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "April 3 - April 17", focus: "Technical & Tactical", price: "From $35/day", linkTo: "/holiday-program" },
+        { 
+            title: "Parklea Development Program", 
+            description: "The Parklea Development Program is designed to identify and nurture dedicated players looking to elevate their game. Focusing on high-quality training, a strong team culture, and long-term development, the program aims to enhance technical skills, tactical understanding, decision-making, and confidence in real match situations. Participants are challenged in a competitive yet supportive environment that encourages growth both on and off the field. This program is ideal for committed athletes who are serious about their progression and seeking structured development beyond standard team training.", 
+            price: "$15 per week", 
+            linkTo: "/academy/parklea" 
+        }
     ];
 
     const coaches = [
@@ -233,7 +253,7 @@ export default function Academy() {
                         <div className="w-32 h-1 bg-[#FF6B00] mx-auto mb-6"></div>
                         <p className="text-gray-400 text-lg max-w-2xl mx-auto">Programs designed for every age and skill level</p>
                     </motion.div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 items-start">
                         {programs.map((program, index) => (<ProgramCard key={index} {...program} delay={index * 0.1} />))}
                     </div>
                 </div>

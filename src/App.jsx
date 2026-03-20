@@ -14,6 +14,7 @@ import Sponsors from './Pages/Sponsors';
 import About from './Pages/About';
 import Academy from './Pages/Academy';
 import ParkleaProgram from './Pages/ParkleaProgram';
+import HolidayProgram from './Pages/HolidayProgram';
 import Contact from './Pages/Contact';
 import Moments from './Pages/Moments';
 // --- NEW: Import the LiveScores page ---
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/academy" element={<Academy />} />
           <Route path="/academy/parklea" element={<ParkleaProgram />} />
+          <Route path="/holiday-program" element={<HolidayProgram />} />
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

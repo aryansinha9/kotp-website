@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [registrations, setRegistrations] = useState([]);
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
+  const [holidayRegistrations, setHolidayRegistrations] = useState([]);
   const [reels, setReels] = useState([]);
   const [completedTournaments, setCompletedTournaments] = useState([]);
   const [selectedTournamentId, setSelectedTournamentId] = useState('');
@@ -60,7 +61,7 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [regData, reelData, allTournaments, parkleaData] = await Promise.all([
+      const [regData, reelData, allTournaments, parkleaData, holidayData] = await Promise.all([
         Registration.list(),
         FeaturedReel.list(),
         Tournament.list('start_date'),
@@ -72,7 +73,33 @@ export default function AdminDashboard() {
           );
           data = data.filter(r => {
             const key = `${(r.participant_name || '').toLowerCase()}-${(r.parent_email || '').toLowerCase()}`;
-            return !((r.payment_status === 'pending') && successfulKeys.has(key));
+            return !((r.payment_status === 'pending' || r.payment_status === 'pending_payment') && successfulKeys.has(key));
+          });
+          data.sort((a, b) => {
+            const getSortWeight = (reg) => {
+              const isPaid = (reg.payment_status === 'successful' || reg.payment_status === 'paid');
+              const isStandard = (!reg.package_type || reg.package_type === 'standard');
+              
+              if (isPaid && isStandard) return 1;
+              if (isPaid && !isStandard) return 2;
+              if (!isPaid && isStandard) return 3;
+              if (!isPaid && !isStandard) return 4;
+              return 5;
+            };
+
+            return getSortWeight(a) - getSortWeight(b);
+          });
+          return data;
+        }),
+        supabase.from('holiday_program_registrations').select('*').order('created_at', { ascending: false }).then(res => {
+          let data = res.data || [];
+          const successfulKeys = new Set(
+            data.filter(r => r.payment_status === 'successful' || r.payment_status === 'paid')
+              .map(r => `${(r.participant_name || '').toLowerCase()}-${(r.parent_email || '').toLowerCase()}`)
+          );
+          data = data.filter(r => {
+            const key = `${(r.participant_name || '').toLowerCase()}-${(r.parent_email || '').toLowerCase()}`;
+            return !((r.payment_status === 'pending' || r.payment_status === 'pending_payment') && successfulKeys.has(key));
           });
           data.sort((a, b) => {
             const getSortWeight = (reg) => {
@@ -93,6 +120,7 @@ export default function AdminDashboard() {
       ]);
       setRegistrations(regData);
       setParkleaRegistrations(parkleaData);
+      setHolidayRegistrations(holidayData);
       setReels(reelData);
       setCompletedTournaments(allTournaments.filter(t => t.status === 'completed'));
       setOngoingTournaments(allTournaments.filter(t => t.status === 'ongoing'));
@@ -151,6 +179,39 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
+  const downloadHolidayCSV = () => {
+    if (holidayRegistrations.length === 0) return;
+    const headers = [
+      'Date', 'Package', 'Total Due', 'Status', 'Selected Days', 'Participant', 'Age', 'DOB', 'Position',
+      'Parent Name', 'Parent Phone', 'Parent Email', 'Emergency Contact', 'Address',
+      'Medical Condition?', 'Medical Details',
+      'Medication?', 'Medication Details', 'Signature'
+    ];
+
+    const rows = holidayRegistrations.map(r => [
+      new Date(r.created_at).toLocaleDateString(), 
+      (r.package_type || 'Custom Days'), 
+      `$${r.total_amount || 0}`, 
+      r.payment_status, 
+      `"${(r.selected_days || '').replace(/"/g, '""')}"`,
+      r.participant_name, r.age_turning_2026, r.dob, r.position,
+      r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, `"${(r.home_address || '').replace(/"/g, '""')}"`,
+      r.has_medical_condition, `"${(r.medical_description || '').replace(/"/g, '""')}"`,
+      r.has_medication, `"${(r.medication_details || '').replace(/"/g, '""')}"`, r.signature
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + [headers.join(','), ...rows.map(e => e.join(','))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Holiday_Registrations_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleGallerySubmit = async () => {
     if (!selectedTournamentId || selectedFiles.length === 0) { setUploadMessage({ type: "error", text: "Please select a tournament and at least one file." }); return; }
     setUploading(true); setUploadMessage({ type: "", text: "" });
@@ -174,6 +235,17 @@ export default function AdminDashboard() {
   const handleDeleteParkleaRegistration = async (id) => {
     if (window.confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
       const { error } = await supabase.from('parklea_registrations').delete().eq('id', id);
+      if (error) {
+        alert(`Failed to delete registration: ${error.message} (You may need to enable DELETE policies in Supabase RLS).`);
+      } else {
+        await loadData();
+      }
+    }
+  };
+
+  const handleDeleteHolidayRegistration = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this registration? This action cannot be undone.")) {
+      const { error } = await supabase.from('holiday_program_registrations').delete().eq('id', id);
       if (error) {
         alert(`Failed to delete registration: ${error.message} (You may need to enable DELETE policies in Supabase RLS).`);
       } else {
@@ -213,6 +285,47 @@ Status: ${reg.payment_status}`;
                 <Copy className="w-4 h-4" /> Copy Information
               </button>
               <button onClick={() => { setIsOpen(false); handleDeleteParkleaRegistration(reg.id); }} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2 border-t border-white/5">
+                <Trash2 className="w-4 h-4" /> Delete
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const ActionMenuHoliday = ({ reg }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const copyInfo = () => {
+      const info = `Name: ${reg.participant_name}
+Age: ${reg.age_turning_2026}
+Parent: ${reg.parent_name}
+Email: ${reg.parent_email}
+Phone: ${reg.parent_phone}
+Selected Days: ${reg.selected_days}
+Package: ${reg.package_type}
+Total: $${reg.total_amount || 0}
+Medical: ${reg.has_medical_condition === 'yes' ? reg.medical_description : 'None'}
+Status: ${reg.payment_status}`;
+      navigator.clipboard.writeText(info);
+      setIsOpen(false);
+      alert("Information copied to clipboard!");
+    };
+
+    return (
+      <div className="relative">
+        <button onClick={() => setIsOpen(!isOpen)} className="text-gray-400 hover:text-white p-2 rounded hover:bg-white/5 transition-colors">
+          <MoreVertical className="w-5 h-5" />
+        </button>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
+            <div className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-md shadow-lg z-20 overflow-hidden">
+              <button onClick={copyInfo} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                <Copy className="w-4 h-4" /> Copy Information
+              </button>
+              <button onClick={() => { setIsOpen(false); handleDeleteHolidayRegistration(reg.id); }} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2 border-t border-white/5">
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
             </div>
@@ -295,6 +408,35 @@ Status: ${reg.payment_status}`;
                     <StyledTableCell>{getStatusBadge(reg.payment_status)}</StyledTableCell>
                     <StyledTableCell>
                       <ActionMenu reg={reg} />
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </StyledTable>
+            )}
+          </Section>
+
+          <Section icon={ClipboardList} title="HOLIDAY PROGRAM REGISTRATIONS" count={holidayRegistrations.length} defaultOpen={false}>
+            <div className="flex justify-end mb-4">
+              <Button onClick={downloadHolidayCSV} disabled={holidayRegistrations.length === 0} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                <Download className="w-4 h-4 mr-2" /> EXPORT TO CSV
+              </Button>
+            </div>
+            {holidayRegistrations.length === 0 ? <p className="text-center text-gray-500 py-8">No holiday registrations yet</p> : (
+              <StyledTable headers={["Date", "Package", "Total", "Selected Days", "Participant", "Age", "Parent", "Email", "Phone", "Status", "Actions"]}>
+                {holidayRegistrations.map((reg) => (
+                  <StyledTableRow key={reg.id}>
+                    <StyledTableCell>{new Date(reg.created_at).toLocaleDateString()}</StyledTableCell>
+                    <StyledTableCell className="capitalize text-gray-400">{reg.package_type || 'Custom'}</StyledTableCell>
+                    <StyledTableCell>${reg.total_amount || 0}</StyledTableCell>
+                    <StyledTableCell>{(reg.selected_days || '').split(',').length} Days</StyledTableCell>
+                    <StyledTableCell className="font-semibold text-white">{reg.participant_name}</StyledTableCell>
+                    <StyledTableCell>{reg.age_turning_2026}</StyledTableCell>
+                    <StyledTableCell>{reg.parent_name}</StyledTableCell>
+                    <StyledTableCell><a href={`mailto:${reg.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-4 h-4" />Email</a></StyledTableCell>
+                    <StyledTableCell><a href={`tel:${reg.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-4 h-4" />Call</a></StyledTableCell>
+                    <StyledTableCell>{getStatusBadge(reg.payment_status)}</StyledTableCell>
+                    <StyledTableCell>
+                      <ActionMenuHoliday reg={reg} />
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
