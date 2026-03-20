@@ -147,7 +147,27 @@ export default function AdminDashboard() {
   }, [selectedScoreTournamentId]);
 
   const handleLogout = async () => { await supabase.auth.signOut(); navigate('/admin'); };
-  const handleFileChange = (e) => { setSelectedFiles(Array.from(e.target.files)); setUploadMessage({ type: "", text: "" }); };
+  const handleFileChange = (e) => { 
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime'];
+    const maxSizeBytes = 20 * 1024 * 1024; // 20MB limit
+    const validFiles = [];
+    const files = Array.from(e.target.files);
+
+    for (let file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        setUploadMessage({ type: "error", text: `Invalid file type: ${file.name}. Only common images and videos are supported.` });
+        return;
+      }
+      if (file.size > maxSizeBytes) {
+        setUploadMessage({ type: "error", text: `File too large: ${file.name}. Maximum size is 20MB.` });
+        return;
+      }
+      validFiles.push(file);
+    }
+    
+    setSelectedFiles(validFiles); 
+    setUploadMessage({ type: "", text: "" }); 
+  };
   const getStatusBadge = (status) => (status === 'paid' || status === 'successful' ? <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-400 border border-green-500/30">Paid</span> : <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Pending</span>);
 
   const downloadParkleaCSV = () => {
