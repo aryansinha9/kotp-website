@@ -152,7 +152,7 @@ export default function HolidayProgram() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-white">Age (Turning in 2026) *</Label>
-                                    <Input type="number" name="ageTurning2026" required value={formData.ageTurning2026} onChange={handleChange} min="4" max="25" className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]" />
+                                    <Input type="number" name="ageTurning2026" required value={formData.ageTurning2026} onChange={handleChange} className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]" />
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-white">Primary Position *</Label>

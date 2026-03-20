@@ -49,7 +49,7 @@ serve(async (req: Request) => {
       throw new Error("Invalid parent name.")
     
     const ageNum = parseInt(ageTurning2026, 10)
-    if (isNaN(ageNum) || ageNum < 3 || ageNum > 25) 
+    if (isNaN(ageNum)) 
       throw new Error("Invalid age.")
 
     if (!parentPhone || typeof parentPhone !== 'string' || parentPhone.trim().length < 8) 
