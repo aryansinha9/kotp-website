@@ -129,10 +129,7 @@ serve(async (req: Request) => {
     // 2. Stripe integration
     const priceData: any = {
       currency: 'aud',
-      product_data: {
-        name: `Holiday Program - ${computedPackageType}`,
-        description: `Days selected: ${selectedDays.join(', ')}`
-      },
+      product: 'prod_UBHor9QgnXE56R',
       unit_amount: backendTotal * 100, // Stripe uses cents
     }
 
