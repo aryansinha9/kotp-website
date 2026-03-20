@@ -23,6 +23,7 @@ import Register from './Pages/Register';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
+import ScrollToTop from './Components/ScrollToTop';
 import Gallery from './Pages/Gallery';
 import RegistrationSuccess from './Pages/RegistrationSuccess';
 import UpdatePassword from './Pages/UpdatePassword';
@@ -53,6 +54,7 @@ const ComingSoon = () => (
 export default function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Group 1: Public Routes */}
         <Route element={<PublicLayout />}>
