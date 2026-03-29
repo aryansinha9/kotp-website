@@ -163,6 +163,12 @@ export default function Academy() {
             description: "The Parklea Development Program is designed to identify and nurture dedicated players looking to elevate their game. Focusing on high-quality training, a strong team culture, and long-term development, the program aims to enhance technical skills, tactical understanding, decision-making, and confidence in real match situations. Participants are challenged in a competitive yet supportive environment that encourages growth both on and off the field. This program is ideal for committed athletes who are serious about their progression and seeking structured development beyond standard team training.", 
             price: "$15 per week", 
             linkTo: "/academy/parklea" 
+        },
+        {
+            title: "AIA After School Program",
+            description: "Details coming soon. Stay tuned for more information about this exciting new after school program.",
+            price: "TBA",
+            linkTo: "/academy/aia-after-school"
         }
     ];
 
