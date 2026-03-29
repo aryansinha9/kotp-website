@@ -122,6 +122,7 @@ serve(async (req: Request) => {
         },
       ],
       mode: 'payment',
+      automatic_tax: { enabled: true },
       allow_promotion_codes: true,
       success_url: `${origin}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/academy/aia-after-school?status=cancelled`,
