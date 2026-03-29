@@ -111,10 +111,24 @@ serve(async (req: Request) => {
 
     if (dbError) throw dbError
 
-    // 2. Create Stripe Checkout session — uses the pre-created Stripe price ($125 + GST)
+    // 2. Create/Get Stripe Customer with address info to trigger correct taxing
+    const customer = await stripe.customers.create({
+      email: parentEmail.trim(),
+      name: `${parentFirstName.trim()} ${parentLastName.trim()}`,
+      address: {
+        line1: streetAddress.trim(),
+        line2: streetAddress2?.trim() || undefined,
+        city: city.trim(),
+        state: state.trim(),
+        postal_code: postalCode.trim(),
+        country: 'AU', // Explicitly set to Australia for GST
+      },
+    })
+
+    // 3. Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      customer_email: parentEmail.trim(),
+      customer: customer.id, // Use the newly created customer with address
       line_items: [
         {
           price: 'price_1TGDwXJTT6itmjMc7KLsQsq4',
@@ -133,11 +147,12 @@ serve(async (req: Request) => {
       },
     })
 
-    // 3. Store Stripe session ID in DB
+    // 4. Store Stripe session ID in DB
     await supabaseAdmin
       .from('aia_program_registrations')
       .update({ stripe_session_id: session.id })
       .eq('id', record.id)
+
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
