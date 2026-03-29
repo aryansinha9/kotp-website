@@ -166,8 +166,8 @@ export default function Academy() {
         },
         {
             title: "AIA After School Program",
-            description: "Details coming soon. Stay tuned for more information about this exciting new after school program.",
-            price: "TBA",
+            description: "A structured after-school football program run at AIA, focused on developing players' technical skills, game awareness, and confidence in a fun and supportive environment. Sessions are designed to help students improve their football ability while staying active and engaged after school.",
+            price: "$125",
             linkTo: "/academy/aia-after-school"
         }
     ];
