@@ -30,10 +30,6 @@ export default function AIAAfterSchoolProgramForm() {
     agreeTerms: false,
     signature: "",
     signatureDate: new Date().toISOString().split('T')[0],
-    referralFirstName: "",
-    referralLastName: "",
-    howDidYouHear: "",
-    interestedPrograms: ""
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -323,58 +319,6 @@ export default function AIAAfterSchoolProgramForm() {
           </div>
         </div>
 
-        {/* Marketing & Referrals */}
-        <div className="space-y-6">
-          <h3 className="headline-font text-2xl text-[#FF6B00]">MARKETING &amp; REFERRALS</h3>
-          <div>
-            <Label className="text-white mb-2 block">Who did you refer?</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                value={formData.referralFirstName}
-                onChange={(e) => handleInputChange("referralFirstName", e.target.value)}
-                className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]"
-                placeholder="First Name"
-              />
-              <Input
-                value={formData.referralLastName}
-                onChange={(e) => handleInputChange("referralLastName", e.target.value)}
-                className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00]"
-                placeholder="Last Name"
-              />
-            </div>
-          </div>
-          <div>
-            <Label className="text-white mb-2 block">How did you find out about us?</Label>
-            <Select value={formData.howDidYouHear} onValueChange={(value) => handleInputChange("howDidYouHear", value)}>
-              <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white">
-                <SelectValue placeholder="Please Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="social-media">Social Media</SelectItem>
-                <SelectItem value="previous-participant">Previous Participant</SelectItem>
-                <SelectItem value="referral">Referral</SelectItem>
-                <SelectItem value="school">School</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="text-white mb-2 block">Would you like to know more about other KOTP programs?</Label>
-            <Select value={formData.interestedPrograms} onValueChange={(value) => handleInputChange("interestedPrograms", value)}>
-              <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white">
-                <SelectValue placeholder="Please Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="holiday-program">Holiday Program</SelectItem>
-                <SelectItem value="parklea-development">Parklea Development Program</SelectItem>
-                <SelectItem value="small-group">Small Group Sessions</SelectItem>
-                <SelectItem value="private">Private Sessions</SelectItem>
-                <SelectItem value="tournaments">KOTP Tournaments</SelectItem>
-                <SelectItem value="nothing">Nothing at the moment</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
 
         {/* Submit */}
         <div className="pt-8">
