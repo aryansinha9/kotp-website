@@ -37,19 +37,26 @@ serve(async (req) => {
       const tournamentId = session.metadata?.tournament_id
 
       if (registrationId && teamName && tournamentId) {
-        // 1. Mark registration as completed in 'tournament_registrations' (legacy hook)
-        const { error: updateErrorTR } = await supabaseAdmin
-          .from("tournament_registrations")
-          .update({ payment_status: "completed" })
-          .eq("id", registrationId)
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(registrationId);
+
+        let updateErrorTR = null;
+        if (isUUID) {
+          // 1. Mark registration as completed in 'tournament_registrations' (legacy hook)
+          const { error } = await supabaseAdmin
+            .from("tournament_registrations")
+            .update({ payment_status: "completed" })
+            .eq("id", registrationId);
+          updateErrorTR = error;
+        }
 
         // 1b. Mark registration as 'paid' in 'registrations' (active standard hook)
+        // Works with BIGINT via string conversion automatically
         const { error: updateErrorReg } = await supabaseAdmin
           .from("registrations")
           .update({ payment_status: "paid" })
           .eq("id", registrationId)
 
-        if (updateErrorTR && updateErrorReg) {
+        if ((isUUID && updateErrorTR) || updateErrorReg) {
           console.error("Error updating registration:", updateErrorTR, updateErrorReg)
         }
 
