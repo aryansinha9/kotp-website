@@ -8,6 +8,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") as string, {
 })
 
 const endpointSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET_TOURNAMENT")
+const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature")
@@ -27,7 +28,7 @@ serve(async (req) => {
       throw new Error("Webhook secret not configured")
     }
 
-    const event = stripe.webhooks.constructEvent(body, signature, endpointSecret)
+    const event = await stripe.webhooks.constructEventAsync(body, signature, endpointSecret, undefined, cryptoProvider)
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as any
