@@ -1,0 +1,13 @@
+ALTER TABLE public.registrations
+ADD COLUMN IF NOT EXISTS players JSONB,
+ADD COLUMN IF NOT EXISTS medical_description TEXT,
+ADD COLUMN IF NOT EXISTS agreed_to_terms BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS signature TEXT,
+ADD COLUMN IF NOT EXISTS signature_date DATE,
+ADD COLUMN IF NOT EXISTS stripe_session_id TEXT;
+
+ALTER TABLE public.registrations
+ALTER COLUMN contact_person DROP NOT NULL,
+ALTER COLUMN email DROP NOT NULL,
+ALTER COLUMN phone DROP NOT NULL,
+ALTER COLUMN payment_status SET DEFAULT 'pending';

@@ -113,8 +113,32 @@ export default function AdminDashboard() {
 
   const csvDown = (name, headers, rows) => { const c = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n'); const l = document.createElement('a'); l.setAttribute('href', encodeURI(c)); l.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(l); l.click(); document.body.removeChild(l); };
   const downloadParkleaCSV = () => { if (!parkleaRegistrations.length) return; csvDown('Parklea_Registrations', ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'], parkleaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'standard'),r.payment_status,r.participant_name,r.age_turning_2026,r.dob,r.team,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.jersey_size,r.shorts_size,r.socks_size,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
-  const downloadHolidayCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
+  const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadAIACSV = () => { if (!aiaRegistrations.length) return; csvDown('AIA_Registrations', ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'], aiaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),r.payment_status,r.participant_first_name,r.participant_last_name,r.dob,(r.year_group||'').replace('-',' '),r.parent_first_name,r.parent_last_name,r.parent_phone,r.parent_email,`"${(r.street_address||'').replace(/"/g,'""')}"`,r.city,r.state,r.postal_code,`"${(r.allergies||'').replace(/"/g,'""')}"`,`"${(r.inhaler||'').replace(/"/g,'""')}"`,r.signature])); };
+  const downloadTournamentCSV = () => {
+    if (!registrations.length) return;
+    const headers = ['Date', 'Tournament', 'Team Name', 'Captain Name', 'Captain Email', 'Captain Phone', 'Payment Status', 'Medical Description', 'Agreed Terms', 'Signature', 'Player List (Name, Captain?, Email, Phone, IG)'];
+    const rows = registrations.map(r => {
+      let playersStr = "";
+      if (Array.isArray(r.players)) {
+        playersStr = r.players.map(p => `${p.firstName} ${p.lastName} ${p.isCaptain ? '(CAPTAIN)' : ''} - ${p.email||''} - ${p.phone||''} - ${p.instagram||''}`).join(" | ");
+      }
+      return [
+        new Date(r.created_at).toLocaleDateString(),
+        r.tournaments?.name || 'N/A',
+        r.team_name,
+        r.contact_person,
+        r.email,
+        r.phone,
+        r.payment_status,
+        `"${(r.medical_description || '').replace(/"/g, '""')}"`,
+        r.agreed_to_terms ? 'Yes' : 'No',
+        r.signature,
+        `"${playersStr.replace(/"/g, '""')}"`
+      ];
+    });
+    csvDown('Tournament_Registrations', headers, rows);
+  };
 
   const handleGallerySubmit = async () => {
     if (!selectedTournamentId || !selectedFiles.length) { setUploadMessage({ type: 'error', text: 'Select a tournament and files.' }); return; }

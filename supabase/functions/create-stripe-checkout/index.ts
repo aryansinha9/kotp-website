@@ -35,7 +35,7 @@ serve(async (req: Request) => {
     )
 
     const registrationData = await req.json()
-    const { tournamentId, teamName, contactPerson, email, phone, ageGroup } = registrationData
+    const { tournamentId, teamName, contactPerson, email, phone, ageGroup, players, medicalInfo, signature, signatureDate } = registrationData
 
     if (!tournamentId) throw new Error("Tournament ID is required.")
 
@@ -49,6 +49,29 @@ serve(async (req: Request) => {
     if (!tournament) throw new Error('Tournament not found.')
     if (tournament.entry_fee <= 0) {
       throw new Error('This tournament is free or has an invalid entry fee.')
+    }
+
+    // Insert pending registration into DB first
+    const { data: registration, error: insertError } = await supabaseAdmin
+      .from('registrations')
+      .insert({
+        tournament_id: tournamentId,
+        team_name: teamName,
+        contact_person: contactPerson,
+        email: email,
+        phone: phone,
+        players: players,
+        medical_description: medicalInfo,
+        agreed_to_terms: true,
+        signature: signature,
+        signature_date: signatureDate,
+        payment_status: 'pending'
+      })
+      .select('id')
+      .single()
+
+    if (insertError) {
+      throw new Error(`Failed to save registration: ${insertError.message}`)
     }
 
     const priceInCents = Math.round(tournament.entry_fee * 100)
@@ -72,15 +95,16 @@ serve(async (req: Request) => {
       success_url: `${SITE_URL}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_URL}/register/${tournamentId}?status=cancelled`,
       metadata: {
+        registration_id: registration.id,
         tournament_id: tournamentId,
-        team_name: teamName,
-        contact_person: contactPerson,
-        email: email,
-        phone: phone,
-        age_group: ageGroup || '',
-        amount_paid: tournament.entry_fee.toString(),
       },
     })
+
+    // Update with session ID
+    await supabaseAdmin
+      .from('registrations')
+      .update({ stripe_session_id: session.id })
+      .eq('id', registration.id)
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

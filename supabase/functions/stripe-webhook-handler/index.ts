@@ -42,34 +42,29 @@ Deno.serve(async (req) => {
       const session = receivedEvent.data.object as Stripe.Checkout.Session
       const metadata = session.metadata
 
-      if (!metadata || !metadata.tournament_id) {
-        throw new Error('Webhook received without necessary registration metadata.')
+      if (!metadata || !metadata.registration_id) {
+        throw new Error('Webhook received without necessary registration_id metadata.')
       }
 
       const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL') ?? '', SERVICE_ROLE_KEY)
 
+      // Update the existing pending registration
       const { data: registrationData, error } = await supabaseAdmin
         .from('registrations')
-        .insert({
-          tournament_id: metadata.tournament_id,
-          team_name: metadata.team_name,
-          contact_person: metadata.contact_person,
-          email: metadata.email,
-          phone: metadata.phone,
-          age_group: metadata.age_group,
+        .update({
           payment_status: 'paid',
-          amount_paid: parseFloat(metadata.amount_paid),
           stripe_session_id: session.id,
         })
+        .eq('id', metadata.registration_id)
         .select(`*, tournaments ( name )`)
         .single()
 
       if (error) {
-        console.error('Database insertion error:', error)
+        console.error('Database update error:', error)
         throw new Error(`Database error: ${error.message}`)
       }
       
-      console.log(`✅ Successfully inserted registration for team: ${registrationData.team_name}`)
+      console.log(`✅ Successfully updated registration for team: ${registrationData.team_name}`)
 
       const tournamentName = registrationData.tournaments?.name || 'the tournament';
       
@@ -78,9 +73,9 @@ Deno.serve(async (req) => {
       const { data: emailData, error: emailError } = await resend.emails.send({
         // --- THIS IS THE ONLY CHANGE ---
         from: 'onboarding@resend.dev', // Use the Resend test address
-        to: metadata.email,
+        to: registrationData.email,
         subject: `Confirmation: You're Registered for ${tournamentName}!`,
-        html: `<p>Hi ${metadata.contact_person}, your team <strong>${metadata.team_name}</strong> is registered for the <strong>${tournamentName}</strong>. Payment of $${metadata.amount_paid} received.</p><p>This is a test email from a local development environment.</p>`,
+        html: `<p>Hi ${registrationData.contact_person}, your team <strong>${registrationData.team_name}</strong> is registered for the <strong>${tournamentName}</strong>. Payment received.</p><p>This is a test email from a local development environment.</p>`,
       });
 
       if (emailError) {
