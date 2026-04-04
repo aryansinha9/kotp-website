@@ -37,14 +37,20 @@ serve(async (req) => {
       const tournamentId = session.metadata?.tournament_id
 
       if (registrationId && teamName && tournamentId) {
-        // 1. Mark registration as completed
-        const { error: updateError } = await supabaseAdmin
+        // 1. Mark registration as completed in 'tournament_registrations' (legacy hook)
+        const { error: updateErrorTR } = await supabaseAdmin
           .from("tournament_registrations")
           .update({ payment_status: "completed" })
           .eq("id", registrationId)
 
-        if (updateError) {
-          console.error("Error updating registration:", updateError)
+        // 1b. Mark registration as 'paid' in 'registrations' (active standard hook)
+        const { error: updateErrorReg } = await supabaseAdmin
+          .from("registrations")
+          .update({ payment_status: "paid" })
+          .eq("id", registrationId)
+
+        if (updateErrorTR && updateErrorReg) {
+          console.error("Error updating registration:", updateErrorTR, updateErrorReg)
         }
 
         // 2. Insert into the teams table so it appears in Live Scores

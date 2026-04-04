@@ -117,27 +117,67 @@ export default function AdminDashboard() {
   const downloadAIACSV = () => { if (!aiaRegistrations.length) return; csvDown('AIA_Registrations', ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'], aiaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),r.payment_status,r.participant_first_name,r.participant_last_name,r.dob,(r.year_group||'').replace('-',' '),r.parent_first_name,r.parent_last_name,r.parent_phone,r.parent_email,`"${(r.street_address||'').replace(/"/g,'""')}"`,r.city,r.state,r.postal_code,`"${(r.allergies||'').replace(/"/g,'""')}"`,`"${(r.inhaler||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadTournamentCSV = () => {
     if (!registrations.length) return;
-    const headers = ['Date', 'Tournament', 'Team Name', 'Captain Name', 'Captain Email', 'Captain Phone', 'Payment Status', 'Medical Description', 'Agreed Terms', 'Signature', 'Player List (Name, Captain?, Email, Phone, IG)'];
-    const rows = registrations.map(r => {
-      let playersStr = "";
-      if (Array.isArray(r.players)) {
-        playersStr = r.players.map(p => `${p.firstName} ${p.lastName} ${p.isCaptain ? '(CAPTAIN)' : ''} - ${p.email||''} - ${p.phone||''} - ${p.instagram||''}`).join(" | ");
-      }
-      return [
-        new Date(r.created_at).toLocaleDateString(),
-        r.tournaments?.name || 'N/A',
-        r.team_name,
-        r.contact_person,
-        r.email,
-        r.phone,
-        r.payment_status,
-        `"${(r.medical_description || '').replace(/"/g, '""')}"`,
+    
+    // Create rows with multiple line breaks for teams
+    const csvContentRows = [];
+    
+    // Overall Header for the entire file isn't needed if we use sections,
+    // but let's make a standard CSV where each team is a block.
+    
+    registrations.forEach(r => {
+      // 1. Team Info Header Row
+      csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
+      csvContentRows.push([
+        ' ',
+        `"${(r.tournaments?.name || 'N/A').replace(/"/g, '""')}"`,
+        `"${(r.team_name || 'N/A').replace(/"/g, '""')}"`,
+        `"${(r.contact_person || 'N/A').replace(/"/g, '""')}"`,
+        `"${(r.email || 'N/A').replace(/"/g, '""')}"`,
+        `"${(r.phone || 'N/A').replace(/"/g, '""')}"`,
+        r.payment_status || 'N/A',
         r.agreed_to_terms ? 'Yes' : 'No',
-        r.signature,
-        `"${playersStr.replace(/"/g, '""')}"`
-      ];
+        r.signature_date ? new Date(r.signature_date).toLocaleDateString() : 'N/A',
+        `"${(r.signature || '').replace(/"/g, '""')}"`
+      ]);
+      
+      // Medical info
+      if (r.medical_description && r.medical_description.trim().length > 0) {
+          csvContentRows.push(['MEDICAL INFO', `"${r.medical_description.replace(/"/g, '""')}"`]);
+      }
+      
+      // 2. Player Roster Headers
+      csvContentRows.push([' ', 'PLAYER ROSTER', 'First Name', 'Last Name', 'Is Captain', 'Email', 'Phone', 'Instagram']);
+      
+      if (Array.isArray(r.players) && r.players.length > 0) {
+        r.players.forEach((p, idx) => {
+          csvContentRows.push([
+            ' ',
+            `Player ${idx + 1}`,
+            `"${(p.firstName || '').replace(/"/g, '""')}"`,
+            `"${(p.lastName || '').replace(/"/g, '""')}"`,
+            p.isCaptain ? 'YES (CAPTAIN)' : 'No',
+            `"${(p.email || '').replace(/"/g, '""')}"`,
+            `"${(p.phone || '').replace(/"/g, '""')}"`,
+            `"${(p.instagram || '').replace(/"/g, '""')}"`
+          ]);
+        });
+      } else {
+        csvContentRows.push([' ', 'No players recorded']);
+      }
+      
+      // Blank spacer row between teams
+      csvContentRows.push([]);
+      csvContentRows.push([]);
     });
-    csvDown('Tournament_Registrations', headers, rows);
+    
+    // Call our csv downloader without uniform headers, just the content rows
+    const c = "data:text/csv;charset=utf-8," + csvContentRows.map(r => r.join(',')).join('\\n');
+    const l = document.createElement('a'); 
+    l.setAttribute('href', encodeURI(c)); 
+    l.setAttribute('download', `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.csv`); 
+    document.body.appendChild(l); 
+    l.click(); 
+    document.body.removeChild(l);
   };
 
   const handleGallerySubmit = async () => {
@@ -159,6 +199,7 @@ export default function AdminDashboard() {
   const handleDeleteParkleaRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('parklea_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteHolidayRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('holiday_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteAIARegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('aia_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
+  const handleDeleteTournamentRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('tournament_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteReel = async id => { if (window.confirm('Delete?')) { const { error } = await FeaturedReel.deleteById(id); if (error) setReelMessage({ type: 'error', text: error.message }); else { setReelMessage({ type: 'success', text: 'Deleted.' }); await loadData(); } } };
   const handleCreateGame = async () => { if (!selectedScoreTournamentId || !teamAId || !teamBId || teamAId === teamBId) { alert('Select a tournament and two different teams.'); return; } setIsCreatingGame(true); await Game.create({ tournament_id: selectedScoreTournamentId, team_a_id: teamAId, team_b_id: teamBId, status: 'SCHEDULED' }); setGames(await Game.filter({ tournament_id: selectedScoreTournamentId })); setTeamAId(''); setTeamBId(''); setIsCreatingGame(false); };
   const handleScoreChange = async (gameId, field, inc) => { const game = games.find(g => g.id === gameId); if (!game) return; const { data: updated } = await Game.update(gameId, { [field]: Math.max(0, (game[field] || 0) + (inc ? 1 : -1)) }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g)); };
@@ -177,8 +218,13 @@ export default function AdminDashboard() {
   };
   const ActionMenuAIA = ({ reg }) => {
     const [open, setOpen] = useState(false);
-    const copy = () => { navigator.clipboard.writeText(`Name: ${reg.participant_first_name} ${reg.participant_last_name}\nYear Group: ${(reg.year_group||'').replace('-',' ')}\nDOB: ${reg.dob}\nParent: ${reg.parent_first_name} ${reg.parent_last_name}\nEmail: ${reg.parent_email}\nPhone: ${reg.parent_phone}\nAddress: ${reg.street_address}, ${reg.city} ${reg.state} ${reg.postal_code}\nAllergies: ${reg.allergies}\nStatus: ${reg.payment_status}`); setOpen(false); alert('Copied!'); };
+    const copy = () => { navigator.clipboard.writeText(`Name: ${reg.participant_first_name} ${reg.participant_last_name}\\nYear Group: ${(reg.year_group||'').replace('-',' ')}\\nDOB: ${reg.dob}\\nParent: ${reg.parent_first_name} ${reg.parent_last_name}\\nEmail: ${reg.parent_email}\\nPhone: ${reg.parent_phone}\\nAddress: ${reg.street_address}, ${reg.city} ${reg.state} ${reg.postal_code}\\nAllergies: ${reg.allergies}\\nStatus: ${reg.payment_status}`); setOpen(false); alert('Copied!'); };
     return <div className="relative"><button onClick={() => setOpen(!open)} className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5"><MoreVertical className="w-4 h-4" /></button>{open && (<><div className="fixed inset-0 z-10" onClick={() => setOpen(false)} /><div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"><button onClick={copy} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2"><Copy className="w-3.5 h-3.5" />Copy</button><button onClick={() => { setOpen(false); handleDeleteAIARegistration(reg.id); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/5"><Trash2 className="w-3.5 h-3.5" />Delete</button></div></>)}</div>;
+  };
+  const ActionMenuTournament = ({ reg }) => {
+    const [open, setOpen] = useState(false);
+    const copy = () => { navigator.clipboard.writeText(`Team: ${reg.team_name||'N/A'}\\nContact: ${reg.contact_person}\\nEmail: ${reg.email}\\nPhone: ${reg.phone}\\nStatus: ${reg.payment_status}`); setOpen(false); alert('Copied!'); };
+    return <div className="relative"><button onClick={() => setOpen(!open)} className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5"><MoreVertical className="w-4 h-4" /></button>{open && (<><div className="fixed inset-0 z-10" onClick={() => setOpen(false)} /><div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"><button onClick={copy} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2"><Copy className="w-3.5 h-3.5" />Copy</button><button onClick={() => { setOpen(false); handleDeleteTournamentRegistration(reg.id); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/5"><Trash2 className="w-3.5 h-3.5" />Delete</button></div></>)}</div>;
   };
 
   const liveGames = games.filter(g => g.status === 'LIVE');
@@ -277,8 +323,8 @@ export default function AdminDashboard() {
           <div>
             <SectionHeader title="Tournament Registrations" count={registrations.length} action={<Button onClick={downloadTournamentCSV} disabled={!registrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
             {!registrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
-              <T headers={['Team Name','Tournament','Contact','Email','Phone','Division','Status']}>
-                {registrations.map(r => <TR key={r.id}><TD className="font-semibold text-white">{r.team_name||'N/A'}</TD><TD>{r.tournaments?.name||'N/A'}</TD><TD>{r.contact_person}</TD><TD><a href={`mailto:${r.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{r.division||'N/A'}</TD><TD>{getStatusBadge(r.payment_status)}</TD></TR>)}
+              <T headers={['Team Name','Tournament','Contact','Email','Phone','Division','Status','Actions']}>
+                {registrations.map(r => <TR key={r.id}><TD className="font-semibold text-white">{r.team_name||'N/A'}</TD><TD>{r.tournaments?.name||'N/A'}</TD><TD>{r.contact_person}</TD><TD><a href={`mailto:${r.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{r.division||'N/A'}</TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuTournament reg={r} /></TD></TR>)}
               </T>
             )}
           </div>
