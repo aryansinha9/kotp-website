@@ -93,6 +93,7 @@ serve(async (req: Request) => {
         },
       ],
       mode: 'payment',
+      allow_promotion_codes: true,
       success_url: `${SITE_URL}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_URL}/register/${tournamentId}?status=cancelled`,
       metadata: {
