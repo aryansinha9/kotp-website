@@ -107,7 +107,7 @@ export default function AdminDashboard() {
     }
     setSelectedFiles(valid); setUploadMessage({ type: '', text: '' });
   };
-  const getStatusBadge = s => s === 'paid' || s === 'successful'
+  const getStatusBadge = s => ['paid', 'successful', 'completed'].includes(s?.toLowerCase())
     ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20">Paid</span>
     : <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">Pending</span>;
 
@@ -185,8 +185,8 @@ export default function AdminDashboard() {
   const scheduledGames = games.filter(g => g.status === 'SCHEDULED');
   const finalGames = games.filter(g => g.status === 'FINAL');
 
-  const paidCount = (arr) => arr.filter(r => r.payment_status === 'paid' || r.payment_status === 'successful').length;
-  const pendingCount = (arr) => arr.filter(r => r.payment_status === 'pending' || r.payment_status === 'pending_payment').length;
+  const paidCount = (arr) => arr.filter(r => ['paid', 'successful', 'completed'].includes(r.payment_status?.toLowerCase())).length;
+  const pendingCount = (arr) => arr.filter(r => !['paid', 'successful', 'completed'].includes(r.payment_status?.toLowerCase())).length;
 
   const navGroups = [
     { label: 'Dashboard', items: [{ key: 'overview', label: 'Overview', icon: LayoutDashboard }] },
@@ -222,7 +222,7 @@ export default function AdminDashboard() {
               <StatCard title="Parklea Program" icon={ClipboardList} total={parkleaRegistrations.length} paid={paidCount(parkleaRegistrations)} pending={pendingCount(parkleaRegistrations)} onClick={() => setActiveSection('parklea')} delay={0} />
               <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => setActiveSection('holiday')} delay={0.08} />
               <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => setActiveSection('aia')} delay={0.16} />
-              <StatCard title="Tournament Regs" icon={Users} total={registrations.length} paid={registrations.filter(r=>r.payment_status==='paid'||r.payment_status==='successful').length} pending={registrations.filter(r=>r.payment_status!=='paid'&&r.payment_status!=='successful').length} onClick={() => setActiveSection('tournaments')} delay={0.24} />
+              <StatCard title="Tournament Regs" icon={Users} total={registrations.length} paid={paidCount(registrations)} pending={pendingCount(registrations)} onClick={() => setActiveSection('tournaments')} delay={0.24} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[{key:'scores',label:'Score Control',icon:Trophy,desc:'Manage live game scores'},{key:'gallery',label:'Gallery',icon:Upload,desc:'Upload tournament media'},{key:'reels',label:'Featured Reels',icon:Film,desc:`${reels.length} reels published`}].map(({ key, label, icon: Icon, desc }) => (
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
       case 'holiday':
         return (
           <div>
-            <SectionHeader title="Holiday Program" count={holidayRegistrations.length} action={<Button onClick={downloadHolidayCSV} disabled={!holidayRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
+            <SectionHeader title="Holiday Program" count={holidayRegistrations.length} action={<Button onClick={downloadHolCSV} disabled={!holidayRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
             {!holidayRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
               <T headers={['Date','Package','Total','Days','Participant','Age','Parent','Email','Phone','Status','Actions']}>
                 {holidayRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{r.package_type||'Custom'}</TD><TD>${r.total_amount||0}</TD><TD>{(r.selected_days||'').split(',').length} days</TD><TD className="font-semibold text-white">{r.participant_name}</TD><TD>{r.age_turning_2026}</TD><TD>{r.parent_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuHoliday reg={r} /></TD></TR>)}
@@ -275,7 +275,7 @@ export default function AdminDashboard() {
       case 'tournaments':
         return (
           <div>
-            <SectionHeader title="Tournament Registrations" count={registrations.length} />
+            <SectionHeader title="Tournament Registrations" count={registrations.length} action={<Button onClick={downloadTournamentCSV} disabled={!registrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
             {!registrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
               <T headers={['Team Name','Tournament','Contact','Email','Phone','Division','Status']}>
                 {registrations.map(r => <TR key={r.id}><TD className="font-semibold text-white">{r.team_name||'N/A'}</TD><TD>{r.tournaments?.name||'N/A'}</TD><TD>{r.contact_person}</TD><TD><a href={`mailto:${r.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{r.division||'N/A'}</TD><TD>{getStatusBadge(r.payment_status)}</TD></TR>)}
