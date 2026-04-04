@@ -14,7 +14,8 @@ import { Loader2 } from "lucide-react";
 export default function TournamentRegistration() {
   const navigate = useNavigate();
   // Static Tournament Details
-  const tournamentId = "00000000-0000-0000-0000-000000000000"; // Dummy ID, edge function doesn't technically STRICTLY validate uuid format unless we enforce it, but if they have it in 'tournaments', we'll need a real one. We'll use a placeholder or handle it in webhook. 
+  // CHANGE THIS to the actual numeric ID of the "KOTP World Cup" from your SUPABASE 'tournaments' table
+  const tournamentId = 1;  
   // Wait, if it needs to go into 'teams', the teams table references tournament_id. We'll leave it as a known placeholder or let the user fix it. We'll leave a clear note.
   const TOURNAMENT_NAME = "KOTP World Cup";
 

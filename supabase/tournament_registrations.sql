@@ -2,7 +2,7 @@
 
 CREATE TABLE public.tournament_registrations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    tournament_id UUID REFERENCES public.tournaments(id) ON DELETE CASCADE,
+    tournament_id BIGINT REFERENCES public.tournaments(id) ON DELETE CASCADE,
     team_name TEXT NOT NULL,
     players JSONB NOT NULL,
     medical_info TEXT,

@@ -55,7 +55,7 @@ serve(async (req) => {
           .insert([
             {
               name: teamName,
-              tournament_id: tournamentId,
+              tournament_id: Number(tournamentId),
             }
           ])
 

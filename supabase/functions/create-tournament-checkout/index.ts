@@ -23,8 +23,8 @@ serve(async (req: Request) => {
       throw new Error('Server configuration error: SERVICE_ROLE_KEY is missing.')
     }
 
-    // Get tournament price ID from env or fallback to a dummy/placeholder
-    const TOURNAMENT_PRICE_ID = Deno.env.get('STRIPE_TOURNAMENT_PRICE_ID') || 'REPLACE_ME_WITH_YOUR_NEW_PRICE_ID'
+    // Get tournament price ID from env or fallback to the provided KOTP World Cup price
+    const TOURNAMENT_PRICE_ID = Deno.env.get('STRIPE_TOURNAMENT_PRICE_ID') || 'price_1TIQ0zJTT6itmjMcXbY7lBao'
 
     const stripe = new Stripe(STRIPE_SECRET_KEY, {
       apiVersion: '2023-10-16',
@@ -123,7 +123,7 @@ serve(async (req: Request) => {
         registration_id: record.id,
         team_name: teamName.trim(),
         captain_email: captainEmail,
-        tournament_id: tournamentId
+        tournament_id: String(tournamentId)
       },
     })
 
