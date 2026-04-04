@@ -21,6 +21,7 @@ import Moments from './Pages/Moments';
 // --- NEW: Import the LiveScores page ---
 import LiveScores from './Pages/LiveScores';
 import Register from './Pages/Register';
+import TournamentRegistration from './Pages/TournamentRegistration';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/gallery/:tournamentId" element={<Gallery />} />
           <Route path="/register/:tournamentId" element={<Register />} />
+          <Route path="/tournament-registration" element={<TournamentRegistration />} />
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />
           <Route path="/academy" element={<Academy />} />

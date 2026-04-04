@@ -193,14 +193,11 @@ export default function Tournaments() {
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <h2 className="headline-font text-5xl md:text-7xl text-white mb-6">YOUR TIME IS NOW</h2>
             <p className="text-gray-400 text-xl mb-8">Don't miss your chance to compete against the best</p>
-            <a href="#upcoming-tournaments" onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('upcoming-tournaments')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
+            <Link to="/tournament-registration">
               <button className="kotp-button bg-[#FF6B00] text-white px-12 py-4 rounded-md headline-font text-xl tracking-wider pulse-glow hover:scale-105 transition-transform duration-300">
-                REGISTER FOR NEXT TOURNAMENT
+                REGISTER FOR KOTP WORLD CUP
               </button>
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>
