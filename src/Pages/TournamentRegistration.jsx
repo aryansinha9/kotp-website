@@ -13,11 +13,25 @@ import { Loader2 } from "lucide-react";
 
 export default function TournamentRegistration() {
   const navigate = useNavigate();
-  // Static Tournament Details
-  // CHANGE THIS to the actual numeric ID of the "KOTP World Cup" from your SUPABASE 'tournaments' table
-  const tournamentId = 1;  
-  // Wait, if it needs to go into 'teams', the teams table references tournament_id. We'll leave it as a known placeholder or let the user fix it. We'll leave a clear note.
+  const [tournamentId, setTournamentId] = useState(null);
   const TOURNAMENT_NAME = "KOTP World Cup";
+
+  // Fetch the real tournament ID from Supabase dynamically
+  React.useEffect(() => {
+    const fetchWorldCupId = async () => {
+      const { data, error } = await supabase
+        .from('tournaments')
+        .select('id')
+        .eq('name', TOURNAMENT_NAME)
+        .limit(1)
+        .maybeSingle();
+      
+      if (data && data.id) {
+        setTournamentId(data.id);
+      }
+    };
+    fetchWorldCupId();
+  }, []);
 
   const [teamName, setTeamName] = useState("");
   const [players, setPlayers] = useState([
@@ -339,7 +353,7 @@ export default function TournamentRegistration() {
 
             <Button
               type="submit"
-              disabled={isSubmitting || !agreeTerms || players.length < 7}
+              disabled={isSubmitting || !agreeTerms || players.length < 7 || !tournamentId}
               className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 transition-all duration-300 h-auto disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
@@ -348,6 +362,11 @@ export default function TournamentRegistration() {
                 <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT</>
               )}
             </Button>
+            {!tournamentId && (
+              <p className="text-red-500 text-center mt-4 bg-red-500/10 py-3 px-4 rounded border border-red-500/20">
+                Error: The KOTP World Cup has not been properly set up in the database yet. Registrations are halted.
+              </p>
+            )}
             {errorMsg && (
               <p className="text-red-500 text-center mt-4 bg-red-500/10 py-3 px-4 rounded border border-red-500/20">
                 {errorMsg}
