@@ -142,7 +142,7 @@ export default function TournamentRegistration() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#0a0a0a] p-6 rounded-lg border border-[#FF6B00]/20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-[#0a0a0a] p-6 rounded-lg border border-[#FF6B00]/20">
             <div className="space-y-4">
               <h3 className="headline-font text-3xl text-[#FF6B00]">{TOURNAMENT_NAME}</h3>
               <div className="flex items-center gap-3 text-white">
@@ -154,7 +154,12 @@ export default function TournamentRegistration() {
                 <span>Ultimate Soccer</span>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-start md:items-end">
+            <div className="flex flex-col justify-center items-start md:items-center border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8">
+              <p className="text-gray-400 mb-2 text-sm uppercase tracking-widest">Registration Fee</p>
+              <h2 className="headline-font text-5xl text-[#FF6B00]">$800</h2>
+              <p className="text-gray-500 text-xs mt-1">AUD per team</p>
+            </div>
+            <div className="flex flex-col justify-center items-start md:items-end border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8">
               <p className="text-gray-400 mb-2">Grand Prize</p>
               <h2 className="headline-font text-5xl text-white max-w-[200px] text-left md:text-right">
                 $3,000 <span className="text-[#FF6B00]">CASH</span>
@@ -373,9 +378,7 @@ export default function TournamentRegistration() {
               </p>
             )}
             <p className="text-center text-gray-500 text-sm mt-6">
-              Registration is not complete until payment is finalized.
-              <br/>
-              <span className="text-[#FF6B00] font-semibold">Note to Developer: Ensure STRIPE_TOURNAMENT_PRICE_ID is set in Supabase edge function environment variables.</span>
+              Registration is not complete until payment is finalised.
             </p>
           </div>
         </form>
