@@ -32,49 +32,37 @@ serve(async (req) => {
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as any
-
       const registrationId = session.metadata?.registration_id
       const teamName = session.metadata?.team_name
       const tournamentId = session.metadata?.tournament_id
 
-      if (registrationId && teamName && tournamentId) {
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(registrationId);
+      if (registrationId) {
+        console.log(`Processing paid tournament registration: ${registrationId}`)
 
-        let updateErrorTR = null;
-        if (isUUID) {
-          // 1. Mark registration as completed in 'tournament_registrations' (legacy hook)
-          const { error } = await supabaseAdmin
-            .from("tournament_registrations")
-            .update({ payment_status: "completed" })
-            .eq("id", registrationId);
-          updateErrorTR = error;
-        }
-
-        // 1b. Mark registration as 'paid' in 'registrations' (active standard hook)
-        // Works with BIGINT via string conversion automatically
-        const { error: updateErrorReg } = await supabaseAdmin
-          .from("registrations")
-          .update({ payment_status: "paid" })
+        // Update payment status to 'paid' in tournament_registrations
+        const { error: updateError } = await supabaseAdmin
+          .from("tournament_registrations")
+          .update({
+            payment_status: "paid",
+            stripe_session_id: session.id,
+          })
           .eq("id", registrationId)
 
-        if ((isUUID && updateErrorTR) || updateErrorReg) {
-          console.error("Error updating registration:", updateErrorTR, updateErrorReg)
+        if (updateError) {
+          console.error("Error updating tournament registration:", updateError)
+          throw updateError
         }
 
-        // 2. Insert into the teams table so it appears in Live Scores
-        // Using "onConflict" or checking first isn't strictly necessary for a new registration, 
-        // but we'll just insert straight away as there's no unique constraint on (name, tournament_id) explicitly known.
-        const { error: teamError } = await supabaseAdmin
-          .from("teams")
-          .insert([
-            {
-              name: teamName,
-              tournament_id: Number(tournamentId),
-            }
-          ])
+        // Insert into teams table for Live Scores (if team name and tournament are present)
+        if (teamName && tournamentId) {
+          const { error: teamError } = await supabaseAdmin
+            .from("teams")
+            .insert([{ name: teamName, tournament_id: Number(tournamentId) }])
 
-        if (teamError) {
-          console.error("Error inserting team for Live Scores:", teamError)
+          if (teamError) {
+            // Non-fatal: log but don't crash the webhook
+            console.error("Error inserting team for Live Scores:", teamError)
+          }
         }
       }
     }

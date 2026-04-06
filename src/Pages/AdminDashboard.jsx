@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
-import { Registration, FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
+import { FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock } from "lucide-react";
 import { format } from 'date-fns';
@@ -46,7 +46,7 @@ const StatCard = ({ title, icon: Icon, total, paid, pending, onClick, delay = 0 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
-  const [registrations, setRegistrations] = useState([]);
+  const [tournamentRegistrations, setTournamentRegistrations] = useState([]);
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
   const [holidayRegistrations, setHolidayRegistrations] = useState([]);
   const [aiaRegistrations, setAiaRegistrations] = useState([]);
@@ -76,13 +76,14 @@ export default function AdminDashboard() {
         data.sort((a, b) => { const w = r => { const p = r.payment_status === 'successful' || r.payment_status === 'paid'; const s = !r.package_type || r.package_type === 'standard'; return p && s ? 1 : p ? 2 : s ? 3 : 4; }; return w(a) - w(b); });
         return data;
       };
-      const [regData, reelData, allT, parkleaData, holidayData, aiaData] = await Promise.all([
-        Registration.list(), FeaturedReel.list(), Tournament.list('start_date'),
+      const [tournRegData, reelData, allT, parkleaData, holidayData, aiaData] = await Promise.all([
+        supabase.from('tournament_registrations').select('*, tournaments(name)').order('created_at', { ascending: false }).then(res => res.data || []),
+        FeaturedReel.list(), Tournament.list('start_date'),
         supabase.from('parklea_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
         supabase.from('holiday_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
         supabase.from('aia_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
       ]);
-      setRegistrations(regData); setParkleaRegistrations(parkleaData); setHolidayRegistrations(holidayData);
+      setTournamentRegistrations(tournRegData); setParkleaRegistrations(parkleaData); setHolidayRegistrations(holidayData);
       setAiaRegistrations(aiaData); setReels(reelData);
       setCompletedTournaments(allT.filter(t => t.status === 'completed'));
       setOngoingTournaments(allT.filter(t => t.status === 'ongoing'));
@@ -116,7 +117,7 @@ export default function AdminDashboard() {
   const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadAIACSV = () => { if (!aiaRegistrations.length) return; csvDown('AIA_Registrations', ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'], aiaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),r.payment_status,r.participant_first_name,r.participant_last_name,r.dob,(r.year_group||'').replace('-',' '),r.parent_first_name,r.parent_last_name,r.parent_phone,r.parent_email,`"${(r.street_address||'').replace(/"/g,'""')}"`,r.city,r.state,r.postal_code,`"${(r.allergies||'').replace(/"/g,'""')}"`,`"${(r.inhaler||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadTournamentCSV = () => {
-    if (!registrations.length) return;
+    if (!tournamentRegistrations.length) return;
     
     // Create rows with multiple line breaks for teams
     const csvContentRows = [];
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
     // Overall Header for the entire file isn't needed if we use sections,
     // but let's make a standard CSV where each team is a block.
     
-    registrations.forEach(r => {
+    tournamentRegistrations.forEach(r => {
       // 1. Team Info Header Row
       csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
       csvContentRows.push([
@@ -141,8 +142,8 @@ export default function AdminDashboard() {
       ]);
       
       // Medical info
-      if (r.medical_description && r.medical_description.trim().length > 0) {
-          csvContentRows.push(['MEDICAL INFO', `"${r.medical_description.replace(/"/g, '""')}"`]);
+      if (r.medical_info && r.medical_info.trim().length > 0) {
+          csvContentRows.push(['MEDICAL INFO', `"${r.medical_info.replace(/"/g, '""')}"`]);
       }
       
       // 2. Player Roster Headers
@@ -171,7 +172,7 @@ export default function AdminDashboard() {
     });
     
     // Call our csv downloader without uniform headers, just the content rows
-    const c = "data:text/csv;charset=utf-8," + csvContentRows.map(r => r.join(',')).join('\\n');
+    const c = "data:text/csv;charset=utf-8," + csvContentRows.map(r => r.join(',')).join('\n');
     const l = document.createElement('a'); 
     l.setAttribute('href', encodeURI(c)); 
     l.setAttribute('download', `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.csv`); 
@@ -199,7 +200,7 @@ export default function AdminDashboard() {
   const handleDeleteParkleaRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('parklea_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteHolidayRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('holiday_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteAIARegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('aia_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
-  const handleDeleteTournamentRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
+  const handleDeleteTournamentRegistration = async id => { if (window.confirm('Delete this registration? This cannot be undone.')) { const { error } = await supabase.from('tournament_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteReel = async id => { if (window.confirm('Delete?')) { const { error } = await FeaturedReel.deleteById(id); if (error) setReelMessage({ type: 'error', text: error.message }); else { setReelMessage({ type: 'success', text: 'Deleted.' }); await loadData(); } } };
   const handleCreateGame = async () => { if (!selectedScoreTournamentId || !teamAId || !teamBId || teamAId === teamBId) { alert('Select a tournament and two different teams.'); return; } setIsCreatingGame(true); await Game.create({ tournament_id: selectedScoreTournamentId, team_a_id: teamAId, team_b_id: teamBId, status: 'SCHEDULED' }); setGames(await Game.filter({ tournament_id: selectedScoreTournamentId })); setTeamAId(''); setTeamBId(''); setIsCreatingGame(false); };
   const handleScoreChange = async (gameId, field, inc) => { const game = games.find(g => g.id === gameId); if (!game) return; const { data: updated } = await Game.update(gameId, { [field]: Math.max(0, (game[field] || 0) + (inc ? 1 : -1)) }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g)); };
@@ -240,7 +241,7 @@ export default function AdminDashboard() {
       { key: 'parklea', label: 'Parklea Program', icon: ClipboardList, count: parkleaRegistrations.length },
       { key: 'holiday', label: 'Holiday Program', icon: ClipboardList, count: holidayRegistrations.length },
       { key: 'aia', label: 'AIA After School', icon: ClipboardList, count: aiaRegistrations.length },
-      { key: 'tournaments', label: 'Tournaments', icon: Users, count: registrations.length },
+      { key: 'tournaments', label: 'Tournaments', icon: Users, count: tournamentRegistrations.length },
     ]},
     { label: 'Management', items: [
       { key: 'scores', label: 'Score Control', icon: Trophy },
@@ -268,7 +269,7 @@ export default function AdminDashboard() {
               <StatCard title="Parklea Program" icon={ClipboardList} total={parkleaRegistrations.length} paid={paidCount(parkleaRegistrations)} pending={pendingCount(parkleaRegistrations)} onClick={() => setActiveSection('parklea')} delay={0} />
               <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => setActiveSection('holiday')} delay={0.08} />
               <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => setActiveSection('aia')} delay={0.16} />
-              <StatCard title="Tournament Regs" icon={Users} total={registrations.length} paid={paidCount(registrations)} pending={pendingCount(registrations)} onClick={() => setActiveSection('tournaments')} delay={0.24} />
+              <StatCard title="Tournament Regs" icon={Users} total={tournamentRegistrations.length} paid={paidCount(tournamentRegistrations)} pending={pendingCount(tournamentRegistrations)} onClick={() => setActiveSection('tournaments')} delay={0.24} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[{key:'scores',label:'Score Control',icon:Trophy,desc:'Manage live game scores'},{key:'gallery',label:'Gallery',icon:Upload,desc:'Upload tournament media'},{key:'reels',label:'Featured Reels',icon:Film,desc:`${reels.length} reels published`}].map(({ key, label, icon: Icon, desc }) => (
@@ -321,10 +322,25 @@ export default function AdminDashboard() {
       case 'tournaments':
         return (
           <div>
-            <SectionHeader title="Tournament Registrations" count={registrations.length} action={<Button onClick={downloadTournamentCSV} disabled={!registrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
-            {!registrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
-              <T headers={['Team Name','Tournament','Contact','Email','Phone','Division','Status','Actions']}>
-                {registrations.map(r => <TR key={r.id}><TD className="font-semibold text-white">{r.team_name||'N/A'}</TD><TD>{r.tournaments?.name||'N/A'}</TD><TD>{r.contact_person}</TD><TD><a href={`mailto:${r.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{r.division||'N/A'}</TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuTournament reg={r} /></TD></TR>)}
+            <SectionHeader title="Tournament Registrations" count={tournamentRegistrations.length} action={<Button onClick={downloadTournamentCSV} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
+            {!tournamentRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
+              <T headers={['Date','Team Name','Tournament','Captain','Email','Phone','Players','Status','Actions']}>
+                {tournamentRegistrations.map(r => {
+                  const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
+                  return (
+                    <TR key={r.id}>
+                      <TD>{new Date(r.created_at).toLocaleDateString()}</TD>
+                      <TD className="font-semibold text-white">{r.team_name||'N/A'}</TD>
+                      <TD>{r.tournaments?.name||'N/A'}</TD>
+                      <TD>{captain ? `${captain.firstName} ${captain.lastName}` : 'N/A'}</TD>
+                      <TD>{captain?.email ? <a href={`mailto:${captain.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a> : 'N/A'}</TD>
+                      <TD>{captain?.phone ? <a href={`tel:${captain.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a> : 'N/A'}</TD>
+                      <TD>{Array.isArray(r.players) ? r.players.length : 0} players</TD>
+                      <TD>{getStatusBadge(r.payment_status)}</TD>
+                      <TD><ActionMenuTournament reg={r} /></TD>
+                    </TR>
+                  );
+                })}
               </T>
             )}
           </div>

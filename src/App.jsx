@@ -6,6 +6,7 @@ import {
   Routes,
   Route,
   Outlet,
+  Navigate,
 } from 'react-router-dom';
 import Layout from './Layout.jsx';
 import Home from './Pages/Home';
@@ -63,7 +64,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/gallery/:tournamentId" element={<Gallery />} />
-          <Route path="/register/:tournamentId" element={<Register />} />
+          <Route path="/register/:tournamentId" element={<Navigate to="/tournament-registration" replace />} />
           <Route path="/tournament-registration" element={<TournamentRegistration />} />
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />
