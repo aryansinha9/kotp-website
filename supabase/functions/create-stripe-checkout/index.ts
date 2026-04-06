@@ -82,7 +82,7 @@ serve(async (req: Request) => {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: 'aud',
             product_data: {
               name: `Registration: ${tournament.name}`,
               description: `Team: ${teamName}`,
