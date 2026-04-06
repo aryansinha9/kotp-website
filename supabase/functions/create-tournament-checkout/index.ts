@@ -23,9 +23,6 @@ serve(async (req: Request) => {
       throw new Error('Server configuration error: SERVICE_ROLE_KEY is missing.')
     }
 
-    // Get tournament price ID from env or fallback to the provided KOTP World Cup price
-    const TOURNAMENT_PRICE_ID = Deno.env.get('STRIPE_TOURNAMENT_PRICE_ID') || 'price_1TIQ0zJTT6itmjMcXbY7lBao'
-
     const stripe = new Stripe(STRIPE_SECRET_KEY, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
@@ -86,6 +83,17 @@ serve(async (req: Request) => {
         throw new Error('Exactly one player must be selected as the team captain.')
     }
 
+    // Fetch tournament to get entry fee
+    const { data: tournament, error: tournamentError } = await supabaseAdmin
+      .from('tournaments')
+      .select('name, entry_fee')
+      .eq('id', tournamentId)
+      .single()
+
+    if (tournamentError || !tournament) throw new Error('Tournament not found.')
+
+    const priceInCents = Math.round((tournament.entry_fee || 800) * 100)
+
     // 1. Insert into Supabase as "pending"
     const { data: record, error: dbError } = await supabaseAdmin
       .from('tournament_registrations')
@@ -104,14 +112,20 @@ serve(async (req: Request) => {
 
     if (dbError) throw dbError
 
-    // 2. Create Stripe Checkout session
-    // We are no longer using automatic_tax as user confirmed $800 is a flat rate
+    // 2. Create Stripe Checkout session with explicit AUD price_data
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      customer_email: captainEmail, // Use captain's email
+      customer_email: captainEmail,
       line_items: [
         {
-          price: TOURNAMENT_PRICE_ID,
+          price_data: {
+            currency: 'aud',
+            product_data: {
+              name: `Tournament Registration: ${tournament.name}`,
+              description: `Team: ${teamName.trim()} — Captain: ${captainName}`,
+            },
+            unit_amount: priceInCents,
+          },
           quantity: 1,
         },
       ],
