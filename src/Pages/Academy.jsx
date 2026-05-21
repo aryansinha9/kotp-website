@@ -157,7 +157,7 @@ export default function Academy() {
     ];
 
     const programs = [
-        { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "April 3 - April 17", focus: "Technical & Tactical", price: "From $35/day", linkTo: "/holiday-program" },
+        { title: "Holiday Program", ageGroup: "Ages: All ages", schedule: "July 6 - July 17", focus: "Technical & Tactical", price: "From $35/day", linkTo: "/holiday-program" },
         { 
             title: "Parklea Development Program", 
             description: "The Parklea Development Program is designed to identify and nurture dedicated players looking to elevate their game. Focusing on high-quality training, a strong team culture, and long-term development, the program aims to enhance technical skills, tactical understanding, decision-making, and confidence in real match situations. Participants are challenged in a competitive yet supportive environment that encourages growth both on and off the field. This program is ideal for committed athletes who are serious about their progression and seeking structured development beyond standard team training.", 

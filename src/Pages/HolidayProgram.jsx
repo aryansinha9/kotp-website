@@ -11,9 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/supabaseClient";
 
 const holidayDays = [
-    "Fri 3 Apr", "Sat 4 Apr", "Sun 5 Apr", 
-    "Mon 6 Apr", "Tue 7 Apr", "Wed 8 Apr", "Thu 9 Apr", "Fri 10 Apr", 
-    "Mon 13 Apr", "Tue 14 Apr", "Wed 15 Apr", "Thu 16 Apr", "Fri 17 Apr"
+    "Mon 6 Jul", "Tue 7 Jul", "Wed 8 Jul", "Thu 9 Jul", "Fri 10 Jul",
+    "Mon 13 Jul", "Tue 14 Jul", "Wed 15 Jul", "Thu 16 Jul", "Fri 17 Jul"
 ];
 
 export default function HolidayProgram() {
@@ -64,19 +63,16 @@ export default function HolidayProgram() {
     const dayCount = formData.selectedDays.length;
     let calculatedTotal = dayCount * 35;
     let packageDisplay = "Single Days";
-    
-    if (dayCount === 7) { 
-        calculatedTotal = 199; 
-        packageDisplay = "7-Day Package"; 
-    } else if (dayCount >= 8 && dayCount <= 9) {
-        calculatedTotal = 199 + ((dayCount - 7) * 35);
-        packageDisplay = "7-Day + Extra Days";
-    } else if (dayCount === 10) { 
-        calculatedTotal = 299; 
-        packageDisplay = "10-Day Full Program"; 
-    } else if (dayCount >= 11 && dayCount <= 13) {
-        calculatedTotal = 299 + ((dayCount - 10) * 35);
-        packageDisplay = "10-Day + Extra Days";
+
+    if (dayCount === 5) {
+        calculatedTotal = 150;
+        packageDisplay = "1 Week Package (5 Days)";
+    } else if (dayCount > 5 && dayCount < 10) {
+        calculatedTotal = 150 + ((dayCount - 5) * 35);
+        packageDisplay = "1 Week + Extra Days";
+    } else if (dayCount === 10) {
+        calculatedTotal = 280;
+        packageDisplay = "2 Week Package (10 Days)";
     }
 
     const handleSubmit = async (e) => {
@@ -246,7 +242,7 @@ export default function HolidayProgram() {
                                 <Calendar className="w-5 h-5 text-[#FF6B00]" />
                                 <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider m-0">Select Program Days</h3>
                             </div>
-                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Note: 7 days is a $199 package, 10 days is a $299 package, and single days are $35/day.</p>
+                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Note: 5 days (1 week) is a $150 package, 10 days (2 weeks) is a $280 package, and single days are $35/day.</p>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                 {holidayDays.map((day) => {

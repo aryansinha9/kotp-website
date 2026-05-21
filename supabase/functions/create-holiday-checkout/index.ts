@@ -63,9 +63,8 @@ serve(async (req: Request) => {
       throw new Error("Signature is required.")
 
     const validOfferings = [
-        "Fri 3 Apr", "Sat 4 Apr", "Sun 5 Apr", 
-        "Mon 6 Apr", "Tue 7 Apr", "Wed 8 Apr", "Thu 9 Apr", "Fri 10 Apr", 
-        "Mon 13 Apr", "Tue 14 Apr", "Wed 15 Apr", "Thu 16 Apr", "Fri 17 Apr"
+        "Mon 6 Jul", "Tue 7 Jul", "Wed 8 Jul", "Thu 9 Jul", "Fri 10 Jul",
+        "Mon 13 Jul", "Tue 14 Jul", "Wed 15 Jul", "Thu 16 Jul", "Fri 17 Jul"
     ];
 
     if (!Array.isArray(selectedDays) || selectedDays.length === 0) {
@@ -83,18 +82,15 @@ serve(async (req: Request) => {
     let backendTotal = dayCount * 35;
     let computedPackageType = "Single Days";
     
-    if (dayCount === 7) { 
-        backendTotal = 199; 
-        computedPackageType = "7-Day Package"; 
-    } else if (dayCount >= 8 && dayCount <= 9) {
-        backendTotal = 199 + ((dayCount - 7) * 35);
-        computedPackageType = "7-Day + Extra Days";
-    } else if (dayCount === 10) { 
-        backendTotal = 299; 
-        computedPackageType = "10-Day Full Program"; 
-    } else if (dayCount >= 11 && dayCount <= 13) {
-        backendTotal = 299 + ((dayCount - 10) * 35);
-        computedPackageType = "10-Day + Extra Days";
+    if (dayCount === 5) {
+        backendTotal = 150;
+        computedPackageType = "1 Week Package (5 Days)";
+    } else if (dayCount > 5 && dayCount < 10) {
+        backendTotal = 150 + ((dayCount - 5) * 35);
+        computedPackageType = "1 Week + Extra Days";
+    } else if (dayCount === 10) {
+        backendTotal = 280;
+        computedPackageType = "2 Week Package (10 Days)";
     }
 
     // 1. Insert into Supabase as "pending_payment"
