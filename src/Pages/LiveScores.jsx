@@ -210,7 +210,7 @@ export default function LiveScores() {
                     <div className="w-full md:w-72">
                       <Select value={searchTeamId} onValueChange={setSearchTeamId}>
                         <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11"><SelectValue placeholder="All Teams" /></SelectTrigger>
-                        <SelectContent className="bg-[#1a1a1a] border-white/10">
+                        <SelectContent className="bg-[#1a1a1a] border-white/10 max-h-64 overflow-y-auto">
                           <SelectItem value="ALL" className="text-white">All Teams</SelectItem>
                           {teams.map(t => <SelectItem key={t.id} value={String(t.id)} className="text-white">{t.name}</SelectItem>)}
                         </SelectContent>
