@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
 import { FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X } from "lucide-react";
+import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X, Menu } from "lucide-react";
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
@@ -46,6 +46,7 @@ const StatCard = ({ title, icon: Icon, total, paid, pending, onClick, delay = 0 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [tournamentRegistrations, setTournamentRegistrations] = useState([]);
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
   const [holidayRegistrations, setHolidayRegistrations] = useState([]);
@@ -382,9 +383,30 @@ export default function AdminDashboard() {
                   </div>
                   <Button onClick={handleCreateGame} disabled={isCreatingGame} className="bg-[#FF6B00] text-white headline-font h-11 w-full md:w-auto">{isCreatingGame ? 'Creating...' : 'Create Game'}</Button>
                 </div>
-                {liveGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4 flex items-center gap-2"><span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />LIVE ({liveGames.length})</h3><div className="space-y-4">{liveGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border-2 border-red-500/30 rounded-xl p-6"><div className="flex justify-between items-center mb-4"><div className="flex items-center gap-3"><span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs headline-font">LIVE</span>{g.label && <span className="text-[#FF6B00] text-sm headline-font">{g.label}</span>}</div><Button onClick={() => handleStatusChange(g.id, g.status)} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">End Game</Button></div><div className="grid grid-cols-3 gap-4 items-center"><div className="text-right"><p className="headline-font text-lg text-white mb-2">{getTeamName(g.team_a_id)}</p><div className="flex items-center justify-end gap-2"><Button onClick={() => handleScoreChange(g.id,'team_a_score',false)} size="icon" variant="outline" className="border-white/10 text-white h-9 w-9"><Minus className="w-4 h-4" /></Button><span className="text-4xl headline-font text-[#FF6B00] w-10 text-center">{g.team_a_score||0}</span><Button onClick={() => handleScoreChange(g.id,'team_a_score',true)} size="icon" className="bg-[#FF6B00] text-white h-9 w-9"><Plus className="w-4 h-4" /></Button></div></div><div className="text-center text-2xl text-gray-600">VS</div><div className="text-left"><p className="headline-font text-lg text-white mb-2">{getTeamName(g.team_b_id)}</p><div className="flex items-center gap-2"><Button onClick={() => handleScoreChange(g.id,'team_b_score',false)} size="icon" variant="outline" className="border-white/10 text-white h-9 w-9"><Minus className="w-4 h-4" /></Button><span className="text-4xl headline-font text-[#FF6B00] w-10 text-center">{g.team_b_score||0}</span><Button onClick={() => handleScoreChange(g.id,'team_b_score',true)} size="icon" className="bg-[#FF6B00] text-white h-9 w-9"><Plus className="w-4 h-4" /></Button></div></div></div></div>))}</div></div>)}
-                {scheduledGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4">SCHEDULED ({scheduledGames.length})</h3><div className="space-y-3">{scheduledGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 flex items-center justify-between"><div className="flex-1 grid grid-cols-3 gap-4 items-center"><p className="headline-font text-white text-right">{getTeamName(g.team_a_id)}</p><div className="text-center"><p className="text-gray-600">VS</p>{g.label && <p className="text-[#FF6B00] text-xs headline-font mt-1">{g.label}</p>}</div><p className="headline-font text-white">{getTeamName(g.team_b_id)}</p></div><div className="flex items-center gap-2 ml-4"><Button onClick={() => handleStatusChange(g.id, g.status)} className="bg-[#FF6B00] text-white headline-font">Start</Button><button onClick={() => handleDeleteGame(g.id)} className="text-gray-500 hover:text-red-400 p-2 transition-colors"><Trash2 className="w-4 h-4" /></button></div></div>))}</div></div>)}
-                {finalGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4">FINAL ({finalGames.length})</h3><div className="space-y-3">{finalGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 opacity-60 hover:opacity-100 transition-opacity"><div className="flex items-center justify-between mb-3">{g.label && <span className="text-gray-500 text-xs headline-font">{g.label}</span>}<button onClick={() => handleDeleteGame(g.id)} className="text-gray-600 hover:text-red-400 p-1 transition-colors ml-auto"><Trash2 className="w-4 h-4" /></button></div><div className="grid grid-cols-3 gap-4 items-center"><div className="text-right"><p className="headline-font text-white">{getTeamName(g.team_a_id)}</p><p className="headline-font text-3xl text-white">{g.team_a_score||0}</p></div><p className="text-center text-gray-600">FINAL</p><div><p className="headline-font text-white">{getTeamName(g.team_b_id)}</p><p className="headline-font text-3xl text-white">{g.team_b_score||0}</p></div></div></div>))}</div></div>)}
+                {liveGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4 flex items-center gap-2"><span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />LIVE ({liveGames.length})</h3><div className="space-y-4">{liveGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border-2 border-red-500/30 rounded-xl p-4 md:p-6">
+                  <div className="flex flex-wrap justify-between items-center gap-2 mb-4"><div className="flex items-center gap-2 flex-wrap"><span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs headline-font">LIVE</span>{g.label && <span className="text-[#FF6B00] text-sm headline-font">{g.label}</span>}</div><Button onClick={() => handleStatusChange(g.id, g.status)} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font text-xs md:text-sm">End Game</Button></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    <div className="flex items-center justify-between md:flex-col md:items-end gap-2">
+                      <p className="headline-font text-base md:text-lg text-white">{getTeamName(g.team_a_id)}</p>
+                      <div className="flex items-center gap-1.5 md:gap-2">
+                        <Button onClick={() => handleScoreChange(g.id,'team_a_score',false)} size="icon" variant="outline" className="border-white/10 text-white h-8 w-8 md:h-9 md:w-9"><Minus className="w-3.5 h-3.5" /></Button>
+                        <span className="text-3xl md:text-4xl headline-font text-[#FF6B00] w-8 md:w-10 text-center">{g.team_a_score||0}</span>
+                        <Button onClick={() => handleScoreChange(g.id,'team_a_score',true)} size="icon" className="bg-[#FF6B00] text-white h-8 w-8 md:h-9 md:w-9"><Plus className="w-3.5 h-3.5" /></Button>
+                      </div>
+                    </div>
+                    <div className="text-center text-xl md:text-2xl text-gray-600 hidden md:block">VS</div>
+                    <div className="flex items-center justify-between md:flex-col md:items-start gap-2">
+                      <p className="headline-font text-base md:text-lg text-white">{getTeamName(g.team_b_id)}</p>
+                      <div className="flex items-center gap-1.5 md:gap-2">
+                        <Button onClick={() => handleScoreChange(g.id,'team_b_score',false)} size="icon" variant="outline" className="border-white/10 text-white h-8 w-8 md:h-9 md:w-9"><Minus className="w-3.5 h-3.5" /></Button>
+                        <span className="text-3xl md:text-4xl headline-font text-[#FF6B00] w-8 md:w-10 text-center">{g.team_b_score||0}</span>
+                        <Button onClick={() => handleScoreChange(g.id,'team_b_score',true)} size="icon" className="bg-[#FF6B00] text-white h-8 w-8 md:h-9 md:w-9"><Plus className="w-3.5 h-3.5" /></Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>))}</div></div>)}
+                {scheduledGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4">SCHEDULED ({scheduledGames.length})</h3><div className="space-y-3">{scheduledGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border border-white/10 rounded-xl p-4 md:p-5"><div className="flex items-center justify-between gap-2"><div className="flex-1 flex flex-col md:grid md:grid-cols-3 gap-1 md:gap-4 items-center"><p className="headline-font text-white text-sm md:text-base md:text-right">{getTeamName(g.team_a_id)}</p><div className="text-center"><span className="text-gray-600 text-xs md:text-base">VS</span>{g.label && <p className="text-[#FF6B00] text-xs headline-font">{g.label}</p>}</div><p className="headline-font text-white text-sm md:text-base">{getTeamName(g.team_b_id)}</p></div><div className="flex items-center gap-1.5 md:gap-2 ml-2 md:ml-4 flex-shrink-0"><Button onClick={() => handleStatusChange(g.id, g.status)} className="bg-[#FF6B00] text-white headline-font text-xs md:text-sm px-3 md:px-4">Start</Button><button onClick={() => handleDeleteGame(g.id)} className="text-gray-500 hover:text-red-400 p-1.5 md:p-2 transition-colors"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button></div></div></div>))}</div></div>)}
+                {finalGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4">FINAL ({finalGames.length})</h3><div className="space-y-3">{finalGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-4 md:p-5 opacity-60 hover:opacity-100 transition-opacity"><div className="flex items-center justify-between mb-3">{g.label && <span className="text-gray-500 text-xs headline-font">{g.label}</span>}<button onClick={() => handleDeleteGame(g.id)} className="text-gray-600 hover:text-red-400 p-1 transition-colors ml-auto"><Trash2 className="w-4 h-4" /></button></div><div className="grid grid-cols-3 gap-2 md:gap-4 items-center"><div className="text-right"><p className="headline-font text-white text-sm md:text-base">{getTeamName(g.team_a_id)}</p><p className="headline-font text-2xl md:text-3xl text-white">{g.team_a_score||0}</p></div><p className="text-center text-gray-600 text-sm">FINAL</p><div><p className="headline-font text-white text-sm md:text-base">{getTeamName(g.team_b_id)}</p><p className="headline-font text-2xl md:text-3xl text-white">{g.team_b_score||0}</p></div></div></div>))}</div></div>)}
               </div>
             )}
           </div>
@@ -437,17 +459,27 @@ export default function AdminDashboard() {
 
   if (loading) return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><Loader2 className="w-10 h-10 text-[#FF6B00] animate-spin" /></div>;
 
+  const handleNavClick = (key) => { setActiveSection(key); setSidebarOpen(false); };
+
   return (
     <div className="flex min-h-screen bg-[#0a0a0a]">
+      {/* ── Mobile sidebar backdrop ── */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="w-64 fixed top-0 left-0 h-screen bg-[#111111] border-r border-white/10 flex flex-col z-20">
+      <aside className={`w-64 fixed top-0 left-0 h-screen bg-[#111111] border-r border-white/10 flex flex-col z-40 transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Brand */}
-        <div className="px-6 py-5 border-b border-white/10 flex items-center gap-3">
-          <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_3g32263g32263g32-Photoroom.svg" alt="KOTP" className="w-8 h-8" />
-          <div>
-            <p className="headline-font text-white text-base leading-tight">KOTP</p>
-            <p className="text-gray-600 text-xs">Admin Portal</p>
+        <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Gemini_Generated_Image_3g32263g32263g32-Photoroom.svg" alt="KOTP" className="w-8 h-8" />
+            <div>
+              <p className="headline-font text-white text-base leading-tight">KOTP</p>
+              <p className="text-gray-600 text-xs">Admin Portal</p>
+            </div>
           </div>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-400 hover:text-white p-1"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Nav */}
@@ -457,7 +489,7 @@ export default function AdminDashboard() {
               <p className="text-gray-600 text-xs uppercase tracking-widest font-medium px-3 mb-2">{group.label}</p>
               <div className="space-y-0.5">
                 {group.items.map(item => (
-                  <button key={item.key} onClick={() => setActiveSection(item.key)}
+                  <button key={item.key} onClick={() => handleNavClick(item.key)}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activeSection === item.key ? 'bg-[#FF6B00]/10 text-[#FF6B00] border border-[#FF6B00]/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
                     <item.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="flex-1 text-left">{item.label}</span>
@@ -471,7 +503,7 @@ export default function AdminDashboard() {
 
         {/* Sign out */}
         <div className="px-3 pb-4 border-t border-white/10 pt-4">
-          <div className="bg-gradient-to-br from-[#FF6B00]/15 to-[#FF6B00]/5 border border-[#FF6B00]/20 rounded-xl p-4 mb-3 text-center">
+          <div className="hidden md:block bg-gradient-to-br from-[#FF6B00]/15 to-[#FF6B00]/5 border border-[#FF6B00]/20 rounded-xl p-4 mb-3 text-center">
             <Trophy className="w-6 h-6 text-[#FF6B00] mx-auto mb-2" />
             <p className="text-white text-xs font-semibold">KOTP Dashboard</p>
             <p className="text-gray-600 text-xs mt-0.5">Season 2025–26</p>
@@ -483,15 +515,18 @@ export default function AdminDashboard() {
       </aside>
 
       {/* ── Main ── */}
-      <div className="ml-64 flex-1 flex flex-col min-h-screen">
+      <div className="md:ml-64 flex-1 flex flex-col min-h-screen w-full">
         {/* Top bar */}
-        <header className="sticky top-0 z-10 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-white/10 px-8 h-16 flex items-center justify-between">
-          <h1 className="headline-font text-xl text-white">{sectionTitle[activeSection]}</h1>
-          <p className="text-gray-600 text-sm">{format(new Date(), 'EEEE, MMM d yyyy')}</p>
+        <header className="sticky top-0 z-20 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-white/10 px-4 md:px-8 h-14 md:h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="md:hidden text-gray-400 hover:text-white p-1.5 -ml-1"><Menu className="w-5 h-5" /></button>
+            <h1 className="headline-font text-lg md:text-xl text-white">{sectionTitle[activeSection]}</h1>
+          </div>
+          <p className="text-gray-600 text-xs md:text-sm hidden sm:block">{format(new Date(), 'EEEE, MMM d yyyy')}</p>
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div key={activeSection} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>
               {renderContent()}
