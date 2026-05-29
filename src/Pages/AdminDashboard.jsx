@@ -67,6 +67,8 @@ export default function AdminDashboard() {
   const [teamAId, setTeamAId] = useState('');
   const [teamBId, setTeamBId] = useState('');
   const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [newTeamName, setNewTeamName] = useState('');
+  const [isAddingTeam, setIsAddingTeam] = useState(false);
 
   const loadData = async () => {
     try {
@@ -202,6 +204,7 @@ export default function AdminDashboard() {
   const handleDeleteAIARegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('aia_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteTournamentRegistration = async id => { if (window.confirm('Delete this registration? This cannot be undone.')) { const { error } = await supabase.from('tournament_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteReel = async id => { if (window.confirm('Delete?')) { const { error } = await FeaturedReel.deleteById(id); if (error) setReelMessage({ type: 'error', text: error.message }); else { setReelMessage({ type: 'success', text: 'Deleted.' }); await loadData(); } } };
+  const handleAddTeam = async () => { if (!selectedScoreTournamentId || !newTeamName.trim()) { alert('Enter a team name.'); return; } setIsAddingTeam(true); await Team.create({ name: newTeamName.trim(), tournament_id: selectedScoreTournamentId, logo_url: '' }); setTeams(await Team.filter({ tournament_id: selectedScoreTournamentId })); setNewTeamName(''); setIsAddingTeam(false); };
   const handleCreateGame = async () => { if (!selectedScoreTournamentId || !teamAId || !teamBId || teamAId === teamBId) { alert('Select a tournament and two different teams.'); return; } setIsCreatingGame(true); await Game.create({ tournament_id: selectedScoreTournamentId, team_a_id: teamAId, team_b_id: teamBId, status: 'SCHEDULED' }); setGames(await Game.filter({ tournament_id: selectedScoreTournamentId })); setTeamAId(''); setTeamBId(''); setIsCreatingGame(false); };
   const handleScoreChange = async (gameId, field, inc) => { const game = games.find(g => g.id === gameId); if (!game) return; const { data: updated } = await Game.update(gameId, { [field]: Math.max(0, (game[field] || 0) + (inc ? 1 : -1)) }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g)); };
   const handleStatusChange = async (gameId, cur) => { const { data: updated } = await Game.update(gameId, { status: cur === 'SCHEDULED' ? 'LIVE' : 'FINAL' }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g).sort((a, b) => new Date(a.start_time) - new Date(b.start_time))); };
@@ -359,6 +362,14 @@ export default function AdminDashboard() {
             </div>
             {selectedScoreTournamentId && (
               <div className="space-y-6">
+                <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6">
+                  <h3 className="headline-font text-lg text-white mb-4">ADD TEAM</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-3"><Input value={newTeamName} onChange={e => setNewTeamName(e.target.value)} placeholder="Enter team name" className="bg-[#0a0a0a] border-white/10 text-white h-11" onKeyDown={e => e.key === 'Enter' && handleAddTeam()} /></div>
+                    <Button onClick={handleAddTeam} disabled={isAddingTeam || !newTeamName.trim()} className="bg-[#FF6B00] text-white headline-font h-11">{isAddingTeam ? 'Adding...' : <><Plus className="w-4 h-4 mr-2" />Add Team</>}</Button>
+                  </div>
+                  {teams.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{teams.map(t => <span key={t.id} className="bg-[#0a0a0a] border border-white/10 text-white text-sm px-3 py-1.5 rounded-full">{t.name}</span>)}</div>}
+                </div>
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6">
                   <h3 className="headline-font text-lg text-white mb-4">CREATE NEW GAME</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

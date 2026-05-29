@@ -17,7 +17,7 @@ const ScoreDisplay = ({ score }) => {
 };
 
 const LiveGameCard = ({ game, teams }) => {
-  const getTeamName = (teamId) => teams.find(t => t.id === teamId)?.name || "Team";
+  const getTeamName = (teamId) => teams.find(t => String(t.id) === String(teamId))?.name || "Team";
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-2 border-red-500 rounded-lg p-8 md:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent animate-pulse"></div>
@@ -48,7 +48,7 @@ const LiveGameCard = ({ game, teams }) => {
 };
 
 const UpcomingGameCard = ({ game, teams }) => {
-  const getTeamName = (teamId) => teams.find(t => t.id === teamId)?.name || "Team";
+  const getTeamName = (teamId) => teams.find(t => String(t.id) === String(teamId))?.name || "Team";
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6">
       <div className="flex items-center gap-2 mb-4"><Clock className="w-5 h-5 text-[#FF6B00]" /><span className="text-gray-400 text-sm headline-font">UPCOMING</span></div>
@@ -62,7 +62,7 @@ const UpcomingGameCard = ({ game, teams }) => {
 };
 
 const FinalGameCard = ({ game, teams }) => {
-  const getTeamName = (teamId) => teams.find(t => t.id === teamId)?.name || "Team";
+  const getTeamName = (teamId) => teams.find(t => String(t.id) === String(teamId))?.name || "Team";
   const teamAWon = (game.team_a_score || 0) > (game.team_b_score || 0);
   const teamBWon = (game.team_b_score || 0) > (game.team_a_score || 0);
   return (
@@ -84,26 +84,35 @@ export default function LiveScores() {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Load list of ongoing tournaments on mount
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadTournaments = async () => {
       setLoading(true);
       const ongoingTournaments = await Tournament.filter({ status: "ongoing" });
       setTournaments(ongoingTournaments);
       if (ongoingTournaments.length > 0) {
-        const defaultTournamentId = ongoingTournaments[0].id;
-        setSelectedTournament(defaultTournamentId);
-        const [initialGames, initialTeams] = await Promise.all([
-          Game.filter({ tournament_id: defaultTournamentId }),
-          Team.filter({ tournament_id: defaultTournamentId }),
-        ]);
-        setGames(initialGames);
-        setTeams(initialTeams);
+        setSelectedTournament(ongoingTournaments[0].id);
       }
       setLoading(false);
     };
-    loadInitialData();
+    loadTournaments();
   }, []);
 
+  // Load games + teams whenever selectedTournament changes
+  useEffect(() => {
+    if (!selectedTournament) return;
+    const loadGamesAndTeams = async () => {
+      const [gamesData, teamsData] = await Promise.all([
+        Game.filter({ tournament_id: selectedTournament }),
+        Team.filter({ tournament_id: selectedTournament }),
+      ]);
+      setGames(gamesData);
+      setTeams(teamsData);
+    };
+    loadGamesAndTeams();
+  }, [selectedTournament]);
+
+  // Realtime subscription for live score updates
   useEffect(() => {
     if (!selectedTournament) return;
     const channel = supabase
@@ -123,6 +132,13 @@ export default function LiveScores() {
     return () => { supabase.removeChannel(channel); };
   }, [selectedTournament]);
 
+  const handleTournamentSwitch = (tournamentId) => {
+    setSelectedTournament(tournamentId);
+    setGames([]);
+    setTeams([]);
+  };
+
+  const selectedTournamentName = tournaments.find(t => t.id === selectedTournament)?.name;
   const liveGames = games.filter(g => g.status === "LIVE");
   const upcomingGames = games.filter(g => g.status === "SCHEDULED");
   const finalGames = games.filter(g => g.status === "FINAL");
@@ -134,6 +150,30 @@ export default function LiveScores() {
           <h1 className="headline-font text-6xl md:text-8xl text-white mb-4 text-glow">LIVE SCORES</h1>
           <p className="text-gray-400 text-xl">Follow the action in real-time</p>
         </motion.div>
+
+        {/* Tournament selector — shown when multiple ongoing tournaments exist */}
+        {tournaments.length > 1 && (
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {tournaments.map(t => (
+              <button
+                key={t.id}
+                onClick={() => handleTournamentSwitch(t.id)}
+                className={`px-6 py-3 rounded-full headline-font text-sm tracking-wider transition-all duration-300 ${
+                  selectedTournament === t.id
+                    ? 'bg-[#FF6B00] text-white glow-orange'
+                    : 'bg-[#1a1a1a] text-gray-400 border border-white/10 hover:border-[#FF6B00]/50 hover:text-white'
+                }`}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Show current tournament name */}
+        {selectedTournamentName && (
+          <p className="text-center text-[#FF6B00] headline-font text-2xl mt-6">{selectedTournamentName}</p>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto">
