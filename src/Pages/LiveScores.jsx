@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, Clock, CheckCircle, Zap, Loader2 } from "lucide-react";
+import { Trophy, Clock, CheckCircle, Zap, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Tournament, Game, Team } from "@/Entities/all";
 import { supabase } from "@/supabaseClient";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 const ScoreDisplay = ({ score }) => {
   return (
@@ -90,6 +91,8 @@ export default function LiveScores() {
   const [games, setGames] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTeamId, setSearchTeamId] = useState("ALL");
+  const [showFinished, setShowFinished] = useState(false);
 
   // Load list of ongoing tournaments on mount
   useEffect(() => {
@@ -143,12 +146,23 @@ export default function LiveScores() {
     setSelectedTournament(tournamentId);
     setGames([]);
     setTeams([]);
+    setSearchTeamId("ALL");
+    setShowFinished(false);
   };
 
   const selectedTournamentName = tournaments.find(t => t.id === selectedTournament)?.name;
-  const liveGames = games.filter(g => g.status === "LIVE");
-  const upcomingGames = games.filter(g => g.status === "SCHEDULED");
-  const finalGames = games.filter(g => g.status === "FINAL");
+  
+  const filteredGames = searchTeamId === "ALL" 
+    ? games 
+    : games.filter(g => String(g.team_a_id) === searchTeamId || String(g.team_b_id) === searchTeamId);
+
+  const liveGames = filteredGames.filter(g => g.status === "LIVE");
+  const upcomingGames = filteredGames.filter(g => g.status === "SCHEDULED");
+  const finalGames = filteredGames.filter(g => g.status === "FINAL");
+
+  useEffect(() => {
+    if (searchTeamId !== "ALL") setShowFinished(true);
+  }, [searchTeamId]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] py-24 px-4">
@@ -188,14 +202,53 @@ export default function LiveScores() {
           tournaments.length === 0 ? <div className="text-center py-24"><p className="text-gray-500 text-xl">No ongoing tournaments at the moment</p></div> :
             games.length === 0 && !loading ? <div className="text-center py-24"><p className="text-gray-500 text-xl">No games scheduled yet for this tournament</p></div> : (
               <div className="space-y-16">
+                
+                {/* Team Filter Bar */}
+                {teams.length > 0 && (
+                  <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-4 md:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <h3 className="headline-font text-white text-xl">FILTER MATCHES</h3>
+                    <div className="w-full md:w-72">
+                      <Select value={searchTeamId} onValueChange={setSearchTeamId}>
+                        <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11"><SelectValue placeholder="All Teams" /></SelectTrigger>
+                        <SelectContent className="bg-[#1a1a1a] border-white/10">
+                          <SelectItem value="ALL" className="text-white">All Teams</SelectItem>
+                          {teams.map(t => <SelectItem key={t.id} value={String(t.id)} className="text-white">{t.name}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
+
                 {liveGames.length > 0 && (
                   <section><motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8"><div className="flex items-center gap-3 mb-4"><motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }} className="w-4 h-4 bg-red-500 rounded-full" /><h2 className="headline-font text-4xl md:text-5xl text-white">LIVE NOW</h2></div><div className="w-32 h-1 bg-red-500"></div></motion.div><div className="space-y-6">{liveGames.map((game) => (<LiveGameCard key={game.id} game={game} teams={teams} />))}</div></section>
                 )}
+                
                 {upcomingGames.length > 0 && (
                   <section><motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8"><h2 className="headline-font text-4xl md:text-5xl text-white mb-4">UPCOMING</h2><div className="w-32 h-1 bg-[#FF6B00]"></div></motion.div><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{upcomingGames.map((game) => (<UpcomingGameCard key={game.id} game={game} teams={teams} />))}</div></section>
                 )}
+                
                 {finalGames.length > 0 && (
-                  <section><motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8"><h2 className="headline-font text-4xl md:text-5xl text-white mb-4">FINAL SCORES</h2><div className="w-32 h-1 bg-gray-500"></div></motion.div><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{finalGames.map((game) => (<FinalGameCard key={game.id} game={game} teams={teams} />))}</div></section>
+                  <section>
+                    <button onClick={() => setShowFinished(!showFinished)} className="w-full group">
+                      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8 flex items-center justify-between">
+                        <div>
+                          <h2 className="headline-font text-4xl md:text-5xl text-white mb-4 group-hover:text-gray-300 transition-colors text-left">FINAL SCORES</h2>
+                          <div className="w-32 h-1 bg-gray-500"></div>
+                        </div>
+                        <div className="bg-[#1a1a1a] border border-white/10 p-3 rounded-full group-hover:border-[#FF6B00]/50 transition-colors">
+                          {showFinished ? <ChevronUp className="w-6 h-6 text-[#FF6B00]" /> : <ChevronDown className="w-6 h-6 text-gray-400 group-hover:text-[#FF6B00] transition-colors" />}
+                        </div>
+                      </motion.div>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showFinished && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">{finalGames.map((game) => (<FinalGameCard key={game.id} game={game} teams={teams} />))}</div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </section>
                 )}
               </div>
             )}
