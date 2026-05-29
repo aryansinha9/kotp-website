@@ -19,27 +19,27 @@ const ScoreDisplay = ({ score }) => {
 const LiveGameCard = ({ game, teams }) => {
   const getTeamName = (teamId) => teams.find(t => String(t.id) === String(teamId))?.name || "Team";
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-2 border-red-500 rounded-lg p-8 md:p-12 overflow-hidden">
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border-2 border-red-500 rounded-lg p-6 md:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent animate-pulse"></div>
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-        {game.label && <span className="bg-[#FF6B00]/20 text-[#FF6B00] px-3 py-2 rounded-full headline-font text-xs">{game.label}</span>}
-        <div className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full">
-          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }} className="w-2 h-2 bg-white rounded-full" />
-          <span className="headline-font text-sm">LIVE</span>
+      <div className="absolute top-4 right-4 z-10 flex flex-col md:flex-row items-end md:items-center gap-2">
+        {game.label && <span className="bg-[#FF6B00]/20 text-[#FF6B00] px-3 py-1.5 md:py-2 rounded-full headline-font text-xs">{game.label}</span>}
+        <div className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full">
+          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }} className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full" />
+          <span className="headline-font text-xs md:text-sm">LIVE</span>
         </div>
       </div>
-      <div className="relative z-10">
-        <div className="grid grid-cols-3 gap-8 items-center">
-          <div className="text-center md:text-right">
-            <h3 className="headline-font text-3xl md:text-4xl text-white mb-4">{getTeamName(game.team_a_id)}</h3>
+      <div className="relative z-10 mt-10 md:mt-0">
+        <div className="flex flex-col md:grid md:grid-cols-3 gap-6 md:gap-8 items-center">
+          <div className="text-center md:text-right w-full">
+            <h3 className="headline-font text-2xl md:text-4xl text-white mb-2 md:mb-4 leading-tight">{getTeamName(game.team_a_id)}</h3>
             <ScoreDisplay score={game.team_a_score} />
           </div>
-          <div className="text-center">
-            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Screenshot%202025-12-09%20at%203.34.34%20pm-Photoroom.svg" alt="VS" className="w-12 h-12 mx-auto mb-4 animate-spin" style={{ animationDuration: '8s' }} />
-            <p className="text-4xl headline-font text-gray-500">VS</p>
+          <div className="text-center w-full flex flex-col items-center">
+            <img src="https://gjeepzarenavlrnpvyee.supabase.co/storage/v1/object/public/tournament-gallery/site-assets/Screenshot%202025-12-09%20at%203.34.34%20pm-Photoroom.svg" alt="VS" className="w-8 h-8 md:w-12 md:h-12 mx-auto mb-2 md:mb-4 animate-spin" style={{ animationDuration: '8s' }} />
+            <p className="text-2xl md:text-4xl headline-font text-gray-500">VS</p>
           </div>
-          <div className="text-center md:text-left">
-            <h3 className="headline-font text-3xl md:text-4xl text-white mb-4">{getTeamName(game.team_b_id)}</h3>
+          <div className="text-center md:text-left w-full">
+            <h3 className="headline-font text-2xl md:text-4xl text-white mb-2 md:mb-4 leading-tight">{getTeamName(game.team_b_id)}</h3>
             <ScoreDisplay score={game.team_b_score} />
           </div>
         </div>
@@ -51,12 +51,15 @@ const LiveGameCard = ({ game, teams }) => {
 const UpcomingGameCard = ({ game, teams }) => {
   const getTeamName = (teamId) => teams.find(t => String(t.id) === String(teamId))?.name || "Team";
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6">
-      <div className="flex items-center gap-2 mb-4"><Clock className="w-5 h-5 text-[#FF6B00]" /><span className="text-gray-400 text-sm headline-font">UPCOMING</span>{game.label && <span className="text-[#FF6B00] text-sm headline-font ml-auto">{game.label}</span>}</div>
-      <div className="flex items-center justify-between">
-        <div className="text-center flex-1"><p className="headline-font text-xl text-white">{getTeamName(game.team_a_id)}</p></div>
-        <div className="px-4"><span className="text-xl text-gray-500">VS</span></div>
-        <div className="text-center flex-1"><p className="headline-font text-xl text-white">{getTeamName(game.team_b_id)}</p></div>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-5 md:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2"><Clock className="w-4 h-4 md:w-5 md:h-5 text-[#FF6B00]" /><span className="text-gray-400 text-xs md:text-sm headline-font">UPCOMING</span></div>
+        {game.label && <span className="text-[#FF6B00] text-xs md:text-sm headline-font">{game.label}</span>}
+      </div>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
+        <div className="text-center flex-1 w-full"><p className="headline-font text-lg md:text-xl text-white leading-tight">{getTeamName(game.team_a_id)}</p></div>
+        <div className="px-4"><span className="text-lg md:text-xl text-gray-500">VS</span></div>
+        <div className="text-center flex-1 w-full"><p className="headline-font text-lg md:text-xl text-white leading-tight">{getTeamName(game.team_b_id)}</p></div>
       </div>
     </motion.div>
   );
@@ -67,12 +70,15 @@ const FinalGameCard = ({ game, teams }) => {
   const teamAWon = (game.team_a_score || 0) > (game.team_b_score || 0);
   const teamBWon = (game.team_b_score || 0) > (game.team_a_score || 0);
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-6">
-      <div className="flex items-center gap-2 mb-4"><CheckCircle className="w-5 h-5 text-gray-500" /><span className="text-gray-500 text-sm headline-font">FINAL</span>{game.label && <span className="text-gray-500 text-sm headline-font ml-auto">{game.label}</span>}</div>
-      <div className="grid grid-cols-3 gap-4 items-center">
-        <div className="text-center"><p className={`headline-font text-xl mb-2 ${teamAWon ? 'text-[#FF6B00]' : 'text-white'}`}>{getTeamName(game.team_a_id)}</p><p className="text-3xl headline-font text-white">{game.team_a_score || 0}</p></div>
-        <div className="text-center"><span className="text-xl text-gray-500">-</span></div>
-        <div className="text-center"><p className={`headline-font text-xl mb-2 ${teamBWon ? 'text-[#FF6B00]' : 'text-white'}`}>{getTeamName(game.team_b_id)}</p><p className="text-3xl headline-font text-white">{game.team_b_score || 0}</p></div>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1a1a1a] border border-white/10 rounded-lg p-5 md:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-gray-500" /><span className="text-gray-500 text-xs md:text-sm headline-font">FINAL</span></div>
+        {game.label && <span className="text-gray-500 text-xs md:text-sm headline-font">{game.label}</span>}
+      </div>
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4 items-center">
+        <div className="text-center w-full"><p className={`headline-font text-lg md:text-xl mb-1 md:mb-2 leading-tight ${teamAWon ? 'text-[#FF6B00]' : 'text-white'}`}>{getTeamName(game.team_a_id)}</p><p className="text-3xl headline-font text-white">{game.team_a_score || 0}</p></div>
+        <div className="text-center hidden md:block"><span className="text-xl text-gray-500">-</span></div>
+        <div className="text-center w-full"><p className={`headline-font text-lg md:text-xl mb-1 md:mb-2 leading-tight ${teamBWon ? 'text-[#FF6B00]' : 'text-white'}`}>{getTeamName(game.team_b_id)}</p><p className="text-3xl headline-font text-white">{game.team_b_score || 0}</p></div>
       </div>
     </motion.div>
   );

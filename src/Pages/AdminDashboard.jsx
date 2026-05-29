@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
-import { FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
+import { FeaturedReel, Tournament, MediaItem, Team, Game, Field } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X, Menu } from "lucide-react";
 import { format } from 'date-fns';
@@ -71,6 +71,13 @@ export default function AdminDashboard() {
   const [newTeamName, setNewTeamName] = useState('');
   const [isAddingTeam, setIsAddingTeam] = useState(false);
   const [newGameLabel, setNewGameLabel] = useState('');
+  
+  // Fields State
+  const [fields, setFields] = useState([]);
+  const [newFieldName, setNewFieldName] = useState('');
+  const [isAddingField, setIsAddingField] = useState(false);
+  const [selectedFieldFilter, setSelectedFieldFilter] = useState('ALL');
+  const [gameFieldId, setGameFieldId] = useState('UNASSIGNED');
 
   const loadData = async () => {
     try {
@@ -96,8 +103,17 @@ export default function AdminDashboard() {
 
   useEffect(() => { loadData(); }, []);
   useEffect(() => {
-    if (!selectedScoreTournamentId) { setTeams([]); setGames([]); return; }
-    const load = async () => { const [td, gd] = await Promise.all([Team.filter({ tournament_id: selectedScoreTournamentId }), Game.filter({ tournament_id: selectedScoreTournamentId })]); setTeams(td); setGames(gd); };
+    if (!selectedScoreTournamentId) { setTeams([]); setGames([]); setFields([]); return; }
+    const load = async () => { 
+      const [td, gd, fd] = await Promise.all([
+        Team.filter({ tournament_id: selectedScoreTournamentId }), 
+        Game.filter({ tournament_id: selectedScoreTournamentId }),
+        Field.filter({ tournament_id: selectedScoreTournamentId })
+      ]); 
+      setTeams(td); 
+      setGames(gd); 
+      setFields(fd);
+    };
     load();
   }, [selectedScoreTournamentId]);
 
@@ -208,7 +224,11 @@ export default function AdminDashboard() {
   const handleDeleteReel = async id => { if (window.confirm('Delete?')) { const { error } = await FeaturedReel.deleteById(id); if (error) setReelMessage({ type: 'error', text: error.message }); else { setReelMessage({ type: 'success', text: 'Deleted.' }); await loadData(); } } };
   const handleAddTeam = async () => { if (!selectedScoreTournamentId || !newTeamName.trim()) { alert('Enter a team name.'); return; } setIsAddingTeam(true); await Team.create({ name: newTeamName.trim(), tournament_id: selectedScoreTournamentId, logo_url: '' }); setTeams(await Team.filter({ tournament_id: selectedScoreTournamentId })); setNewTeamName(''); setIsAddingTeam(false); };
   const handleDeleteTeam = async (id, name) => { if (!window.confirm(`Remove "${name}" from this tournament?`)) return; const { error } = await supabase.from('teams').delete().eq('id', id); if (error) { alert(error.message); return; } setTeams(teams.filter(t => t.id !== id)); };
-  const handleCreateGame = async () => { if (!selectedScoreTournamentId || !teamAId || !teamBId || teamAId === teamBId) { alert('Select a tournament and two different teams.'); return; } setIsCreatingGame(true); await Game.create({ tournament_id: selectedScoreTournamentId, team_a_id: teamAId, team_b_id: teamBId, status: 'SCHEDULED', label: newGameLabel.trim() || null }); setGames(await Game.filter({ tournament_id: selectedScoreTournamentId })); setTeamAId(''); setTeamBId(''); setNewGameLabel(''); setIsCreatingGame(false); };
+  
+  const handleAddField = async () => { if (!selectedScoreTournamentId || !newFieldName.trim()) { alert('Enter a field name.'); return; } setIsAddingField(true); await Field.create({ name: newFieldName.trim(), tournament_id: selectedScoreTournamentId }); setFields(await Field.filter({ tournament_id: selectedScoreTournamentId })); setNewFieldName(''); setIsAddingField(false); };
+  const handleDeleteField = async (id, name) => { if (!window.confirm(`Delete field "${name}"?`)) return; const { error } = await Field.delete(id); if (error) { alert(error.message); return; } setFields(fields.filter(f => f.id !== id)); };
+  
+  const handleCreateGame = async () => { if (!selectedScoreTournamentId || !teamAId || !teamBId || teamAId === teamBId) { alert('Select a tournament and two different teams.'); return; } setIsCreatingGame(true); await Game.create({ tournament_id: selectedScoreTournamentId, team_a_id: teamAId, team_b_id: teamBId, status: 'SCHEDULED', label: newGameLabel.trim() || null, field_id: gameFieldId === 'UNASSIGNED' ? null : gameFieldId }); setGames(await Game.filter({ tournament_id: selectedScoreTournamentId })); setTeamAId(''); setTeamBId(''); setNewGameLabel(''); setGameFieldId('UNASSIGNED'); setIsCreatingGame(false); };
   const handleDeleteGame = async (gameId) => { if (!window.confirm('Delete this game? This cannot be undone.')) return; const { error } = await supabase.from('games').delete().eq('id', gameId); if (error) { alert(error.message); return; } setGames(games.filter(g => g.id !== gameId)); };
   const handleScoreChange = async (gameId, field, inc) => { const game = games.find(g => g.id === gameId); if (!game) return; const { data: updated } = await Game.update(gameId, { [field]: Math.max(0, (game[field] || 0) + (inc ? 1 : -1)) }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g)); };
   const handleStatusChange = async (gameId, cur) => { const { data: updated } = await Game.update(gameId, { status: cur === 'SCHEDULED' ? 'LIVE' : 'FINAL' }); if (updated) setGames(games.map(g => g.id === gameId ? updated : g).sort((a, b) => new Date(a.start_time) - new Date(b.start_time))); };
@@ -235,9 +255,15 @@ export default function AdminDashboard() {
     return <div className="relative"><button onClick={() => setOpen(!open)} className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5"><MoreVertical className="w-4 h-4" /></button>{open && (<><div className="fixed inset-0 z-10" onClick={() => setOpen(false)} /><div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"><button onClick={copy} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2"><Copy className="w-3.5 h-3.5" />Copy</button><button onClick={() => { setOpen(false); handleDeleteTournamentRegistration(reg.id); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/5"><Trash2 className="w-3.5 h-3.5" />Delete</button></div></>)}</div>;
   };
 
-  const liveGames = games.filter(g => g.status === 'LIVE');
-  const scheduledGames = games.filter(g => g.status === 'SCHEDULED');
-  const finalGames = games.filter(g => g.status === 'FINAL');
+  const getFilteredGames = () => {
+    if (selectedFieldFilter === 'ALL') return games;
+    if (selectedFieldFilter === 'UNASSIGNED') return games.filter(g => !g.field_id);
+    return games.filter(g => String(g.field_id) === String(selectedFieldFilter));
+  };
+  const filteredGames = getFilteredGames();
+  const liveGames = filteredGames.filter(g => g.status === 'LIVE');
+  const scheduledGames = filteredGames.filter(g => g.status === 'SCHEDULED');
+  const finalGames = filteredGames.filter(g => g.status === 'FINAL');
 
   const paidCount = (arr) => arr.filter(r => ['paid', 'successful', 'completed'].includes(r.payment_status?.toLowerCase())).length;
   const pendingCount = (arr) => arr.filter(r => !['paid', 'successful', 'completed'].includes(r.payment_status?.toLowerCase())).length;
@@ -375,13 +401,34 @@ export default function AdminDashboard() {
                   {teams.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{teams.map(t => <span key={t.id} className="bg-[#0a0a0a] border border-white/10 text-white text-sm px-3 py-1.5 rounded-full flex items-center gap-2">{t.name}<button onClick={() => handleDeleteTeam(t.id, t.name)} className="text-gray-500 hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button></span>)}</div>}
                 </div>
                 <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6">
+                  <h3 className="headline-font text-lg text-white mb-4">MANAGE FIELDS</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="md:col-span-3"><Input value={newFieldName} onChange={e => setNewFieldName(e.target.value)} placeholder="Enter field name (e.g. Field 1, Court 2)" className="bg-[#0a0a0a] border-white/10 text-white h-11" onKeyDown={e => e.key === 'Enter' && handleAddField()} /></div>
+                    <Button onClick={handleAddField} disabled={isAddingField || !newFieldName.trim()} className="bg-[#FF6B00] text-white headline-font h-11">{isAddingField ? 'Adding...' : <><Plus className="w-4 h-4 mr-2" />Add Field</>}</Button>
+                  </div>
+                  {fields.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{fields.map(f => <span key={f.id} className="bg-[#0a0a0a] border border-white/10 text-white text-sm px-3 py-1.5 rounded-full flex items-center gap-2">{f.name}<button onClick={() => handleDeleteField(f.id, f.name)} className="text-gray-500 hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button></span>)}</div>}
+                </div>
+                <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6">
                   <h3 className="headline-font text-lg text-white mb-4">CREATE NEW GAME</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <Select value={teamAId} onValueChange={setTeamAId}><SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11"><SelectValue placeholder="Team A" /></SelectTrigger><SelectContent className="bg-[#1a1a1a] border-white/10">{teams.map(t => <SelectItem key={t.id} value={String(t.id)} className="text-white">{t.name}</SelectItem>)}</SelectContent></Select>
                     <Select value={teamBId} onValueChange={setTeamBId}><SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11"><SelectValue placeholder="Team B" /></SelectTrigger><SelectContent className="bg-[#1a1a1a] border-white/10">{teams.map(t => <SelectItem key={t.id} value={String(t.id)} className="text-white">{t.name}</SelectItem>)}</SelectContent></Select>
-                    <Input value={newGameLabel} onChange={e => setNewGameLabel(e.target.value)} placeholder='e.g. Round 1, Semi Final, Grand Final' className="bg-[#0a0a0a] border-white/10 text-white h-11" />
+                    <Select value={gameFieldId} onValueChange={setGameFieldId}><SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11"><SelectValue placeholder="Assign to Field" /></SelectTrigger><SelectContent className="bg-[#1a1a1a] border-white/10"><SelectItem value="UNASSIGNED" className="text-white">Unassigned (None)</SelectItem>{fields.map(f => <SelectItem key={f.id} value={String(f.id)} className="text-white">{f.name}</SelectItem>)}</SelectContent></Select>
+                    <Input value={newGameLabel} onChange={e => setNewGameLabel(e.target.value)} placeholder='Label (e.g. Round 1)' className="bg-[#0a0a0a] border-white/10 text-white h-11" />
                   </div>
                   <Button onClick={handleCreateGame} disabled={isCreatingGame} className="bg-[#FF6B00] text-white headline-font h-11 w-full md:w-auto">{isCreatingGame ? 'Creating...' : 'Create Game'}</Button>
+                </div>
+                
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-8 mb-4 border-t border-white/10 pt-8">
+                  <h2 className="headline-font text-2xl text-white">GAMES LIST</h2>
+                  <Select value={selectedFieldFilter} onValueChange={setSelectedFieldFilter}>
+                    <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white w-full md:w-64 h-11"><SelectValue placeholder="Filter by Field" /></SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-white/10">
+                      <SelectItem value="ALL" className="text-white">All Fields / Games</SelectItem>
+                      <SelectItem value="UNASSIGNED" className="text-white">Unassigned Games</SelectItem>
+                      {fields.map(f => <SelectItem key={f.id} value={String(f.id)} className="text-white">{f.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 {liveGames.length > 0 && (<div><h3 className="headline-font text-xl text-white mb-4 flex items-center gap-2"><span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />LIVE ({liveGames.length})</h3><div className="space-y-4">{liveGames.map(g => (<div key={g.id} className="bg-[#1a1a1a] border-2 border-red-500/30 rounded-xl p-4 md:p-6">
                   <div className="flex flex-wrap justify-between items-center gap-2 mb-4"><div className="flex items-center gap-2 flex-wrap"><span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs headline-font">LIVE</span>{g.label && <span className="text-[#FF6B00] text-sm headline-font">{g.label}</span>}</div><Button onClick={() => handleStatusChange(g.id, g.status)} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font text-xs md:text-sm">End Game</Button></div>
