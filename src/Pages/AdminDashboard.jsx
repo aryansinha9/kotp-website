@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
 import { FeaturedReel, Tournament, MediaItem, Team, Game } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock } from "lucide-react";
+import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X } from "lucide-react";
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
