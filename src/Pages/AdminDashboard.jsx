@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
+import * as XLSX from 'xlsx';
 
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 const T = ({ headers, children }) => (
@@ -132,6 +133,12 @@ export default function AdminDashboard() {
     ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20">Paid</span>
     : <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">Pending</span>;
 
+  const getTeamTypeBadge = t => t === 'Champion'
+    ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FF6B00]/15 text-[#FF6B00] border border-[#FF6B00]/20">Champion</span>
+    : t === 'Challenger'
+    ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/20">Challenger</span>
+    : <span className="text-gray-600 text-xs">—</span>;
+
   const csvDown = (name, headers, rows) => { const c = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n'); const l = document.createElement('a'); l.setAttribute('href', encodeURI(c)); l.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(l); l.click(); document.body.removeChild(l); };
   const downloadParkleaCSV = () => { if (!parkleaRegistrations.length) return; csvDown('Parklea_Registrations', ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'], parkleaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'standard'),r.payment_status,r.participant_name,r.age_turning_2026,r.dob,r.team,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.jersey_size,r.shorts_size,r.socks_size,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
@@ -139,19 +146,16 @@ export default function AdminDashboard() {
   const downloadTournamentCSV = () => {
     if (!tournamentRegistrations.length) return;
     
-    // Create rows with multiple line breaks for teams
     const csvContentRows = [];
-    
-    // Overall Header for the entire file isn't needed if we use sections,
-    // but let's make a standard CSV where each team is a block.
     
     tournamentRegistrations.forEach(r => {
       // 1. Team Info Header Row
-      csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
+      csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Team Type', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
       csvContentRows.push([
         ' ',
         `"${(r.tournaments?.name || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.team_name || 'N/A').replace(/"/g, '""')}"`,
+        r.team_type || 'N/A',
         `"${(r.contact_person || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.email || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.phone || 'N/A').replace(/"/g, '""')}"`,
@@ -186,12 +190,10 @@ export default function AdminDashboard() {
         csvContentRows.push([' ', 'No players recorded']);
       }
       
-      // Blank spacer row between teams
       csvContentRows.push([]);
       csvContentRows.push([]);
     });
     
-    // Call our csv downloader without uniform headers, just the content rows
     const c = "data:text/csv;charset=utf-8," + csvContentRows.map(r => r.join(',')).join('\n');
     const l = document.createElement('a'); 
     l.setAttribute('href', encodeURI(c)); 
@@ -199,6 +201,65 @@ export default function AdminDashboard() {
     document.body.appendChild(l); 
     l.click(); 
     document.body.removeChild(l);
+  };
+
+  const downloadTournamentXLSX = () => {
+    if (!tournamentRegistrations.length) return;
+
+    const wb = XLSX.utils.book_new();
+
+    // ── Sheet 1: Team Summary ─────────────────────────────────────────────────
+    const summaryHeaders = ['Date', 'Tournament', 'Team Name', 'Team Type', 'Captain', 'Email', 'Phone', 'Players', 'Medical Info', 'Payment Status', 'Agreed Terms', 'Signature', 'Signature Date'];
+    const summaryRows = tournamentRegistrations.map(r => {
+      const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
+      return [
+        new Date(r.created_at).toLocaleDateString(),
+        r.tournaments?.name || 'N/A',
+        r.team_name || 'N/A',
+        r.team_type || 'N/A',
+        captain ? `${captain.firstName} ${captain.lastName}` : 'N/A',
+        captain?.email || 'N/A',
+        captain?.phone || 'N/A',
+        Array.isArray(r.players) ? r.players.length : 0,
+        r.medical_info || '',
+        r.payment_status || 'N/A',
+        r.agreed_to_terms ? 'Yes' : 'No',
+        r.signature || '',
+        r.signature_date ? new Date(r.signature_date).toLocaleDateString() : 'N/A',
+      ];
+    });
+    const summarySheet = XLSX.utils.aoa_to_sheet([summaryHeaders, ...summaryRows]);
+    // Column widths
+    summarySheet['!cols'] = [10,30,20,12,22,28,16,8,40,14,12,24,14].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, summarySheet, 'Team Summary');
+
+    // ── Sheet 2: Full Roster ──────────────────────────────────────────────────
+    const rosterHeaders = ['Tournament', 'Team Name', 'Team Type', 'Payment Status', 'Player #', 'First Name', 'Last Name', 'Role', 'Email', 'Phone', 'Instagram'];
+    const rosterRows = [];
+    tournamentRegistrations.forEach(r => {
+      if (Array.isArray(r.players)) {
+        r.players.forEach((p, idx) => {
+          rosterRows.push([
+            r.tournaments?.name || 'N/A',
+            r.team_name || 'N/A',
+            r.team_type || 'N/A',
+            r.payment_status || 'N/A',
+            idx + 1,
+            p.firstName || '',
+            p.lastName || '',
+            p.isCaptain ? 'Captain' : 'Player',
+            p.email || '',
+            p.phone || '',
+            p.instagram || '',
+          ]);
+        });
+      }
+    });
+    const rosterSheet = XLSX.utils.aoa_to_sheet([rosterHeaders, ...rosterRows]);
+    rosterSheet['!cols'] = [30,20,12,14,8,14,14,8,28,16,16].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, rosterSheet, 'Full Roster');
+
+    XLSX.writeFile(wb, `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const handleGallerySubmit = async () => {
@@ -355,9 +416,22 @@ export default function AdminDashboard() {
       case 'tournaments':
         return (
           <div>
-            <SectionHeader title="Tournament Registrations" count={tournamentRegistrations.length} action={<Button onClick={downloadTournamentCSV} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
+            <SectionHeader
+              title="Tournament Registrations"
+              count={tournamentRegistrations.length}
+              action={
+                <div className="flex gap-2">
+                  <Button onClick={downloadTournamentCSV} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                    <Download className="w-4 h-4 mr-2" />CSV
+                  </Button>
+                  <Button onClick={downloadTournamentXLSX} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                    <Download className="w-4 h-4 mr-2" />Excel
+                  </Button>
+                </div>
+              }
+            />
             {!tournamentRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
-              <T headers={['Date','Team Name','Tournament','Captain','Email','Phone','Players','Status','Actions']}>
+              <T headers={['Date','Team Name','Tournament','Type','Captain','Email','Phone','Players','Status','Actions']}>
                 {tournamentRegistrations.map(r => {
                   const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
                   return (
@@ -365,6 +439,7 @@ export default function AdminDashboard() {
                       <TD>{new Date(r.created_at).toLocaleDateString()}</TD>
                       <TD className="font-semibold text-white">{r.team_name||'N/A'}</TD>
                       <TD>{r.tournaments?.name||'N/A'}</TD>
+                      <TD>{getTeamTypeBadge(r.team_type)}</TD>
                       <TD>{captain ? `${captain.firstName} ${captain.lastName}` : 'N/A'}</TD>
                       <TD>{captain?.email ? <a href={`mailto:${captain.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a> : 'N/A'}</TD>
                       <TD>{captain?.phone ? <a href={`tel:${captain.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a> : 'N/A'}</TD>

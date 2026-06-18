@@ -6,7 +6,8 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 import { Button } from "@/Components/ui/button";
 import { Checkbox } from "@/Components/ui/checkbox";
-import { Users, FileText, Send, Trophy, Calendar, MapPin, Plus, Trash2, HeartPulse, HelpCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
+import { Users, FileText, Send, Trophy, Calendar, MapPin, Plus, Trash2, HeartPulse, HelpCircle, Shield, Sword } from "lucide-react";
 import { supabase } from "@/supabaseClient";
 import { Loader2 } from "lucide-react";
 
@@ -44,6 +45,7 @@ export default function ChampionsVsChallengersRegistration() {
   ];
 
   const [teamName, setTeamName] = useState("");
+  const [teamType, setTeamType] = useState(""); // 'Champion' | 'Challenger'
   const [players, setPlayers] = useState(makeDefaultPlayers());
   const [medicalInfo, setMedicalInfo] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -102,6 +104,7 @@ export default function ChampionsVsChallengersRegistration() {
         body: {
           tournamentId: tournamentId,
           teamName,
+          teamType,
           players,
           medicalInfo,
           agreeTerms,
@@ -187,6 +190,72 @@ export default function ChampionsVsChallengersRegistration() {
                 className="bg-[#0a0a0a] border-white/10 text-white focus:border-[#FF6B00] text-lg py-6"
                 placeholder="Enter your team name"
               />
+            </div>
+
+            {/* Champion / Challenger selector */}
+            <div>
+              <Label className="text-white mb-3 block">Team Type *</Label>
+              <p className="text-gray-400 text-sm mb-4">
+                Are you entering as a <span className="text-[#FF6B00] font-semibold">Champion</span> (previous KOTP winner / top-tier team) or a <span className="text-blue-400 font-semibold">Challenger</span> (new or rising team)?
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Champion option */}
+                <button
+                  type="button"
+                  onClick={() => setTeamType('Champion')}
+                  className={`relative p-5 rounded-lg border-2 text-left transition-all duration-200 ${
+                    teamType === 'Champion'
+                      ? 'border-[#FF6B00] bg-[#FF6B00]/10'
+                      : 'border-white/10 bg-[#0a0a0a] hover:border-white/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      teamType === 'Champion' ? 'border-[#FF6B00]' : 'border-white/30'
+                    }`}>
+                      {teamType === 'Champion' && <div className="w-2 h-2 rounded-full bg-[#FF6B00]" />}
+                    </div>
+                    <span className="headline-font text-xl text-[#FF6B00]">Champion</span>
+                    <Trophy className="w-5 h-5 text-[#FF6B00] ml-auto" />
+                  </div>
+                  <p className="text-gray-400 text-xs pl-7">Previous KOTP winner or elite-level team</p>
+                </button>
+
+                {/* Challenger option */}
+                <button
+                  type="button"
+                  onClick={() => setTeamType('Challenger')}
+                  className={`relative p-5 rounded-lg border-2 text-left transition-all duration-200 ${
+                    teamType === 'Challenger'
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-white/10 bg-[#0a0a0a] hover:border-white/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      teamType === 'Challenger' ? 'border-blue-500' : 'border-white/30'
+                    }`}>
+                      {teamType === 'Challenger' && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+                    </div>
+                    <span className="headline-font text-xl text-blue-400">Challenger</span>
+                    <Users className="w-5 h-5 text-blue-400 ml-auto" />
+                  </div>
+                  <p className="text-gray-400 text-xs pl-7">New or rising team looking to make their mark</p>
+                </button>
+              </div>
+              {/* Hidden required input to trigger HTML5 validation */}
+              <input
+                type="text"
+                required
+                value={teamType}
+                onChange={() => {}}
+                className="sr-only"
+                aria-hidden="true"
+                tabIndex={-1}
+              />
+              {!teamType && (
+                <p className="text-amber-500 text-xs mt-2">Please select Champion or Challenger to continue.</p>
+              )}
             </div>
           </div>
 
@@ -359,7 +428,7 @@ export default function ChampionsVsChallengersRegistration() {
 
             <Button
               type="submit"
-              disabled={isSubmitting || !agreeTerms || players.length < MIN_PLAYERS || !tournamentId}
+              disabled={isSubmitting || !agreeTerms || players.length < MIN_PLAYERS || !tournamentId || !teamType}
               className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 transition-all duration-300 h-auto disabled:cursor-not-allowed"
             >
               {isSubmitting ? (

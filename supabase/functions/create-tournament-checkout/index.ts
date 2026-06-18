@@ -36,13 +36,15 @@ serve(async (req: Request) => {
     const registrationData = await req.json()
     const {
       tournamentId, teamName, players, medicalInfo,
-      agreeTerms, signature, signatureDate
+      agreeTerms, signature, signatureDate, teamType
     } = registrationData
 
     // --- Server-side validation ---
     if (!tournamentId) throw new Error('Tournament ID is missing.')
     if (!teamName || typeof teamName !== 'string' || teamName.trim().length < 2)
       throw new Error('Invalid team name.')
+    if (!teamType || !['Champion', 'Challenger'].includes(teamType))
+      throw new Error('You must select either Champion or Challenger.')
     if (!agreeTerms) throw new Error('Terms must be agreed to.')
     if (!signature || typeof signature !== 'string' || signature.trim().length < 2)
       throw new Error('Signature is required.')
@@ -106,6 +108,7 @@ serve(async (req: Request) => {
       .insert([{
         tournament_id: tournamentId,
         team_name: teamName.trim(),
+        team_type: teamType,
         players: players, // jsonb 
         medical_info: medicalInfo || null,
         agreed_to_terms: agreeTerms,
