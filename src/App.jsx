@@ -7,6 +7,7 @@ import {
   Route,
   Outlet,
   Navigate,
+  useParams,
 } from 'react-router-dom';
 import Layout from './Layout.jsx';
 import Home from './Pages/Home';
@@ -19,10 +20,10 @@ import HolidayProgram from './Pages/HolidayProgram';
 import AIAAfterSchoolProgram from './Pages/AIAAfterSchoolProgram';
 import Contact from './Pages/Contact';
 import Moments from './Pages/Moments';
-// --- NEW: Import the LiveScores page ---
 import LiveScores from './Pages/LiveScores';
 import Register from './Pages/Register';
 import TournamentRegistration from './Pages/TournamentRegistration';
+import ChampionsVsChallengersRegistration from './Pages/ChampionsVsChallengersRegistration';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -32,6 +33,7 @@ import RegistrationSuccess from './Pages/RegistrationSuccess';
 import UpdatePassword from './Pages/UpdatePassword';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import TermsAndConditions from './Pages/TermsAndConditions';
+import { supabase } from './supabaseClient';
 
 const PublicLayout = () => (
   <Layout>
@@ -39,7 +41,6 @@ const PublicLayout = () => (
   </Layout>
 );
 
-// We need to update the AdminLayout to match the new dark theme
 const AdminLayout = () => (
   <div className="bg-[#0a0a0a] min-h-screen">
     <Outlet />
@@ -54,6 +55,49 @@ const ComingSoon = () => (
   </div>
 );
 
+// Smart redirect: looks up the tournament name and routes to the correct
+// registration page. Falls back to the default tournament registration.
+const CHAMPIONS_VS_CHALLENGERS_NAME = 'KOTP and Ultimate Soccer Present: Champions vs Challengers';
+const WORLD_CUP_NAME = 'KOTP World Cup';
+
+function TournamentRedirect() {
+  const { tournamentId } = useParams();
+  const [redirectTo, setRedirectTo] = React.useState(null);
+
+  React.useEffect(() => {
+    const resolve = async () => {
+      try {
+        const { data } = await supabase
+          .from('tournaments')
+          .select('name')
+          .eq('id', tournamentId)
+          .maybeSingle();
+
+        if (data?.name === CHAMPIONS_VS_CHALLENGERS_NAME) {
+          setRedirectTo('/champions-vs-challengers-registration');
+        } else {
+          // Default: World Cup or any other tournament uses the original page
+          setRedirectTo('/tournament-registration');
+        }
+      } catch {
+        setRedirectTo('/tournament-registration');
+      }
+    };
+    resolve();
+  }, [tournamentId]);
+
+  if (!redirectTo) {
+    // Show a minimal loading state while the DB lookup resolves
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#FF6B00] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return <Navigate to={redirectTo} replace />;
+}
+
 export default function App() {
   return (
     <Router>
@@ -64,8 +108,14 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/gallery/:tournamentId" element={<Gallery />} />
-          <Route path="/register/:tournamentId" element={<Navigate to="/tournament-registration" replace />} />
+
+          {/* Smart routing: resolves tournament name and redirects accordingly */}
+          <Route path="/register/:tournamentId" element={<TournamentRedirect />} />
+
+          {/* Tournament registration pages */}
           <Route path="/tournament-registration" element={<TournamentRegistration />} />
+          <Route path="/champions-vs-challengers-registration" element={<ChampionsVsChallengersRegistration />} />
+
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />
           <Route path="/academy" element={<Academy />} />
@@ -77,7 +127,6 @@ export default function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
 
-          {/* --- NEW: Add the route for the Live Scores page --- */}
           <Route path="/live-scores" element={<LiveScores />} />
 
           <Route path="/faq" element={<ComingSoon />} />

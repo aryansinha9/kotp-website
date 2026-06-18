@@ -46,8 +46,23 @@ serve(async (req: Request) => {
     if (!agreeTerms) throw new Error('Terms must be agreed to.')
     if (!signature || typeof signature !== 'string' || signature.trim().length < 2)
       throw new Error('Signature is required.')
-    if (!players || !Array.isArray(players) || players.length < 7 || players.length > 10) {
-      throw new Error('You must register between 7 and 10 players.')
+
+    // Fetch tournament to get entry fee AND player count limits
+    const { data: tournament, error: tournamentError } = await supabaseAdmin
+      .from('tournaments')
+      .select('name, entry_fee, min_players, max_players')
+      .eq('id', tournamentId)
+      .single()
+
+    if (tournamentError || !tournament) throw new Error('Tournament not found.')
+
+    // Use dynamic player limits from the tournament record.
+    // Fall back to legacy defaults (7 min, 10 max) if columns don't exist yet.
+    const minPlayers = tournament.min_players ?? 7
+    const maxPlayers = tournament.max_players ?? 10
+
+    if (!players || !Array.isArray(players) || players.length < minPlayers || players.length > maxPlayers) {
+      throw new Error(`You must register between ${minPlayers} and ${maxPlayers} players.`)
     }
 
     let captainCount = 0;
@@ -82,15 +97,6 @@ serve(async (req: Request) => {
     if (captainCount !== 1) {
         throw new Error('Exactly one player must be selected as the team captain.')
     }
-
-    // Fetch tournament to get entry fee
-    const { data: tournament, error: tournamentError } = await supabaseAdmin
-      .from('tournaments')
-      .select('name, entry_fee')
-      .eq('id', tournamentId)
-      .single()
-
-    if (tournamentError || !tournament) throw new Error('Tournament not found.')
 
     const priceInCents = Math.round((tournament.entry_fee || 800) * 100)
 
@@ -132,7 +138,9 @@ serve(async (req: Request) => {
       mode: 'payment',
       allow_promotion_codes: true,
       success_url: `${origin}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/tournament-registration?status=cancelled`,
+      cancel_url: tournament.name === 'KOTP and Ultimate Soccer Present: Champions vs Challengers'
+        ? `${origin}/champions-vs-challengers-registration?status=cancelled`
+        : `${origin}/tournament-registration?status=cancelled`,
       metadata: {
         registration_id: record.id,
         team_name: teamName.trim(),
