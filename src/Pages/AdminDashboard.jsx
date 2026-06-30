@@ -49,6 +49,7 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [tournamentRegistrations, setTournamentRegistrations] = useState([]);
+  const [tournamentRegFilter, setTournamentRegFilter] = useState('ALL');
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
   const [holidayRegistrations, setHolidayRegistrations] = useState([]);
   const [aiaRegistrations, setAiaRegistrations] = useState([]);
@@ -145,16 +146,24 @@ export default function AdminDashboard() {
     ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/20">U9-11s</span>
     : null;
 
+  // Filtered tournament registrations based on dropdown selection
+  const filteredTournamentRegs = tournamentRegFilter === 'ALL'
+    ? tournamentRegistrations
+    : tournamentRegistrations.filter(r => r.tournaments?.name === tournamentRegFilter);
+
+  // Get unique tournament names for the filter dropdown
+  const uniqueTournamentNames = [...new Set(tournamentRegistrations.map(r => r.tournaments?.name).filter(Boolean))];
+
   const csvDown = (name, headers, rows) => { const c = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n'); const l = document.createElement('a'); l.setAttribute('href', encodeURI(c)); l.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(l); l.click(); document.body.removeChild(l); };
   const downloadParkleaCSV = () => { if (!parkleaRegistrations.length) return; csvDown('Parklea_Registrations', ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'], parkleaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'standard'),r.payment_status,r.participant_name,r.age_turning_2026,r.dob,r.team,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.jersey_size,r.shorts_size,r.socks_size,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadAIACSV = () => { if (!aiaRegistrations.length) return; csvDown('AIA_Registrations', ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'], aiaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),r.payment_status,r.participant_first_name,r.participant_last_name,r.dob,(r.year_group||'').replace('-',' '),r.parent_first_name,r.parent_last_name,r.parent_phone,r.parent_email,`"${(r.street_address||'').replace(/"/g,'""')}"`,r.city,r.state,r.postal_code,`"${(r.allergies||'').replace(/"/g,'""')}"`,`"${(r.inhaler||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadTournamentCSV = () => {
-    if (!tournamentRegistrations.length) return;
+    if (!filteredTournamentRegs.length) return;
     
     const csvContentRows = [];
     
-    tournamentRegistrations.forEach(r => {
+    filteredTournamentRegs.forEach(r => {
       // 1. Team Info Header Row
       csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Team Type', 'Division', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
       csvContentRows.push([
@@ -201,23 +210,24 @@ export default function AdminDashboard() {
       csvContentRows.push([]);
     });
     
+    const filterLabel = tournamentRegFilter === 'ALL' ? '' : `_${tournamentRegFilter.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const c = "data:text/csv;charset=utf-8," + csvContentRows.map(r => r.join(',')).join('\n');
     const l = document.createElement('a'); 
     l.setAttribute('href', encodeURI(c)); 
-    l.setAttribute('download', `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.csv`); 
+    l.setAttribute('download', `Tournament_Registrations${filterLabel}_${new Date().toISOString().split('T')[0]}.csv`); 
     document.body.appendChild(l); 
     l.click(); 
     document.body.removeChild(l);
   };
 
   const downloadTournamentXLSX = () => {
-    if (!tournamentRegistrations.length) return;
+    if (!filteredTournamentRegs.length) return;
 
     const wb = XLSX.utils.book_new();
 
     // ── Sheet 1: Team Summary ─────────────────────────────────────────────────
     const summaryHeaders = ['Date', 'Tournament', 'Team Name', 'Team Type', 'Division', 'Captain', 'Email', 'Phone', 'Players', 'Medical Info', 'Payment Status', 'Agreed Terms', 'Signature', 'Signature Date'];
-    const summaryRows = tournamentRegistrations.map(r => {
+    const summaryRows = filteredTournamentRegs.map(r => {
       const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
       return [
         new Date(r.created_at).toLocaleDateString(),
@@ -244,7 +254,7 @@ export default function AdminDashboard() {
     // ── Sheet 2: Full Roster ──────────────────────────────────────────────────
     const rosterHeaders = ['Tournament', 'Team Name', 'Team Type', 'Division', 'Payment Status', 'Player #', 'First Name', 'Last Name', 'Role', 'Email', 'Phone', 'Instagram'];
     const rosterRows = [];
-    tournamentRegistrations.forEach(r => {
+    filteredTournamentRegs.forEach(r => {
       if (Array.isArray(r.players)) {
         r.players.forEach((p, idx) => {
           rosterRows.push([
@@ -268,7 +278,8 @@ export default function AdminDashboard() {
     rosterSheet['!cols'] = [30,20,12,16,14,8,14,14,8,28,16,16].map(w => ({ wch: w }));
     XLSX.utils.book_append_sheet(wb, rosterSheet, 'Full Roster');
 
-    XLSX.writeFile(wb, `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.xlsx`);
+    const filterLabel = tournamentRegFilter === 'ALL' ? '' : `_${tournamentRegFilter.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    XLSX.writeFile(wb, `Tournament_Registrations${filterLabel}_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const handleGallerySubmit = async () => {
@@ -427,21 +438,38 @@ export default function AdminDashboard() {
           <div>
             <SectionHeader
               title="Tournament Registrations"
-              count={tournamentRegistrations.length}
+              count={filteredTournamentRegs.length}
               action={
                 <div className="flex gap-2">
-                  <Button onClick={downloadTournamentCSV} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                  <Button onClick={downloadTournamentCSV} disabled={!filteredTournamentRegs.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
                     <Download className="w-4 h-4 mr-2" />CSV
                   </Button>
-                  <Button onClick={downloadTournamentXLSX} disabled={!tournamentRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                  <Button onClick={downloadTournamentXLSX} disabled={!filteredTournamentRegs.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
                     <Download className="w-4 h-4 mr-2" />Excel
                   </Button>
                 </div>
               }
             />
-            {!tournamentRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
+
+            {/* Tournament filter */}
+            <div className="mb-6">
+              <Select value={tournamentRegFilter} onValueChange={setTournamentRegFilter}>
+                <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11 w-full md:w-80">
+                  <SelectValue placeholder="Filter by tournament" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-white/10">
+                  <SelectItem value="ALL" className="text-white">All Tournaments ({tournamentRegistrations.length})</SelectItem>
+                  {uniqueTournamentNames.map(name => {
+                    const count = tournamentRegistrations.filter(r => r.tournaments?.name === name).length;
+                    return <SelectItem key={name} value={name} className="text-white">{name} ({count})</SelectItem>;
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {!filteredTournamentRegs.length ? <p className="text-center text-gray-600 py-16">No registrations{tournamentRegFilter !== 'ALL' ? ' for this tournament' : ''} yet.</p> : (
               <T headers={['Date','Team Name','Tournament','Type','Division','Captain','Email','Phone','Players','Status','Actions']}>
-                {tournamentRegistrations.map(r => {
+                {filteredTournamentRegs.map(r => {
                   const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
                   return (
                     <TR key={r.id}>
