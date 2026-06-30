@@ -24,6 +24,7 @@ import LiveScores from './Pages/LiveScores';
 import Register from './Pages/Register';
 import TournamentRegistration from './Pages/TournamentRegistration';
 import ChampionsVsChallengersRegistration from './Pages/ChampionsVsChallengersRegistration';
+import YouthInvitationalRegistration from './Pages/YouthInvitationalRegistration';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDashboard from './Pages/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -58,6 +59,7 @@ const ComingSoon = () => (
 // Smart redirect: looks up the tournament name and routes to the correct
 // registration page. Falls back to the default tournament registration.
 const CHAMPIONS_VS_CHALLENGERS_NAME = 'KOTP and Ultimate Soccer Present: Champions vs Challengers';
+const YOUTH_INVITATIONAL_NAME = 'KOTP Youth Invitational';
 const WORLD_CUP_NAME = 'KOTP World Cup';
 
 function TournamentRedirect() {
@@ -75,6 +77,8 @@ function TournamentRedirect() {
 
         if (data?.name === CHAMPIONS_VS_CHALLENGERS_NAME) {
           setRedirectTo('/champions-vs-challengers-registration');
+        } else if (data?.name === YOUTH_INVITATIONAL_NAME) {
+          setRedirectTo('/youth-invitational-registration');
         } else {
           // Default: World Cup or any other tournament uses the original page
           setRedirectTo('/tournament-registration');
@@ -115,6 +119,7 @@ export default function App() {
           {/* Tournament registration pages */}
           <Route path="/tournament-registration" element={<TournamentRegistration />} />
           <Route path="/champions-vs-challengers-registration" element={<ChampionsVsChallengersRegistration />} />
+          <Route path="/youth-invitational-registration" element={<YouthInvitationalRegistration />} />
 
           <Route path="/moments" element={<Moments />} />
           <Route path="/about" element={<About />} />

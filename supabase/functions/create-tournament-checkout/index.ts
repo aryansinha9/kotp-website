@@ -5,6 +5,17 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
 
+// Tournaments that require the Champion/Challenger team_type field
+const TEAM_TYPE_TOURNAMENTS = [
+  'KOTP and Ultimate Soccer Present: Champions vs Challengers'
+]
+
+// Tournaments where the cancel URL has a custom path
+const CANCEL_URL_MAP: Record<string, string> = {
+  'KOTP and Ultimate Soccer Present: Champions vs Challengers': '/champions-vs-challengers-registration',
+  'KOTP Youth Invitational': '/youth-invitational-registration',
+}
+
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'))
   if (req.method === 'OPTIONS') {
@@ -36,15 +47,13 @@ serve(async (req: Request) => {
     const registrationData = await req.json()
     const {
       tournamentId, teamName, players, medicalInfo,
-      agreeTerms, signature, signatureDate, teamType
+      agreeTerms, signature, signatureDate, teamType, division
     } = registrationData
 
     // --- Server-side validation ---
     if (!tournamentId) throw new Error('Tournament ID is missing.')
     if (!teamName || typeof teamName !== 'string' || teamName.trim().length < 2)
       throw new Error('Invalid team name.')
-    if (!teamType || !['Champion', 'Challenger'].includes(teamType))
-      throw new Error('You must select either Champion or Challenger.')
     if (!agreeTerms) throw new Error('Terms must be agreed to.')
     if (!signature || typeof signature !== 'string' || signature.trim().length < 2)
       throw new Error('Signature is required.')
@@ -58,10 +67,29 @@ serve(async (req: Request) => {
 
     if (tournamentError || !tournament) throw new Error('Tournament not found.')
 
+    // Validate teamType only for tournaments that require it
+    if (TEAM_TYPE_TOURNAMENTS.includes(tournament.name)) {
+      if (!teamType || !['Champion', 'Challenger'].includes(teamType)) {
+        throw new Error('You must select either Champion or Challenger.')
+      }
+    }
+
+    // Validate division for tournaments that use it
+    const validDivisions = ['U12-14 7 Aside', 'U9-11s 5 Aside']
+    if (division && !validDivisions.includes(division)) {
+      throw new Error('Invalid division selected.')
+    }
+
     // Use dynamic player limits from the tournament record.
-    // Fall back to legacy defaults (7 min, 10 max) if columns don't exist yet.
-    const minPlayers = tournament.min_players ?? 7
+    // For Youth Invitational, override min based on division
+    let minPlayers = tournament.min_players ?? 7
     const maxPlayers = tournament.max_players ?? 10
+
+    if (division === 'U12-14 7 Aside') {
+      minPlayers = 7
+    } else if (division === 'U9-11s 5 Aside') {
+      minPlayers = 5
+    }
 
     if (!players || !Array.isArray(players) || players.length < minPlayers || players.length > maxPlayers) {
       throw new Error(`You must register between ${minPlayers} and ${maxPlayers} players.`)
@@ -88,9 +116,7 @@ serve(async (req: Request) => {
             if (!p.phone || typeof p.phone !== 'string' || p.phone.trim().length < 8) {
                 throw new Error('Captain must have a valid phone number.')
             }
-            if (!p.instagram || typeof p.instagram !== 'string' || p.instagram.trim().length < 1) {
-                throw new Error('Captain must provide an Instagram handle.')
-            }
+            // Instagram is optional — no validation required
             captainEmail = p.email.trim();
             captainName = `${p.firstName.trim()} ${p.lastName.trim()}`;
         }
@@ -103,23 +129,35 @@ serve(async (req: Request) => {
     const priceInCents = Math.round((tournament.entry_fee || 800) * 100)
 
     // 1. Insert into Supabase as "pending"
+    const insertData: Record<string, any> = {
+      tournament_id: tournamentId,
+      team_name: teamName.trim(),
+      players: players, // jsonb
+      medical_info: medicalInfo || null,
+      agreed_to_terms: agreeTerms,
+      signature: signature.trim(),
+      signature_date: signatureDate,
+      payment_status: 'pending'
+    }
+
+    // Only include optional fields if they have values
+    if (teamType) insertData.team_type = teamType
+    if (division) insertData.division = division
+
     const { data: record, error: dbError } = await supabaseAdmin
       .from('tournament_registrations')
-      .insert([{
-        tournament_id: tournamentId,
-        team_name: teamName.trim(),
-        team_type: teamType,
-        players: players, // jsonb 
-        medical_info: medicalInfo || null,
-        agreed_to_terms: agreeTerms,
-        signature: signature.trim(),
-        signature_date: signatureDate,
-        payment_status: 'pending'
-      }])
+      .insert([insertData])
       .select('id')
       .single()
 
     if (dbError) throw dbError
+
+    // Build description including division if present
+    const descParts = [`Team: ${teamName.trim()} — Captain: ${captainName}`]
+    if (division) descParts.push(`Division: ${division}`)
+
+    // Determine cancel URL
+    const cancelPath = CANCEL_URL_MAP[tournament.name] || '/tournament-registration'
 
     // 2. Create Stripe Checkout session with explicit AUD price_data
     const session = await stripe.checkout.sessions.create({
@@ -131,7 +169,7 @@ serve(async (req: Request) => {
             currency: 'aud',
             product_data: {
               name: `Tournament Registration: ${tournament.name}`,
-              description: `Team: ${teamName.trim()} — Captain: ${captainName}`,
+              description: descParts.join(' | '),
             },
             unit_amount: priceInCents,
           },
@@ -141,9 +179,7 @@ serve(async (req: Request) => {
       mode: 'payment',
       allow_promotion_codes: true,
       success_url: `${origin}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: tournament.name === 'KOTP and Ultimate Soccer Present: Champions vs Challengers'
-        ? `${origin}/champions-vs-challengers-registration?status=cancelled`
-        : `${origin}/tournament-registration?status=cancelled`,
+      cancel_url: `${origin}${cancelPath}?status=cancelled`,
       metadata: {
         registration_id: record.id,
         team_name: teamName.trim(),

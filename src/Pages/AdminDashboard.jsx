@@ -139,6 +139,12 @@ export default function AdminDashboard() {
     ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/20">Challenger</span>
     : <span className="text-gray-600 text-xs">—</span>;
 
+  const getDivisionBadge = d => d === 'U12-14 7 Aside'
+    ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FF6B00]/15 text-[#FF6B00] border border-[#FF6B00]/20">U12-14</span>
+    : d === 'U9-11s 5 Aside'
+    ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/20">U9-11s</span>
+    : null;
+
   const csvDown = (name, headers, rows) => { const c = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n'); const l = document.createElement('a'); l.setAttribute('href', encodeURI(c)); l.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(l); l.click(); document.body.removeChild(l); };
   const downloadParkleaCSV = () => { if (!parkleaRegistrations.length) return; csvDown('Parklea_Registrations', ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'], parkleaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'standard'),r.payment_status,r.participant_name,r.age_turning_2026,r.dob,r.team,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.jersey_size,r.shorts_size,r.socks_size,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
   const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
@@ -150,12 +156,13 @@ export default function AdminDashboard() {
     
     tournamentRegistrations.forEach(r => {
       // 1. Team Info Header Row
-      csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Team Type', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
+      csvContentRows.push(['TEAM SUMMARY', 'Tournament', 'Team Name', 'Team Type', 'Division', 'Div/Contact', 'Email', 'Phone', 'Payment Status', 'Agreed Terms', 'Signature Date', 'Signature']);
       csvContentRows.push([
         ' ',
         `"${(r.tournaments?.name || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.team_name || 'N/A').replace(/"/g, '""')}"`,
         r.team_type || 'N/A',
+        r.division || 'N/A',
         `"${(r.contact_person || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.email || 'N/A').replace(/"/g, '""')}"`,
         `"${(r.phone || 'N/A').replace(/"/g, '""')}"`,
@@ -209,7 +216,7 @@ export default function AdminDashboard() {
     const wb = XLSX.utils.book_new();
 
     // ── Sheet 1: Team Summary ─────────────────────────────────────────────────
-    const summaryHeaders = ['Date', 'Tournament', 'Team Name', 'Team Type', 'Captain', 'Email', 'Phone', 'Players', 'Medical Info', 'Payment Status', 'Agreed Terms', 'Signature', 'Signature Date'];
+    const summaryHeaders = ['Date', 'Tournament', 'Team Name', 'Team Type', 'Division', 'Captain', 'Email', 'Phone', 'Players', 'Medical Info', 'Payment Status', 'Agreed Terms', 'Signature', 'Signature Date'];
     const summaryRows = tournamentRegistrations.map(r => {
       const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
       return [
@@ -217,6 +224,7 @@ export default function AdminDashboard() {
         r.tournaments?.name || 'N/A',
         r.team_name || 'N/A',
         r.team_type || 'N/A',
+        r.division || 'N/A',
         captain ? `${captain.firstName} ${captain.lastName}` : 'N/A',
         captain?.email || 'N/A',
         captain?.phone || 'N/A',
@@ -230,11 +238,11 @@ export default function AdminDashboard() {
     });
     const summarySheet = XLSX.utils.aoa_to_sheet([summaryHeaders, ...summaryRows]);
     // Column widths
-    summarySheet['!cols'] = [10,30,20,12,22,28,16,8,40,14,12,24,14].map(w => ({ wch: w }));
+    summarySheet['!cols'] = [10,30,20,12,16,22,28,16,8,40,14,12,24,14].map(w => ({ wch: w }));
     XLSX.utils.book_append_sheet(wb, summarySheet, 'Team Summary');
 
     // ── Sheet 2: Full Roster ──────────────────────────────────────────────────
-    const rosterHeaders = ['Tournament', 'Team Name', 'Team Type', 'Payment Status', 'Player #', 'First Name', 'Last Name', 'Role', 'Email', 'Phone', 'Instagram'];
+    const rosterHeaders = ['Tournament', 'Team Name', 'Team Type', 'Division', 'Payment Status', 'Player #', 'First Name', 'Last Name', 'Role', 'Email', 'Phone', 'Instagram'];
     const rosterRows = [];
     tournamentRegistrations.forEach(r => {
       if (Array.isArray(r.players)) {
@@ -243,6 +251,7 @@ export default function AdminDashboard() {
             r.tournaments?.name || 'N/A',
             r.team_name || 'N/A',
             r.team_type || 'N/A',
+            r.division || 'N/A',
             r.payment_status || 'N/A',
             idx + 1,
             p.firstName || '',
@@ -256,7 +265,7 @@ export default function AdminDashboard() {
       }
     });
     const rosterSheet = XLSX.utils.aoa_to_sheet([rosterHeaders, ...rosterRows]);
-    rosterSheet['!cols'] = [30,20,12,14,8,14,14,8,28,16,16].map(w => ({ wch: w }));
+    rosterSheet['!cols'] = [30,20,12,16,14,8,14,14,8,28,16,16].map(w => ({ wch: w }));
     XLSX.utils.book_append_sheet(wb, rosterSheet, 'Full Roster');
 
     XLSX.writeFile(wb, `Tournament_Registrations_${new Date().toISOString().split('T')[0]}.xlsx`);
@@ -431,7 +440,7 @@ export default function AdminDashboard() {
               }
             />
             {!tournamentRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
-              <T headers={['Date','Team Name','Tournament','Type','Captain','Email','Phone','Players','Status','Actions']}>
+              <T headers={['Date','Team Name','Tournament','Type','Division','Captain','Email','Phone','Players','Status','Actions']}>
                 {tournamentRegistrations.map(r => {
                   const captain = Array.isArray(r.players) ? r.players.find(p => p.isCaptain) : null;
                   return (
@@ -440,6 +449,7 @@ export default function AdminDashboard() {
                       <TD className="font-semibold text-white">{r.team_name||'N/A'}</TD>
                       <TD>{r.tournaments?.name||'N/A'}</TD>
                       <TD>{getTeamTypeBadge(r.team_type)}</TD>
+                      <TD>{getDivisionBadge(r.division) || <span className="text-gray-600 text-xs">—</span>}</TD>
                       <TD>{captain ? `${captain.firstName} ${captain.lastName}` : 'N/A'}</TD>
                       <TD>{captain?.email ? <a href={`mailto:${captain.email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a> : 'N/A'}</TD>
                       <TD>{captain?.phone ? <a href={`tel:${captain.phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a> : 'N/A'}</TD>
