@@ -50,6 +50,7 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [tournamentRegistrations, setTournamentRegistrations] = useState([]);
   const [tournamentRegFilter, setTournamentRegFilter] = useState('ALL');
+  const [academyProgram, setAcademyProgram] = useState('parklea');
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
   const [holidayRegistrations, setHolidayRegistrations] = useState([]);
   const [aiaRegistrations, setAiaRegistrations] = useState([]);
@@ -155,9 +156,45 @@ export default function AdminDashboard() {
   const uniqueTournamentNames = [...new Set(tournamentRegistrations.map(r => r.tournaments?.name).filter(Boolean))];
 
   const csvDown = (name, headers, rows) => { const c = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n'); const l = document.createElement('a'); l.setAttribute('href', encodeURI(c)); l.setAttribute('download', `${name}_${new Date().toISOString().split('T')[0]}.csv`); document.body.appendChild(l); l.click(); document.body.removeChild(l); };
-  const downloadParkleaCSV = () => { if (!parkleaRegistrations.length) return; csvDown('Parklea_Registrations', ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'], parkleaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'standard'),r.payment_status,r.participant_name,r.age_turning_2026,r.dob,r.team,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.jersey_size,r.shorts_size,r.socks_size,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
-  const downloadHolCSV = () => { if (!holidayRegistrations.length) return; csvDown('Holiday_Registrations', ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'], holidayRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),(r.package_type||'Custom'),`$${r.total_amount||0}`,r.payment_status,`"${(r.selected_days||'').replace(/"/g,'""')}"`,r.participant_name,r.age_turning_2026,r.dob,r.position,r.parent_name,r.parent_phone,r.parent_email,r.emergency_contact,`"${(r.home_address||'').replace(/"/g,'""')}"`,r.has_medical_condition,`"${(r.medical_description||'').replace(/"/g,'""')}"`,r.has_medication,`"${(r.medication_details||'').replace(/"/g,'""')}"`,r.signature])); };
-  const downloadAIACSV = () => { if (!aiaRegistrations.length) return; csvDown('AIA_Registrations', ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'], aiaRegistrations.map(r => [new Date(r.created_at).toLocaleDateString(),r.payment_status,r.participant_first_name,r.participant_last_name,r.dob,(r.year_group||'').replace('-',' '),r.parent_first_name,r.parent_last_name,r.parent_phone,r.parent_email,`"${(r.street_address||'').replace(/"/g,'""')}"`,r.city,r.state,r.postal_code,`"${(r.allergies||'').replace(/"/g,'""')}"`,`"${(r.inhaler||'').replace(/"/g,'""')}"`,r.signature])); };
+
+  // ── Academy programs (each keeps its own table/data — grouped only for navigation/export) ──
+  const academyPrograms = {
+    parklea: { label: 'Parklea Program', data: parkleaRegistrations },
+    holiday: { label: 'Holiday Program', data: holidayRegistrations },
+    aia: { label: 'AIA After School Program', data: aiaRegistrations },
+  };
+  const academyExports = {
+    parklea: {
+      name: 'Parklea_Registrations',
+      headers: ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'],
+      mapRow: r => [new Date(r.created_at).toLocaleDateString(), r.package_type||'standard', r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.team, r.position, r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, r.home_address||'', r.jersey_size, r.shorts_size, r.socks_size, r.has_medical_condition, r.medical_description||'', r.has_medication, r.medication_details||'', r.signature],
+    },
+    holiday: {
+      name: 'Holiday_Registrations',
+      headers: ['Date','Package','Total','Status','Selected Days','Participant','Age','DOB','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Medical?','Medical Details','Medication?','Medication Details','Signature'],
+      mapRow: r => [new Date(r.created_at).toLocaleDateString(), r.package_type||'Custom', `$${r.total_amount||0}`, r.payment_status, r.selected_days||'', r.participant_name, r.age_turning_2026, r.dob, r.position, r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, r.home_address||'', r.has_medical_condition, r.medical_description||'', r.has_medication, r.medication_details||'', r.signature],
+    },
+    aia: {
+      name: 'AIA_Registrations',
+      headers: ['Date','Status','First Name','Last Name','DOB','Year Group','Parent First','Parent Last','Phone','Email','Address','City','State','Postcode','Allergies','Inhaler','Signature'],
+      mapRow: r => [new Date(r.created_at).toLocaleDateString(), r.payment_status, r.participant_first_name, r.participant_last_name, r.dob, (r.year_group||'').replace('-',' '), r.parent_first_name, r.parent_last_name, r.parent_phone, r.parent_email, r.street_address||'', r.city, r.state, r.postal_code, r.allergies||'', r.inhaler||'', r.signature],
+    },
+  };
+  const csvCell = v => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const exportAcademyCSV = (key) => {
+    const { data } = academyPrograms[key]; const { name, headers, mapRow } = academyExports[key];
+    if (!data.length) return;
+    csvDown(name, headers, data.map(r => mapRow(r).map(csvCell)));
+  };
+  const exportAcademyXLSX = (key) => {
+    const { data } = academyPrograms[key]; const { name, headers, mapRow } = academyExports[key];
+    if (!data.length) return;
+    const wb = XLSX.utils.book_new();
+    const sheet = XLSX.utils.aoa_to_sheet([headers, ...data.map(mapRow)]);
+    sheet['!cols'] = headers.map(h => ({ wch: Math.max(12, h.length + 6) }));
+    XLSX.utils.book_append_sheet(wb, sheet, 'Registrations');
+    XLSX.writeFile(wb, `${name}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
   const downloadTournamentCSV = () => {
     if (!filteredTournamentRegs.length) return;
     
@@ -352,9 +389,7 @@ export default function AdminDashboard() {
   const navGroups = [
     { label: 'Dashboard', items: [{ key: 'overview', label: 'Overview', icon: LayoutDashboard }] },
     { label: 'Registrations', items: [
-      { key: 'parklea', label: 'Parklea Program', icon: ClipboardList, count: parkleaRegistrations.length },
-      { key: 'holiday', label: 'Holiday Program', icon: ClipboardList, count: holidayRegistrations.length },
-      { key: 'aia', label: 'AIA After School', icon: ClipboardList, count: aiaRegistrations.length },
+      { key: 'academy', label: 'Academy', icon: ClipboardList, count: parkleaRegistrations.length + holidayRegistrations.length + aiaRegistrations.length },
       { key: 'tournaments', label: 'Tournaments', icon: Users, count: tournamentRegistrations.length },
     ]},
     { label: 'Management', items: [
@@ -364,7 +399,7 @@ export default function AdminDashboard() {
     ]},
   ];
 
-  const sectionTitle = { overview: 'Overview', parklea: 'Parklea Program', holiday: 'Holiday Program', aia: 'AIA After School', tournaments: 'Tournament Registrations', scores: 'Score Control', gallery: 'Gallery', reels: 'Featured Reels' };
+  const sectionTitle = { overview: 'Overview', academy: 'Academy Registrations', tournaments: 'Tournament Registrations', scores: 'Score Control', gallery: 'Gallery', reels: 'Featured Reels' };
 
   const SectionHeader = ({ title, count, action }) => (
     <div className="flex items-start justify-between mb-6">
@@ -380,9 +415,9 @@ export default function AdminDashboard() {
           <div className="space-y-8">
             <div><h2 className="headline-font text-3xl text-white mb-1">Welcome back</h2><p className="text-gray-500 text-sm">Here's what's happening across all programs.</p></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-              <StatCard title="Parklea Program" icon={ClipboardList} total={parkleaRegistrations.length} paid={paidCount(parkleaRegistrations)} pending={pendingCount(parkleaRegistrations)} onClick={() => setActiveSection('parklea')} delay={0} />
-              <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => setActiveSection('holiday')} delay={0.08} />
-              <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => setActiveSection('aia')} delay={0.16} />
+              <StatCard title="Parklea Program" icon={ClipboardList} total={parkleaRegistrations.length} paid={paidCount(parkleaRegistrations)} pending={pendingCount(parkleaRegistrations)} onClick={() => { setAcademyProgram('parklea'); setActiveSection('academy'); }} delay={0} />
+              <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => { setAcademyProgram('holiday'); setActiveSection('academy'); }} delay={0.08} />
+              <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => { setAcademyProgram('aia'); setActiveSection('academy'); }} delay={0.16} />
               <StatCard title="Tournament Regs" icon={Users} total={tournamentRegistrations.length} paid={paidCount(tournamentRegistrations)} pending={pendingCount(tournamentRegistrations)} onClick={() => setActiveSection('tournaments')} delay={0.24} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -397,41 +432,55 @@ export default function AdminDashboard() {
           </div>
         );
 
-      case 'parklea':
+      case 'academy': {
+        const prog = academyPrograms[academyProgram];
         return (
           <div>
-            <SectionHeader title="Parklea Program" count={parkleaRegistrations.length} action={<Button onClick={downloadParkleaCSV} disabled={!parkleaRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
-            {!parkleaRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
+            <SectionHeader
+              title={prog.label}
+              count={prog.data.length}
+              action={
+                <div className="flex gap-2">
+                  <Button onClick={() => exportAcademyCSV(academyProgram)} disabled={!prog.data.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                    <Download className="w-4 h-4 mr-2" />CSV
+                  </Button>
+                  <Button onClick={() => exportAcademyXLSX(academyProgram)} disabled={!prog.data.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font">
+                    <Download className="w-4 h-4 mr-2" />Excel
+                  </Button>
+                </div>
+              }
+            />
+
+            {/* Academy program selector */}
+            <div className="mb-6">
+              <Select value={academyProgram} onValueChange={setAcademyProgram}>
+                <SelectTrigger className="bg-[#0a0a0a] border-white/10 text-white h-11 w-full md:w-80">
+                  <SelectValue placeholder="Select program" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-white/10">
+                  {Object.entries(academyPrograms).map(([key, p]) => (
+                    <SelectItem key={key} value={key} className="text-white">{p.label} ({p.data.length})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {!prog.data.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : academyProgram === 'parklea' ? (
               <T headers={['Date','Package','Participant','Age','Team','Parent','Email','Phone','Status','Actions']}>
                 {parkleaRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{r.package_type||'standard'}</TD><TD className="font-semibold text-white">{r.participant_name}</TD><TD>{r.age_turning_2026}</TD><TD>{r.team||'N/A'}</TD><TD>{r.parent_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenu reg={r} /></TD></TR>)}
               </T>
-            )}
-          </div>
-        );
-
-      case 'holiday':
-        return (
-          <div>
-            <SectionHeader title="Holiday Program" count={holidayRegistrations.length} action={<Button onClick={downloadHolCSV} disabled={!holidayRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
-            {!holidayRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
+            ) : academyProgram === 'holiday' ? (
               <T headers={['Date','Package','Total','Days','Participant','Age','Parent','Email','Phone','Status','Actions']}>
                 {holidayRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{r.package_type||'Custom'}</TD><TD>${r.total_amount||0}</TD><TD>{(r.selected_days||'').split(',').length} days</TD><TD className="font-semibold text-white">{r.participant_name}</TD><TD>{r.age_turning_2026}</TD><TD>{r.parent_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuHoliday reg={r} /></TD></TR>)}
               </T>
-            )}
-          </div>
-        );
-
-      case 'aia':
-        return (
-          <div>
-            <SectionHeader title="AIA After School Program" count={aiaRegistrations.length} action={<Button onClick={downloadAIACSV} disabled={!aiaRegistrations.length} className="bg-[#1a1a1a] border border-white/10 text-white hover:bg-white/5 headline-font"><Download className="w-4 h-4 mr-2" />Export CSV</Button>} />
-            {!aiaRegistrations.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : (
+            ) : (
               <T headers={['Date','Year Group','Participant','DOB','Parent','Email','Phone','Status','Actions']}>
                 {aiaRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{(r.year_group||'').replace('-',' ')}</TD><TD className="font-semibold text-white">{r.participant_first_name} {r.participant_last_name}</TD><TD>{r.dob}</TD><TD>{r.parent_first_name} {r.parent_last_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuAIA reg={r} /></TD></TR>)}
               </T>
             )}
           </div>
         );
+      }
 
       case 'tournaments':
         return (
