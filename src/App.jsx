@@ -16,6 +16,7 @@ import Sponsors from './Pages/Sponsors';
 import About from './Pages/About';
 import Academy from './Pages/Academy';
 import ParkleaProgram from './Pages/ParkleaProgram';
+import OffSeasonSummerProgram from './Pages/OffSeasonSummerProgram';
 import HolidayProgram from './Pages/HolidayProgram';
 import AIAAfterSchoolProgram from './Pages/AIAAfterSchoolProgram';
 import Contact from './Pages/Contact';
@@ -125,6 +126,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/academy" element={<Academy />} />
           <Route path="/academy/parklea" element={<ParkleaProgram />} />
+          <Route path="/academy/off-season-summer" element={<OffSeasonSummerProgram />} />
           <Route path="/holiday-program" element={<HolidayProgram />} />
           <Route path="/academy/aia-after-school" element={<AIAAfterSchoolProgram />} />
           <Route path="/sponsors" element={<Sponsors />} />

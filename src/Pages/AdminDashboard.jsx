@@ -52,6 +52,7 @@ export default function AdminDashboard() {
   const [tournamentRegFilter, setTournamentRegFilter] = useState('ALL');
   const [academyProgram, setAcademyProgram] = useState('parklea');
   const [parkleaRegistrations, setParkleaRegistrations] = useState([]);
+  const [offseasonRegistrations, setOffseasonRegistrations] = useState([]);
   const [holidayRegistrations, setHolidayRegistrations] = useState([]);
   const [aiaRegistrations, setAiaRegistrations] = useState([]);
   const [reels, setReels] = useState([]);
@@ -90,15 +91,16 @@ export default function AdminDashboard() {
         data.sort((a, b) => { const w = r => { const p = r.payment_status === 'successful' || r.payment_status === 'paid'; const s = !r.package_type || r.package_type === 'standard'; return p && s ? 1 : p ? 2 : s ? 3 : 4; }; return w(a) - w(b); });
         return data;
       };
-      const [tournRegData, reelData, allT, parkleaData, holidayData, aiaData] = await Promise.all([
+      const [tournRegData, reelData, allT, parkleaData, offseasonData, holidayData, aiaData] = await Promise.all([
         supabase.from('tournament_registrations').select('*, tournaments(name)').order('created_at', { ascending: false }).then(res => res.data || []),
         FeaturedReel.list(), Tournament.list('start_date'),
         supabase.from('parklea_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
+        supabase.from('offseason_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
         supabase.from('holiday_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
         supabase.from('aia_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
       ]);
       setTournamentRegistrations(tournRegData); setParkleaRegistrations(parkleaData); setHolidayRegistrations(holidayData);
-      setAiaRegistrations(aiaData); setReels(reelData);
+      setOffseasonRegistrations(offseasonData); setAiaRegistrations(aiaData); setReels(reelData);
       setCompletedTournaments(allT.filter(t => t.status === 'completed'));
       setOngoingTournaments(allT.filter(t => t.status === 'ongoing'));
     } catch (e) { console.error(e); } finally { setLoading(false); }
@@ -160,12 +162,18 @@ export default function AdminDashboard() {
   // ── Academy programs (each keeps its own table/data — grouped only for navigation/export) ──
   const academyPrograms = {
     parklea: { label: 'Parklea Program', data: parkleaRegistrations },
+    offseason: { label: 'Off-season Summer Program', data: offseasonRegistrations },
     holiday: { label: 'Holiday Program', data: holidayRegistrations },
     aia: { label: 'AIA After School Program', data: aiaRegistrations },
   };
   const academyExports = {
     parklea: {
       name: 'Parklea_Registrations',
+      headers: ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'],
+      mapRow: r => [new Date(r.created_at).toLocaleDateString(), r.package_type||'standard', r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.team, r.position, r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, r.home_address||'', r.jersey_size, r.shorts_size, r.socks_size, r.has_medical_condition, r.medical_description||'', r.has_medication, r.medication_details||'', r.signature],
+    },
+    offseason: {
+      name: 'OffSeason_Summer_Registrations',
       headers: ['Date','Package','Status','Participant','Age','DOB','Team','Position','Parent Name','Parent Phone','Parent Email','Emergency Contact','Address','Jersey','Shorts','Socks','Medical?','Medical Details','Medication?','Medication Details','Signature'],
       mapRow: r => [new Date(r.created_at).toLocaleDateString(), r.package_type||'standard', r.payment_status, r.participant_name, r.age_turning_2026, r.dob, r.team, r.position, r.parent_name, r.parent_phone, r.parent_email, r.emergency_contact, r.home_address||'', r.jersey_size, r.shorts_size, r.socks_size, r.has_medical_condition, r.medical_description||'', r.has_medication, r.medication_details||'', r.signature],
     },
@@ -336,6 +344,7 @@ export default function AdminDashboard() {
     setSubmittingReel(false);
   };
   const handleDeleteParkleaRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('parklea_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
+  const handleDeleteOffseasonRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('offseason_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteHolidayRegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('holiday_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteAIARegistration = async id => { if (window.confirm('Delete this registration?')) { const { error } = await supabase.from('aia_program_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
   const handleDeleteTournamentRegistration = async id => { if (window.confirm('Delete this registration? This cannot be undone.')) { const { error } = await supabase.from('tournament_registrations').delete().eq('id', id); if (error) alert(error.message); else await loadData(); } };
@@ -356,6 +365,11 @@ export default function AdminDashboard() {
     const [open, setOpen] = useState(false);
     const copy = () => { navigator.clipboard.writeText(`Name: ${reg.participant_name}\nTeam: ${reg.team||'N/A'}\nAge: ${reg.age_turning_2026}\nParent: ${reg.parent_name}\nEmail: ${reg.parent_email}\nPhone: ${reg.parent_phone}\nSize: Jersey(${reg.jersey_size}) Shorts(${reg.shorts_size}) Socks(${reg.socks_size})\nMedical: ${reg.has_medical_condition==='yes'?reg.medical_description:'None'}\nStatus: ${reg.payment_status}`); setOpen(false); alert('Copied!'); };
     return <div className="relative"><button onClick={() => setOpen(!open)} className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5"><MoreVertical className="w-4 h-4" /></button>{open && (<><div className="fixed inset-0 z-10" onClick={() => setOpen(false)} /><div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"><button onClick={copy} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2"><Copy className="w-3.5 h-3.5" />Copy</button><button onClick={() => { setOpen(false); handleDeleteParkleaRegistration(reg.id); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/5"><Trash2 className="w-3.5 h-3.5" />Delete</button></div></>)}</div>;
+  };
+  const ActionMenuOffseason = ({ reg }) => {
+    const [open, setOpen] = useState(false);
+    const copy = () => { navigator.clipboard.writeText(`Name: ${reg.participant_name}\nTeam: ${reg.team||'N/A'}\nAge: ${reg.age_turning_2026}\nParent: ${reg.parent_name}\nEmail: ${reg.parent_email}\nPhone: ${reg.parent_phone}\nSize: Jersey(${reg.jersey_size}) Shorts(${reg.shorts_size}) Socks(${reg.socks_size})\nMedical: ${reg.has_medical_condition==='yes'?reg.medical_description:'None'}\nStatus: ${reg.payment_status}`); setOpen(false); alert('Copied!'); };
+    return <div className="relative"><button onClick={() => setOpen(!open)} className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5"><MoreVertical className="w-4 h-4" /></button>{open && (<><div className="fixed inset-0 z-10" onClick={() => setOpen(false)} /><div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"><button onClick={copy} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2"><Copy className="w-3.5 h-3.5" />Copy</button><button onClick={() => { setOpen(false); handleDeleteOffseasonRegistration(reg.id); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/5"><Trash2 className="w-3.5 h-3.5" />Delete</button></div></>)}</div>;
   };
   const ActionMenuHoliday = ({ reg }) => {
     const [open, setOpen] = useState(false);
@@ -389,7 +403,7 @@ export default function AdminDashboard() {
   const navGroups = [
     { label: 'Dashboard', items: [{ key: 'overview', label: 'Overview', icon: LayoutDashboard }] },
     { label: 'Registrations', items: [
-      { key: 'academy', label: 'Academy', icon: ClipboardList, count: parkleaRegistrations.length + holidayRegistrations.length + aiaRegistrations.length },
+      { key: 'academy', label: 'Academy', icon: ClipboardList, count: parkleaRegistrations.length + offseasonRegistrations.length + holidayRegistrations.length + aiaRegistrations.length },
       { key: 'tournaments', label: 'Tournaments', icon: Users, count: tournamentRegistrations.length },
     ]},
     { label: 'Management', items: [
@@ -416,9 +430,10 @@ export default function AdminDashboard() {
             <div><h2 className="headline-font text-3xl text-white mb-1">Welcome back</h2><p className="text-gray-500 text-sm">Here's what's happening across all programs.</p></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
               <StatCard title="Parklea Program" icon={ClipboardList} total={parkleaRegistrations.length} paid={paidCount(parkleaRegistrations)} pending={pendingCount(parkleaRegistrations)} onClick={() => { setAcademyProgram('parklea'); setActiveSection('academy'); }} delay={0} />
-              <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => { setAcademyProgram('holiday'); setActiveSection('academy'); }} delay={0.08} />
-              <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => { setAcademyProgram('aia'); setActiveSection('academy'); }} delay={0.16} />
-              <StatCard title="Tournament Regs" icon={Users} total={tournamentRegistrations.length} paid={paidCount(tournamentRegistrations)} pending={pendingCount(tournamentRegistrations)} onClick={() => setActiveSection('tournaments')} delay={0.24} />
+              <StatCard title="Off-season Summer" icon={ClipboardList} total={offseasonRegistrations.length} paid={paidCount(offseasonRegistrations)} pending={pendingCount(offseasonRegistrations)} onClick={() => { setAcademyProgram('offseason'); setActiveSection('academy'); }} delay={0.08} />
+              <StatCard title="Holiday Program" icon={ClipboardList} total={holidayRegistrations.length} paid={paidCount(holidayRegistrations)} pending={pendingCount(holidayRegistrations)} onClick={() => { setAcademyProgram('holiday'); setActiveSection('academy'); }} delay={0.16} />
+              <StatCard title="AIA After School" icon={ClipboardList} total={aiaRegistrations.length} paid={paidCount(aiaRegistrations)} pending={pendingCount(aiaRegistrations)} onClick={() => { setAcademyProgram('aia'); setActiveSection('academy'); }} delay={0.24} />
+              <StatCard title="Tournament Regs" icon={Users} total={tournamentRegistrations.length} paid={paidCount(tournamentRegistrations)} pending={pendingCount(tournamentRegistrations)} onClick={() => setActiveSection('tournaments')} delay={0.32} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[{key:'scores',label:'Score Control',icon:Trophy,desc:'Manage live game scores'},{key:'gallery',label:'Gallery',icon:Upload,desc:'Upload tournament media'},{key:'reels',label:'Featured Reels',icon:Film,desc:`${reels.length} reels published`}].map(({ key, label, icon: Icon, desc }) => (
@@ -468,6 +483,10 @@ export default function AdminDashboard() {
             {!prog.data.length ? <p className="text-center text-gray-600 py-16">No registrations yet.</p> : academyProgram === 'parklea' ? (
               <T headers={['Date','Package','Participant','Age','Team','Parent','Email','Phone','Status','Actions']}>
                 {parkleaRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{r.package_type||'standard'}</TD><TD className="font-semibold text-white">{r.participant_name}</TD><TD>{r.age_turning_2026}</TD><TD>{r.team||'N/A'}</TD><TD>{r.parent_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenu reg={r} /></TD></TR>)}
+              </T>
+            ) : academyProgram === 'offseason' ? (
+              <T headers={['Date','Package','Participant','Age','Team','Parent','Email','Phone','Status','Actions']}>
+                {offseasonRegistrations.map(r => <TR key={r.id}><TD>{new Date(r.created_at).toLocaleDateString()}</TD><TD className="capitalize text-gray-400">{r.package_type||'standard'}</TD><TD className="font-semibold text-white">{r.participant_name}</TD><TD>{r.age_turning_2026}</TD><TD>{r.team||'N/A'}</TD><TD>{r.parent_name}</TD><TD><a href={`mailto:${r.parent_email}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Email</a></TD><TD><a href={`tel:${r.parent_phone}`} className="text-[#FF6B00] hover:underline flex items-center gap-1"><Phone className="w-3.5 h-3.5" />Call</a></TD><TD>{getStatusBadge(r.payment_status)}</TD><TD><ActionMenuOffseason reg={r} /></TD></TR>)}
               </T>
             ) : academyProgram === 'holiday' ? (
               <T headers={['Date','Package','Total','Days','Participant','Age','Parent','Email','Phone','Status','Actions']}>

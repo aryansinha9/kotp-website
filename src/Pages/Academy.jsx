@@ -165,6 +165,12 @@ export default function Academy() {
             linkTo: "/academy/parklea" 
         },
         {
+            title: "Off-season Summer Program",
+            description: "The Off-season Summer Program is built to keep players sharp, fit, and confident through the summer break. Running every Friday night from 6:30pm to 7:30pm at Morgan Power Reserve, each session blends technical repetition, small-sided game play, and conditioning so players return to pre-season ahead of the pack instead of playing catch-up. The relaxed summer format keeps training enjoyable while still holding players to a high standard, making it ideal for anyone who wants to maintain their touch, sharpen their decision-making, and build real momentum heading into the new season.",
+            price: "$22 per week",
+            linkTo: "/academy/off-season-summer"
+        },
+        {
             title: "AIA After School Program",
             description: "A structured after-school football program run at AIA, focused on developing players' technical skills, game awareness, and confidence in a fun and supportive environment. Sessions are designed to help students improve their football ability while staying active and engaged after school.",
             price: "$125",
