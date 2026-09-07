@@ -11,9 +11,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/supabaseClient";
 
 const holidayDays = [
-    "Mon 6 Jul", "Tue 7 Jul", "Wed 8 Jul", "Thu 9 Jul", "Fri 10 Jul",
-    "Mon 13 Jul", "Tue 14 Jul", "Wed 15 Jul", "Thu 16 Jul", "Fri 17 Jul"
+    "Mon 28 Sep", "Tue 29 Sep", "Wed 30 Sep", "Thu 1 Oct", "Fri 2 Oct", "Sat 3 Oct", "Sun 4 Oct",
+    "Mon 5 Oct", "Tue 6 Oct", "Wed 7 Oct", "Thu 8 Oct", "Fri 9 Oct", "Sat 10 Oct", "Sun 11 Oct"
 ];
+
+const DAY_RATE = 35;
+
+const holidayPackages = [
+    { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
+    { days: 10, price: 250, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
+    { days: 14, price: 300, label: "Full Program Package (14 Days)", extraLabel: null }
+];
+
+const getPricing = (dayCount) => {
+    if (dayCount === 0) return { total: 0, packageType: "Single Days" };
+
+    const exact = holidayPackages.find(p => p.days === dayCount);
+    if (exact) return { total: exact.price, packageType: exact.label };
+
+    const base = [...holidayPackages].reverse().find(p => p.days < dayCount);
+    let total = base ? base.price + ((dayCount - base.days) * DAY_RATE) : dayCount * DAY_RATE;
+    const packageType = base?.extraLabel ?? "Single Days";
+
+    // Never charge more than a larger package that already covers these days.
+    const nextUp = holidayPackages.find(p => p.days > dayCount);
+    if (nextUp && nextUp.price < total) total = nextUp.price;
+
+    return { total, packageType };
+};
 
 export default function HolidayProgram() {
     const [formData, setFormData] = useState({
@@ -61,19 +86,8 @@ export default function HolidayProgram() {
     };
 
     const dayCount = formData.selectedDays.length;
-    let calculatedTotal = dayCount * 35;
-    let packageDisplay = "Single Days";
-
-    if (dayCount === 5) {
-        calculatedTotal = 150;
-        packageDisplay = "1 Week Package (5 Days)";
-    } else if (dayCount > 5 && dayCount < 10) {
-        calculatedTotal = 150 + ((dayCount - 5) * 35);
-        packageDisplay = "1 Week + Extra Days";
-    } else if (dayCount === 10) {
-        calculatedTotal = 280;
-        packageDisplay = "2 Week Package (10 Days)";
-    }
+    const { total: calculatedTotal, packageType: packageDisplay } = getPricing(dayCount);
+    const perDayRate = dayCount > 0 ? calculatedTotal / dayCount : 0;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -242,7 +256,7 @@ export default function HolidayProgram() {
                                 <Calendar className="w-5 h-5 text-[#FF6B00]" />
                                 <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider m-0">Select Program Days</h3>
                             </div>
-                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Note: 5 days (1 week) is a $150 package, 10 days (2 weeks) is a $280 package, and single days are $35/day.</p>
+                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Single days are $35/day, 5 days is a $150 package, 10 days is a $250 package, and all 14 days is a $300 flat package.</p>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                 {holidayDays.map((day) => {
@@ -273,6 +287,7 @@ export default function HolidayProgram() {
                                     <div className="text-center sm:text-right">
                                         <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">Total Due</p>
                                         <p className="text-3xl text-[#FF6B00] headline-font">${calculatedTotal}</p>
+                                        <p className="text-gray-500 text-xs mt-1">${perDayRate.toFixed(2)} per day</p>
                                     </div>
                                 </motion.div>
                             )}

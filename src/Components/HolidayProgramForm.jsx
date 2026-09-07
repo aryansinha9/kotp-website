@@ -25,66 +25,96 @@ const products = [
     id: "two-weeks",
     name: "KOTP Ultimate - TWO Full Weeks (10 Days)",
     description: "The ULTIMATE package for fun. 10 full days of hard work, learning and laughs.",
-    price: 280.00
+    price: 250.00
+  },
+  {
+    id: "full-program",
+    name: "KOTP Complete - THE FULL PROGRAM (14 Days)",
+    description: "Every single day of the program. 14 full days of hard work, learning and laughs for one flat price.",
+    price: 300.00
   },
   {
     id: "day-1",
-    name: "KOTP Holiday Program - Monday 6/7/2026",
+    name: "KOTP Holiday Program - Monday 28/9/2026",
     description: "9am - 3pm: Monday Day 1",
     price: 35.00
   },
   {
     id: "day-2",
-    name: "KOTP Holiday Program - Tuesday 7/7/2026",
+    name: "KOTP Holiday Program - Tuesday 29/9/2026",
     description: "9am - 3pm: Tuesday Day 2",
     price: 35.00
   },
   {
     id: "day-3",
-    name: "KOTP Holiday Program - Wednesday 8/7/2026",
+    name: "KOTP Holiday Program - Wednesday 30/9/2026",
     description: "9am - 3pm: Wednesday Day 3",
     price: 35.00
   },
   {
     id: "day-4",
-    name: "KOTP Holiday Program - Thursday 9/7/2026",
+    name: "KOTP Holiday Program - Thursday 1/10/2026",
     description: "9am - 3pm: Thursday Day 4",
     price: 35.00
   },
   {
     id: "day-5",
-    name: "KOTP Holiday Program - Friday 10/7/2026",
+    name: "KOTP Holiday Program - Friday 2/10/2026",
     description: "9am - 3pm: Friday Day 5",
     price: 35.00
   },
   {
     id: "day-6",
-    name: "KOTP Holiday Program - Monday 13/7/2026",
-    description: "9am - 3pm: Monday Day 6",
+    name: "KOTP Holiday Program - Saturday 3/10/2026",
+    description: "9am - 3pm: Saturday Day 6",
     price: 35.00
   },
   {
     id: "day-7",
-    name: "KOTP Holiday Program - Tuesday 14/7/2026",
-    description: "9am - 3pm: Tuesday Day 7",
+    name: "KOTP Holiday Program - Sunday 4/10/2026",
+    description: "9am - 3pm: Sunday Day 7",
     price: 35.00
   },
   {
     id: "day-8",
-    name: "KOTP Holiday Program - Wednesday 15/7/2026",
-    description: "9am - 3pm: Wednesday Day 8",
+    name: "KOTP Holiday Program - Monday 5/10/2026",
+    description: "9am - 3pm: Monday Day 8",
     price: 35.00
   },
   {
     id: "day-9",
-    name: "KOTP Holiday Program - Thursday 16/7/2026",
-    description: "9am - 3pm: Thursday Day 9",
+    name: "KOTP Holiday Program - Tuesday 6/10/2026",
+    description: "9am - 3pm: Tuesday Day 9",
     price: 35.00
   },
   {
     id: "day-10",
-    name: "KOTP Holiday Program - Friday 17/7/2026",
-    description: "9am - 3pm: Friday Day 10",
+    name: "KOTP Holiday Program - Wednesday 7/10/2026",
+    description: "9am - 3pm: Wednesday Day 10",
+    price: 35.00
+  },
+  {
+    id: "day-11",
+    name: "KOTP Holiday Program - Thursday 8/10/2026",
+    description: "9am - 3pm: Thursday Day 11",
+    price: 35.00
+  },
+  {
+    id: "day-12",
+    name: "KOTP Holiday Program - Friday 9/10/2026",
+    description: "9am - 3pm: Friday Day 12",
+    price: 35.00
+  },
+  {
+    id: "day-13",
+    name: "KOTP Holiday Program - Saturday 10/10/2026",
+    description: "9am - 3pm: Saturday Day 13",
+    price: 35.00
+  },
+  {
+    id: "day-14",
+    name: "KOTP Holiday Program - Sunday 11/10/2026",
+    description: "9am - 3pm: Sunday Day 14",
     price: 35.00
   }
 ];
@@ -359,7 +389,7 @@ export default function HolidayProgramForm() {
             SELECT PROGRAM PACKAGES *
           </h3>
           <p className="text-gray-400 text-sm">
-            Please note our sessions are held between 9am-3pm, Mon-Fri for the two-week holiday program.
+            Please note our sessions are held between 9am-3pm, daily for the two-week holiday program.
           </p>
           <div className="space-y-4">
             {products.map((product) => (
