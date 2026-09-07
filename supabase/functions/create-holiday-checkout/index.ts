@@ -81,8 +81,8 @@ serve(async (req: Request) => {
     const DAY_RATE = 35;
     const holidayPackages = [
         { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
-        { days: 10, price: 250, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
-        { days: 14, price: 300, label: "Full Program Package (14 Days)", extraLabel: null }
+        { days: 10, price: 275, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
+        { days: 14, price: 350, label: "Full Program Package (14 Days)", extraLabel: null }
     ];
 
     const dayCount = selectedDays.length;

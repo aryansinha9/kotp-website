@@ -25,13 +25,13 @@ const products = [
     id: "two-weeks",
     name: "KOTP Ultimate - TWO Full Weeks (10 Days)",
     description: "The ULTIMATE package for fun. 10 full days of hard work, learning and laughs.",
-    price: 250.00
+    price: 275.00
   },
   {
     id: "full-program",
     name: "KOTP Complete - THE FULL PROGRAM (14 Days)",
     description: "Every single day of the program. 14 full days of hard work, learning and laughs for one flat price.",
-    price: 300.00
+    price: 350.00
   },
   {
     id: "day-1",
