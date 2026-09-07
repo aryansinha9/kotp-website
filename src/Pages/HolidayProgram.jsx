@@ -19,8 +19,8 @@ const DAY_RATE = 35;
 
 const holidayPackages = [
     { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
-    { days: 10, price: 250, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
-    { days: 14, price: 300, label: "Full Program Package (14 Days)", extraLabel: null }
+    { days: 10, price: 275, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
+    { days: 14, price: 350, label: "Full Program Package (14 Days)", extraLabel: null }
 ];
 
 const getPricing = (dayCount) => {
@@ -256,7 +256,7 @@ export default function HolidayProgram() {
                                 <Calendar className="w-5 h-5 text-[#FF6B00]" />
                                 <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider m-0">Select Program Days</h3>
                             </div>
-                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Single days are $35/day, 5 days is a $150 package, 10 days is a $250 package, and all 14 days is a $300 flat package.</p>
+                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Single days are $35/day, 5 days is a $150 package, 10 days is a $275 package, and all 14 days is a $350 flat package.</p>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                 {holidayDays.map((day) => {
