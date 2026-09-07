@@ -63,8 +63,8 @@ serve(async (req: Request) => {
       throw new Error("Signature is required.")
 
     const validOfferings = [
-        "Mon 6 Jul", "Tue 7 Jul", "Wed 8 Jul", "Thu 9 Jul", "Fri 10 Jul",
-        "Mon 13 Jul", "Tue 14 Jul", "Wed 15 Jul", "Thu 16 Jul", "Fri 17 Jul"
+        "Mon 28 Sep", "Tue 29 Sep", "Wed 30 Sep", "Thu 1 Oct", "Fri 2 Oct", "Sat 3 Oct", "Sun 4 Oct",
+        "Mon 5 Oct", "Tue 6 Oct", "Wed 7 Oct", "Thu 8 Oct", "Fri 9 Oct", "Sat 10 Oct", "Sun 11 Oct"
     ];
 
     if (!Array.isArray(selectedDays) || selectedDays.length === 0) {
@@ -77,20 +77,30 @@ serve(async (req: Request) => {
         }
     }
 
-    // Server side price calculation
+    // Server side price calculation (must mirror src/Pages/HolidayProgram.jsx)
+    const DAY_RATE = 35;
+    const holidayPackages = [
+        { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
+        { days: 10, price: 250, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
+        { days: 14, price: 300, label: "Full Program Package (14 Days)", extraLabel: null }
+    ];
+
     const dayCount = selectedDays.length;
-    let backendTotal = dayCount * 35;
-    let computedPackageType = "Single Days";
-    
-    if (dayCount === 5) {
-        backendTotal = 150;
-        computedPackageType = "1 Week Package (5 Days)";
-    } else if (dayCount > 5 && dayCount < 10) {
-        backendTotal = 150 + ((dayCount - 5) * 35);
-        computedPackageType = "1 Week + Extra Days";
-    } else if (dayCount === 10) {
-        backendTotal = 280;
-        computedPackageType = "2 Week Package (10 Days)";
+    let backendTotal: number;
+    let computedPackageType: string;
+
+    const exactPackage = holidayPackages.find(p => p.days === dayCount);
+    if (exactPackage) {
+        backendTotal = exactPackage.price;
+        computedPackageType = exactPackage.label;
+    } else {
+        const base = [...holidayPackages].reverse().find(p => p.days < dayCount);
+        backendTotal = base ? base.price + ((dayCount - base.days) * DAY_RATE) : dayCount * DAY_RATE;
+        computedPackageType = base?.extraLabel ?? "Single Days";
+
+        // Never charge more than a larger package that already covers these days.
+        const nextUp = holidayPackages.find(p => p.days > dayCount);
+        if (nextUp && nextUp.price < backendTotal) backendTotal = nextUp.price;
     }
 
     // 1. Insert into Supabase as "pending_payment"
