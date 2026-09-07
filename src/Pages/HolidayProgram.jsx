@@ -17,27 +17,76 @@ const holidayDays = [
 
 const DAY_RATE = 35;
 
-const holidayPackages = [
-    { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
-    { days: 10, price: 275, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
-    { days: 14, price: 350, label: "Full Program Package (14 Days)", extraLabel: null }
+// Three mutually exclusive ways to book. Whichever the user picks is what they
+// pay for - individual days never roll up into a package price automatically.
+const BOOKING_OPTIONS = [
+    {
+        id: "individual",
+        name: "Individual Days",
+        priceLabel: "$35",
+        priceSuffix: "per day",
+        perDay: DAY_RATE,
+        requiredDays: null,
+        summary: "Pay as you go",
+        detail: "Pick as many or as few days as you like."
+    },
+    {
+        id: "package5",
+        name: "5-Day Package",
+        price: 150,
+        priceLabel: "$150",
+        priceSuffix: "for 5 days",
+        perDay: 30,
+        requiredDays: 5,
+        summary: "Choose any 5 days",
+        detail: "Any 5 days across the program, for a single flat price."
+    },
+    {
+        id: "package14",
+        name: "14-Day Package",
+        price: 350,
+        priceLabel: "$350",
+        priceSuffix: "for all 14 days",
+        perDay: 25,
+        requiredDays: 14,
+        summary: "The entire program",
+        detail: "Every day from 28 September to 11 October, included."
+    }
 ];
 
-const getPricing = (dayCount) => {
-    if (dayCount === 0) return { total: 0, packageType: "Single Days" };
+const getOption = (bookingMode) => BOOKING_OPTIONS.find(o => o.id === bookingMode) || null;
 
-    const exact = holidayPackages.find(p => p.days === dayCount);
-    if (exact) return { total: exact.price, packageType: exact.label };
+const getPricing = (bookingMode, dayCount) => {
+    const option = getOption(bookingMode);
+    if (!option) return { total: 0, packageType: "" };
+    if (option.id === "individual") return { total: dayCount * DAY_RATE, packageType: option.name };
+    return { total: option.price, packageType: option.name };
+};
 
-    const base = [...holidayPackages].reverse().find(p => p.days < dayCount);
-    let total = base ? base.price + ((dayCount - base.days) * DAY_RATE) : dayCount * DAY_RATE;
-    const packageType = base?.extraLabel ?? "Single Days";
+// Nudge towards a package only when it is genuinely better value than the
+// individual days already picked. Never shown while a package is active.
+const getRecommendation = (bookingMode, dayCount) => {
+    if (bookingMode !== "individual" || dayCount === 0) return null;
+    const individualTotal = dayCount * DAY_RATE;
 
-    // Never charge more than a larger package that already covers these days.
-    const nextUp = holidayPackages.find(p => p.days > dayCount);
-    if (nextUp && nextUp.price < total) total = nextUp.price;
+    if (dayCount === 5) {
+        return {
+            targetMode: "package5",
+            message: `You could save $${individualTotal - 150} by choosing the 5-Day Package - the same 5 days for $150.`
+        };
+    }
 
-    return { total, packageType };
+    if (dayCount >= 10) {
+        const saving = individualTotal - 350;
+        return {
+            targetMode: "package14",
+            message: saving > 0
+                ? `You could save $${saving} by choosing the 14-Day Package - all 14 days for $350.`
+                : `For the same $350, the 14-Day Package gets you all 14 days instead of ${dayCount}.`
+        };
+    }
+
+    return null;
 };
 
 export default function HolidayProgram() {
@@ -58,6 +107,7 @@ export default function HolidayProgram() {
         agreedToTerms: false,
         signature: "",
         signatureDate: "",
+        bookingMode: "",
         selectedDays: []
     });
 
@@ -76,9 +126,31 @@ export default function HolidayProgram() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const selectBookingMode = (modeId) => {
+        setFormData(prev => {
+            let days = prev.selectedDays;
+            if (modeId === "package14") {
+                // Exactly 14 days exist, so the package is the whole range.
+                days = [...holidayDays];
+            } else if (modeId === "package5") {
+                // Carry over what they already picked, capped at 5, in date order.
+                days = holidayDays.filter(d => prev.selectedDays.includes(d)).slice(0, 5);
+            }
+            return { ...prev, bookingMode: modeId, selectedDays: days };
+        });
+        setErrorMsg('');
+    };
+
     const toggleDay = (day) => {
         setFormData(prev => {
-            const days = prev.selectedDays.includes(day) 
+            const option = getOption(prev.bookingMode);
+            if (!option || option.id === "package14") return prev;
+
+            const isSelected = prev.selectedDays.includes(day);
+            const atLimit = option.requiredDays !== null && prev.selectedDays.length >= option.requiredDays;
+            if (!isSelected && atLimit) return prev;
+
+            const days = isSelected
                 ? prev.selectedDays.filter(d => d !== day)
                 : [...prev.selectedDays, day];
             return { ...prev, selectedDays: days };
@@ -86,13 +158,25 @@ export default function HolidayProgram() {
     };
 
     const dayCount = formData.selectedDays.length;
-    const { total: calculatedTotal, packageType: packageDisplay } = getPricing(dayCount);
-    const perDayRate = dayCount > 0 ? calculatedTotal / dayCount : 0;
+    const activeOption = getOption(formData.bookingMode);
+    const requiredDays = activeOption?.requiredDays ?? null;
+    const selectionComplete = activeOption
+        ? (requiredDays === null ? dayCount > 0 : dayCount === requiredDays)
+        : false;
+    const { total: calculatedTotal, packageType: packageDisplay } = getPricing(formData.bookingMode, dayCount);
+    const perDayRate = activeOption?.perDay ?? DAY_RATE;
+    const recommendation = getRecommendation(formData.bookingMode, dayCount);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.selectedDays.length === 0) {
-            setErrorMsg('Please select at least one day.');
+        if (!activeOption) {
+            setErrorMsg('Please choose a booking option.');
+            return;
+        }
+        if (!selectionComplete) {
+            setErrorMsg(requiredDays === null
+                ? 'Please select at least one day.'
+                : `Please select exactly ${requiredDays} days for the ${activeOption.name}.`);
             return;
         }
 
@@ -250,39 +334,120 @@ export default function HolidayProgram() {
                             </div>
                         </section>
 
-                        {/* 4. Calendar Day Selection */}
+                        {/* 4. Booking Option & Day Selection */}
                         <section className="space-y-6 pt-6 border-t border-white/10">
                             <div className="flex items-center gap-2 border-b border-[#FF6B00]/30 pb-2">
                                 <Calendar className="w-5 h-5 text-[#FF6B00]" />
-                                <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider m-0">Select Program Days</h3>
+                                <h3 className="text-[#FF6B00] font-semibold text-sm uppercase tracking-wider m-0">Choose Your Booking Option</h3>
                             </div>
-                            <p className="text-gray-400 text-sm">Choose the days you would like to attend. Single days are $35/day, 5 days is a $150 package, 10 days is a $275 package, and all 14 days is a $350 flat package.</p>
+                            <p className="text-gray-400 text-sm">Pick how you would like to book. You can change this at any time before submitting.</p>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                                {holidayDays.map((day) => {
-                                    const isSelected = formData.selectedDays.includes(day);
+                            {/* Step 1 - the three booking options */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {BOOKING_OPTIONS.map((option) => {
+                                    const isActive = formData.bookingMode === option.id;
                                     return (
                                         <button
-                                            key={day}
+                                            key={option.id}
                                             type="button"
-                                            onClick={() => toggleDay(day)}
-                                            className={`p-3 rounded-lg border transition-all duration-200 text-sm font-medium ${
-                                                isSelected 
-                                                ? 'bg-[#FF6B00]/20 border-[#FF6B00] text-[#FF6B00]' 
-                                                : 'bg-[#1a1a1a] border-white/10 text-gray-300 hover:border-[#FF6B00]/50'
+                                            onClick={() => selectBookingMode(option.id)}
+                                            aria-pressed={isActive}
+                                            className={`text-left p-5 rounded-lg border transition-all duration-200 ${
+                                                isActive
+                                                ? 'bg-[#FF6B00]/10 border-[#FF6B00]'
+                                                : 'bg-[#1a1a1a] border-white/10 hover:border-[#FF6B00]/50'
                                             }`}
                                         >
-                                            {day}
+                                            <div className="flex items-start justify-between gap-2 mb-3">
+                                                <span className={`font-semibold text-sm ${isActive ? 'text-[#FF6B00]' : 'text-white'}`}>{option.name}</span>
+                                                {isActive && <CheckCircle className="w-4 h-4 text-[#FF6B00] shrink-0 mt-0.5" />}
+                                            </div>
+                                            <p className="text-3xl text-[#FF6B00] headline-font leading-none">{option.priceLabel}</p>
+                                            <p className="text-gray-500 text-xs mt-1 mb-3">{option.priceSuffix}</p>
+                                            <p className="text-white text-sm font-medium mb-1">{option.summary}</p>
+                                            <p className="text-gray-400 text-xs leading-snug">{option.detail}</p>
                                         </button>
                                     );
                                 })}
                             </div>
 
-                            {dayCount > 0 && (
+                            {/* Step 2 - dates, scoped to the chosen option */}
+                            {activeOption && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <p className="text-white text-sm font-medium m-0">
+                                            {activeOption.id === 'individual' && 'Select the days you would like to attend'}
+                                            {activeOption.id === 'package5' && 'Select exactly 5 days for your package'}
+                                            {activeOption.id === 'package14' && 'All 14 days are included in this package'}
+                                        </p>
+                                        {requiredDays !== null ? (
+                                            <span className={`text-xs px-3 py-1 rounded-full border whitespace-nowrap ${
+                                                selectionComplete
+                                                ? 'bg-[#FF6B00]/10 border-[#FF6B00]/40 text-[#FF6B00]'
+                                                : 'bg-white/5 border-white/10 text-gray-400'
+                                            }`}>
+                                                {selectionComplete ? `All ${requiredDays} days selected` : `${dayCount} of ${requiredDays} days selected`}
+                                            </span>
+                                        ) : dayCount > 0 && (
+                                            <span className="text-xs px-3 py-1 rounded-full border bg-white/5 border-white/10 text-gray-400 whitespace-nowrap">
+                                                {dayCount} day{dayCount !== 1 ? 's' : ''} selected
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                        {holidayDays.map((day) => {
+                                            const isSelected = formData.selectedDays.includes(day);
+                                            const isLocked = activeOption.id === 'package14';
+                                            const isBlocked = !isSelected && requiredDays !== null && dayCount >= requiredDays;
+                                            return (
+                                                <button
+                                                    key={day}
+                                                    type="button"
+                                                    disabled={isLocked || isBlocked}
+                                                    onClick={() => toggleDay(day)}
+                                                    className={`p-3 rounded-lg border transition-all duration-200 text-sm font-medium ${
+                                                        isSelected
+                                                        ? `bg-[#FF6B00]/20 border-[#FF6B00] text-[#FF6B00]${isLocked ? ' cursor-default' : ''}`
+                                                        : isBlocked
+                                                        ? 'bg-[#1a1a1a] border-white/5 text-gray-600 cursor-not-allowed'
+                                                        : 'bg-[#1a1a1a] border-white/10 text-gray-300 hover:border-[#FF6B00]/50'
+                                                    }`}
+                                                >
+                                                    {day}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {activeOption.id === 'package5' && selectionComplete && (
+                                        <p className="text-gray-500 text-xs">Your 5 days are locked in. Deselect a day if you would like to swap it.</p>
+                                    )}
+                                    {activeOption.id === 'package14' && (
+                                        <p className="text-gray-500 text-xs">Every day of the program is included, so there is nothing to choose here.</p>
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {/* Subtle better-value nudge */}
+                            {recommendation && (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[#FF6B00]/5 border border-[#FF6B00]/20 rounded-lg px-4 py-3">
+                                    <p className="text-gray-300 text-sm m-0 flex-1">{recommendation.message}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => selectBookingMode(recommendation.targetMode)}
+                                        className="text-[#FF6B00] hover:underline text-sm font-semibold whitespace-nowrap text-left sm:text-right"
+                                    >
+                                        Switch to this package
+                                    </button>
+                                </motion.div>
+                            )}
+
+                            {activeOption && (requiredDays !== null || dayCount > 0) && (
                                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mt-6 bg-[#0a0a0a] p-6 rounded-lg border border-[#FF6B00]/30 flex flex-col sm:flex-row justify-between items-center">
                                     <div className="mb-4 sm:mb-0 text-center sm:text-left">
                                         <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">Selected Package</p>
-                                        <p className="text-xl text-white headline-font">{packageDisplay} ({dayCount} day{dayCount !== 1 ? 's' : ''})</p>
+                                        <p className="text-xl text-white headline-font">{packageDisplay} ({requiredDays !== null ? `${dayCount} of ${requiredDays} days selected` : `${dayCount} day${dayCount !== 1 ? 's' : ''}`})</p>
                                     </div>
                                     <div className="text-center sm:text-right">
                                         <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">Total Due</p>
@@ -322,7 +487,7 @@ export default function HolidayProgram() {
                             </div>
                         </section>
 
-                        <Button type="submit" disabled={submitting || !formData.agreedToTerms || dayCount === 0} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto disabled:cursor-not-allowed">
+                        <Button type="submit" disabled={submitting || !formData.agreedToTerms || !selectionComplete} className="w-full bg-[#FF6B00] hover:bg-[#FF6B00]/90 text-white py-8 rounded-lg headline-font text-2xl tracking-wider pulse-glow disabled:opacity-50 mt-12 transition-all duration-300 h-auto disabled:cursor-not-allowed">
                             {submitting ? "SECURING PAYMENT PORTAL..." : <><Send className="w-6 h-6 mr-3" /> PROCEED TO PAYMENT</>}
                         </Button>
                         {errorMsg && (

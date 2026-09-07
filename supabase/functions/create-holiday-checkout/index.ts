@@ -38,7 +38,7 @@ serve(async (req: Request) => {
       participantName, ageTurning2026, dob, position,
       parentName, parentPhone, parentEmail, emergencyContact, homeAddress,
       hasMedicalCondition, medicalDescription, hasMedication, medicationDetails,
-      agreedToTerms, signature, signatureDate, selectedDays
+      agreedToTerms, signature, signatureDate, selectedDays, bookingMode
     } = registrationData
 
     // --- Server-side input validation ---
@@ -70,38 +70,39 @@ serve(async (req: Request) => {
     if (!Array.isArray(selectedDays) || selectedDays.length === 0) {
       throw new Error("Please select at least one day for the holiday program.")
     }
-    
+
     for (const day of selectedDays) {
         if (!validOfferings.includes(day)) {
             throw new Error(`Invalid day selected: ${day}`);
         }
     }
 
-    // Server side price calculation (must mirror src/Pages/HolidayProgram.jsx)
+    // Deduplicate and keep calendar order, so the exact-day-count checks below
+    // cannot be satisfied by repeating the same day.
+    const uniqueDays = validOfferings.filter(day => selectedDays.includes(day));
+
+    // Server side price calculation (must mirror src/Pages/HolidayProgram.jsx).
+    // The booking mode the user chose decides the price - individual days are
+    // never silently upgraded to a package rate.
     const DAY_RATE = 35;
-    const holidayPackages = [
-        { days: 5, price: 150, label: "1 Week Package (5 Days)", extraLabel: "1 Week + Extra Days" },
-        { days: 10, price: 275, label: "2 Week Package (10 Days)", extraLabel: "2 Week + Extra Days" },
-        { days: 14, price: 350, label: "Full Program Package (14 Days)", extraLabel: null }
+    const bookingOptions = [
+        { id: "individual", label: "Individual Days", price: null, requiredDays: null },
+        { id: "package5", label: "5-Day Package", price: 150, requiredDays: 5 },
+        { id: "package14", label: "14-Day Package", price: 350, requiredDays: 14 }
     ];
 
-    const dayCount = selectedDays.length;
-    let backendTotal: number;
-    let computedPackageType: string;
-
-    const exactPackage = holidayPackages.find(p => p.days === dayCount);
-    if (exactPackage) {
-        backendTotal = exactPackage.price;
-        computedPackageType = exactPackage.label;
-    } else {
-        const base = [...holidayPackages].reverse().find(p => p.days < dayCount);
-        backendTotal = base ? base.price + ((dayCount - base.days) * DAY_RATE) : dayCount * DAY_RATE;
-        computedPackageType = base?.extraLabel ?? "Single Days";
-
-        // Never charge more than a larger package that already covers these days.
-        const nextUp = holidayPackages.find(p => p.days > dayCount);
-        if (nextUp && nextUp.price < backendTotal) backendTotal = nextUp.price;
+    const option = bookingOptions.find(o => o.id === bookingMode);
+    if (!option) {
+        throw new Error("Invalid booking option. Please refresh the page and try again.")
     }
+
+    const dayCount = uniqueDays.length;
+    if (option.requiredDays !== null && dayCount !== option.requiredDays) {
+        throw new Error(`The ${option.label} requires exactly ${option.requiredDays} days. You selected ${dayCount}.`)
+    }
+
+    const backendTotal: number = option.price ?? dayCount * DAY_RATE;
+    const computedPackageType: string = option.label;
 
     // 1. Insert into Supabase as "pending_payment"
     const { data: record, error: dbError } = await supabaseAdmin
@@ -126,7 +127,7 @@ serve(async (req: Request) => {
         payment_status: 'pending_payment',
         package_type: computedPackageType,
         total_amount: backendTotal,
-        selected_days: selectedDays.join(', ')
+        selected_days: uniqueDays.join(', ')
       }])
       .select('id')
       .single()
