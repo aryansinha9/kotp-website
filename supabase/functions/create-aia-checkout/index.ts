@@ -131,7 +131,7 @@ serve(async (req: Request) => {
       customer: customer.id, // Use the newly created customer with address
       line_items: [
         {
-          price: 'price_1TGDwXJTT6itmjMc7KLsQsq4',
+          price: 'price_1UPXJnJTT6itmjMc4DkGwZQE', // $110 AUD + GST, Term 4 2026 (19 Oct - 17 Dec)
           quantity: 1,
         },
       ],
