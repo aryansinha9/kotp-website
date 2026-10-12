@@ -26,7 +26,7 @@ export default function AIAAfterSchoolProgram() {
                         AIA AFTER SCHOOL PROGRAM
                     </h1>
                     <p className="text-gray-300 text-xl leading-relaxed">
-                        Details about this program are coming soon. Register your interest below and we'll be in touch with everything you need to know.
+                        Our next block runs from Monday 19 October to Thursday 17 December 2026. Registration is $110 + GST. Register your athlete below and we'll be in touch with everything you need to know before the first session.
                     </p>
                     <div className="w-32 h-1 bg-[#FF6B00] mt-8"></div>
                 </motion.div>

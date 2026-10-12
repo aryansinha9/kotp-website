@@ -172,8 +172,8 @@ export default function Academy() {
         },
         {
             title: "AIA After School Program",
-            description: "A structured after-school football program run at AIA, focused on developing players' technical skills, game awareness, and confidence in a fun and supportive environment. Sessions are designed to help students improve their football ability while staying active and engaged after school.",
-            price: "$125",
+            description: "A structured after-school football program run at AIA, focused on developing players' technical skills, game awareness, and confidence in a fun and supportive environment. Sessions are designed to help students improve their football ability while staying active and engaged after school. The current block runs from 19 October to 17 December 2026.",
+            price: "$110 + GST",
             linkTo: "/academy/aia-after-school"
         }
     ];
