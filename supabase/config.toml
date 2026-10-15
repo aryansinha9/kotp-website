@@ -53,3 +53,33 @@ entrypoint = "./functions/stripe-webhook-handler/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/stripe-webhook-handler/*.html" ]
+
+# Stripe calls these with no Authorization header, so JWT verification must
+# stay off. Deploying one without this (or without --no-verify-jwt) makes
+# the gateway reject every webhook with UNAUTHORIZED_NO_AUTH_HEADER and
+# payments silently stop being recorded.
+
+[functions.holiday-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/holiday-webhook/index.ts"
+
+[functions.aia-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/aia-webhook/index.ts"
+
+[functions.parklea-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/parklea-webhook/index.ts"
+
+[functions.offseason-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/offseason-webhook/index.ts"
+
+[functions.tournament-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/tournament-webhook/index.ts"
