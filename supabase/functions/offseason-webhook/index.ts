@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'stripe'
+import { sendConfirmationEmailSafely } from '../_shared/email.ts'
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
 // Note: User will need to configure this new secret after adding the webhook
@@ -42,7 +43,9 @@ serve(async (req: Request) => {
       if (registrationId) {
         console.log(`Processing successful checkout for offseason registration: ${registrationId}`)
 
-        const { error } = await supabaseAdmin
+        // The `neq` guard below makes this idempotent - Stripe retries
+        // webhooks, and a retry must not re-send the confirmation email.
+        const { data: updatedRow, error } = await supabaseAdmin
           .from('offseason_registrations')
           .update({
             payment_status: 'successful',
@@ -50,10 +53,32 @@ serve(async (req: Request) => {
             stripe_customer_id: session.customer
           })
           .eq('id', registrationId)
+          .neq('payment_status', 'successful')
+          .select()
+          .maybeSingle()
 
         if (error) {
           console.error("Database error updating offseason registration:", error)
           throw error
+        }
+
+        // Confirmation email. Best-effort - must never fail the webhook.
+        if (updatedRow) {
+          const firstPayment = typeof session.amount_total === 'number'
+            ? `$${(session.amount_total / 100).toFixed(2)} AUD`
+            : ''
+          await sendConfirmationEmailSafely({
+            to: updatedRow.parent_email,
+            participantName: updatedRow.participant_name,
+            programName: 'Off-season Summer Program',
+            details: [
+              { label: 'Package', value: updatedRow.package_type },
+              { label: 'First payment', value: firstPayment },
+              { label: 'Billing', value: 'Recurring weekly until cancelled' },
+            ],
+          })
+        } else {
+          console.log(`offseason registration ${registrationId} was already successful - skipping duplicate email.`)
         }
       }
     }

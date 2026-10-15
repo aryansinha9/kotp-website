@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14?target=denonext'
+import { sendConfirmationEmailSafely } from '../_shared/email.ts'
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET_AIA')
@@ -45,8 +46,9 @@ serve(async (req: Request) => {
       if (registrationId) {
         console.log(`Processing successful checkout for AIA registration: ${registrationId}`)
 
-        // 1. Mark registration as paid
-        const { error } = await supabaseAdmin
+        // 1. Mark registration as paid. The `neq` guard makes this idempotent -
+        //    Stripe retries webhooks, and a retry must not re-send the email.
+        const { data: updatedRow, error } = await supabaseAdmin
           .from('aia_program_registrations')
           .update({
             payment_status: 'paid',
@@ -54,10 +56,17 @@ serve(async (req: Request) => {
             stripe_customer_id: session.customer,
           })
           .eq('id', registrationId)
+          .neq('payment_status', 'paid')
+          .select()
+          .maybeSingle()
 
         if (error) {
           console.error('Database error updating AIA registration:', error)
           throw error
+        }
+
+        if (!updatedRow) {
+          console.log(`AIA registration ${registrationId} was already paid - skipping duplicate email.`)
         }
 
         // 2. Clean up any duplicate pending entries for the same participant + email
@@ -72,6 +81,21 @@ serve(async (req: Request) => {
             .eq('parent_email', parentEmail)
             .neq('id', registrationId)
             .in('payment_status', ['pending', 'pending_payment'])
+        }
+
+        // 3. Confirmation email. Best-effort - must never fail the webhook.
+        if (updatedRow) {
+          const yearGroup = String(updatedRow.year_group || '').replace(/-/g, ' ')
+          await sendConfirmationEmailSafely({
+            to: updatedRow.parent_email,
+            participantName: `${updatedRow.participant_first_name} ${updatedRow.participant_last_name}`.trim(),
+            programName: 'AIA After School Program',
+            details: [
+              { label: 'Program dates', value: '19 October - 17 December 2026' },
+              { label: 'Year group', value: yearGroup },
+            ],
+            amountTotalCents: session.amount_total,
+          })
         }
       }
     }

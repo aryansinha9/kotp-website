@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14?target=denonext'
+import { sendConfirmationEmailSafely } from '../_shared/email.ts'
 
 // Explicitly use the native Supabase keys for bypass, while supporting local vars
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')
@@ -46,18 +47,27 @@ serve(async (req: Request) => {
       if (registrationId) {
         console.log(`Processing successful checkout for holiday registration: ${registrationId}`)
         
-        // 1. Mark current row as paid
-        const { error } = await supabaseAdmin
+        // 1. Mark current row as paid. The `neq` guard makes this idempotent:
+        //    Stripe retries webhooks, and without it a retry would re-send the
+        //    confirmation email to a parent who already has one.
+        const { data: updatedRow, error } = await supabaseAdmin
           .from('holiday_program_registrations')
           .update({ 
             payment_status: 'paid',
             stripe_session_id: session.id
           })
           .eq('id', registrationId)
+          .neq('payment_status', 'paid')
+          .select()
+          .maybeSingle()
 
         if (error) {
           console.error("Database error updating holiday program registration:", error)
           throw error
+        }
+
+        if (!updatedRow) {
+          console.log(`Holiday registration ${registrationId} was already paid - skipping duplicate email.`)
         }
 
         // 2. Remove any other 'pending' duplicate cart entries for this exact participant & parent combo!
@@ -69,6 +79,21 @@ serve(async (req: Request) => {
               .eq('parent_email', parentEmail)
               .neq('id', registrationId)
               .in('payment_status', ['pending', 'pending_payment']);
+        }
+
+        // 3. Confirmation email. Best-effort: never let this fail the webhook,
+        //    or Stripe will retry a payment we have already recorded.
+        if (updatedRow) {
+          await sendConfirmationEmailSafely({
+            to: updatedRow.parent_email,
+            participantName: updatedRow.participant_name,
+            programName: 'KOTP Holiday Program',
+            details: [
+              { label: 'Booking option', value: updatedRow.package_type },
+              { label: 'Days booked', value: updatedRow.selected_days },
+            ],
+            amountTotalCents: session.amount_total,
+          })
         }
       }
     }
