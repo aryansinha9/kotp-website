@@ -8,11 +8,12 @@ const sections = [
   { href: '#how-long', title: '3. HOW LONG WE KEEP YOUR INFORMATION' },
   { href: '#how-safe', title: '4. HOW WE KEEP YOUR INFORMATION SAFE' },
   { href: '#minors-data', title: '5. DATA OF MINORS' },
-  { href: '#privacy-rights', title: '6. YOUR PRIVACY RIGHTS' },
-  { href: '#australia-rights', title: '7. PRIVACY RIGHTS FOR AUSTRALIA' },
-  { href: '#updates', title: '8. UPDATES TO THIS PRIVACY POLICY' },
-  { href: '#contact-info', title: '9. CONTACT INFORMATION' },
-  { href: '#data-review', title: '10. DATA REVIEW, UPDATE, AND DELETION' },
+  { href: '#job-applicants', title: '6. JOB APPLICANTS AND RECRUITMENT' },
+  { href: '#privacy-rights', title: '7. YOUR PRIVACY RIGHTS' },
+  { href: '#australia-rights', title: '8. PRIVACY RIGHTS FOR AUSTRALIA' },
+  { href: '#updates', title: '9. UPDATES TO THIS PRIVACY POLICY' },
+  { href: '#contact-info', title: '10. CONTACT INFORMATION' },
+  { href: '#data-review', title: '11. DATA REVIEW, UPDATE, AND DELETION' },
 ];
 
 export default function PrivacyPolicy() {
@@ -22,7 +23,7 @@ export default function PrivacyPolicy() {
         <div className="text-base leading-7">
           <p className="text-base font-semibold leading-7 text-[#FF6B00] headline-font tracking-wider">Privacy Notice</p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl headline-font">Privacy Policy</h1>
-          <p className="mt-6 text-xl leading-8">Last Updated: August 28, 2025</p>
+          <p className="mt-6 text-xl leading-8">Last Updated: November 23, 2026</p>
 
           <p className="mt-6">
             This privacy notice for A&A Sporting Enterprises PTY LTD (trading as King of the Pitch, "we," "us," or "our") describes how and why we collect, store, use, and share your information when you use our services ("Services").
@@ -80,8 +81,48 @@ export default function PrivacyPolicy() {
             <p>Team contacts are responsible for obtaining consent from minors' parents/guardians. Parent/guardian requests for deletion of minor data are promptly honored.</p>
           </div>
 
+          <div id="job-applicants" className="mt-16 space-y-6">
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">6. JOB APPLICANTS AND RECRUITMENT</h2>
+            <div className="my-6 p-4 border-l-4 border-[#FF6B00] bg-[#1a1a1a] rounded-r-lg">
+              <p className="text-gray-200"><strong>In Short:</strong> If you apply for a role through our Careers page, we collect what you send us and use it only to assess your application.</p>
+            </div>
+            <p>
+              <strong className="text-white">What we collect.</strong> When you apply for a position we collect the details you
+              enter in the application form - your name, email address, phone number and general location; your resume or CV;
+              any links you choose to share such as LinkedIn, a portfolio or GitHub; details of projects you describe; your
+              cover letter and any other information you add; your answers to the role's screening questions; and, where you
+              choose to tell us, your right to work in Australia, availability, notice period and pay expectation. Providing a
+              resume and the required answers is necessary to apply; everything else is optional. We do not ask for, and ask that
+              you do not send, government identifiers, financial details, or health or other sensitive information at the
+              application stage.
+            </p>
+            <p>
+              <strong className="text-white">How we use it.</strong> We use your application solely to assess your suitability for
+              the role you applied for, to contact you about it, and - if you are unsuccessful but a good fit - to consider you for
+              similar openings. We do not use application data for marketing, and we do not sell or disclose it to third parties.
+              Screening questions are used only to check the preliminary requirements stated in the advertisement.
+            </p>
+            <p>
+              <strong className="text-white">Where it is stored and who can see it.</strong> Applications and uploaded files are
+              stored in our Supabase project. Resumes are held in a private storage area with no public link, and are only ever
+              opened through short-lived, individually signed links. Access is limited to the small number of King of the Pitch
+              administrators involved in hiring, each using their own named, password-protected account.
+            </p>
+            <p>
+              <strong className="text-white">How long we keep it.</strong> We keep unsuccessful applications for up to two years
+              from the date you applied, after which they and any uploaded files are deleted. You can ask us to delete your
+              application sooner at any time.
+            </p>
+            <p>
+              <strong className="text-white">Your choices.</strong> To access, correct or delete your application - or to withdraw
+              it - email <a href="mailto:kotp.football@gmail.com" className="font-semibold text-[#FF6B00] hover:text-orange-400">kotp.football@gmail.com</a>{' '}
+              with the reference shown when you applied. Withdrawing or declining to provide optional information will not
+              disadvantage you beyond our ability to assess the application.
+            </p>
+          </div>
+
           <div id="privacy-rights" className="mt-16 space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">6. YOUR PRIVACY RIGHTS</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">7. YOUR PRIVACY RIGHTS</h2>
             <div className="my-6 p-4 border-l-4 border-[#FF6B00] bg-[#1a1a1a] rounded-r-lg">
               <p className="text-gray-200"><strong>In Short:</strong> You may access, correct, delete, or manage how your personal information is used.</p>
             </div>
@@ -89,7 +130,7 @@ export default function PrivacyPolicy() {
           </div>
 
           <div id="australia-rights" className="mt-16 space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">7. PRIVACY RIGHTS FOR AUSTRALIA</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">8. PRIVACY RIGHTS FOR AUSTRALIA</h2>
             <div className="my-6 p-4 border-l-4 border-[#FF6B00] bg-[#1a1a1a] rounded-r-lg">
               <p className="text-gray-200"><strong>In Short:</strong> Your data is protected under the Privacy Act 1988 (Cth) and Australian Privacy Principles (APPs).</p>
             </div>
@@ -97,7 +138,7 @@ export default function PrivacyPolicy() {
           </div>
 
           <div id="updates" className="mt-16 space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">8. UPDATES TO THIS PRIVACY POLICY</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">9. UPDATES TO THIS PRIVACY POLICY</h2>
             <div className="my-6 p-4 border-l-4 border-[#FF6B00] bg-[#1a1a1a] rounded-r-lg">
               <p className="text-gray-200"><strong>In Short:</strong> This policy may be updated from time to time.</p>
             </div>
@@ -105,7 +146,7 @@ export default function PrivacyPolicy() {
           </div>
 
           <div id="contact-info" className="mt-16 space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">9. CONTACT INFORMATION</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">10. CONTACT INFORMATION</h2>
             <p>For questions or concerns, contact our privacy team:</p>
             <address className="mt-4 not-italic text-gray-400">
               <strong>Email:</strong> <a href="mailto:kotp.football@gmail.com" className="font-semibold text-[#FF6B00] hover:text-orange-400">kotp.football@gmail.com</a><br />
@@ -115,7 +156,7 @@ export default function PrivacyPolicy() {
           </div>
 
           <div id="data-review" className="mt-16 space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">10. DATA REVIEW, UPDATE, AND DELETION</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white headline-font">11. DATA REVIEW, UPDATE, AND DELETION</h2>
             <div className="my-6 p-4 border-l-4 border-[#FF6B00] bg-[#1a1a1a] rounded-r-lg">
               <p className="text-gray-200"><strong>In Short:</strong> You can request access, updates, or deletion of your personal information.</p>
             </div>

@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/supabaseClient';
 import { FeaturedReel, Tournament, MediaItem, Team, Game, Field } from '@/Entities/all';
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X, Menu } from "lucide-react";
+import { LogOut, Users, Upload, Film, Mail, Phone, Trash2, Loader2, Image as ImageIcon, Video, Trophy, Plus, Minus, Download, ClipboardList, MoreVertical, Copy, LayoutDashboard, ChevronRight, CheckCircle, Clock, X, Menu, Briefcase, FileText } from "lucide-react";
 import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Textarea } from "@/Components/ui/textarea";
 import * as XLSX from 'xlsx';
+import JobListingsManager from '@/Components/Admin/JobListingsManager';
+import JobApplicationsManager from '@/Components/Admin/JobApplicationsManager';
 
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 const T = ({ headers, children }) => (
@@ -83,6 +85,12 @@ export default function AdminDashboard() {
   const [selectedFieldFilter, setSelectedFieldFilter] = useState('ALL');
   const [gameFieldId, setGameFieldId] = useState('UNASSIGNED');
 
+  // Careers. The job board loads its own data inside its managers (it has its
+  // own RLS-guarded queries), and reports counts back for the sidebar badges.
+  const [jobListingCount, setJobListingCount] = useState(0);
+  const [jobApplicationCount, setJobApplicationCount] = useState(0);
+  const [applicationsJobFilter, setApplicationsJobFilter] = useState(null);
+
   const loadData = async () => {
     try {
       const dedupeAndSort = (data) => {
@@ -99,6 +107,16 @@ export default function AdminDashboard() {
         supabase.from('holiday_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
         supabase.from('aia_program_registrations').select('*').order('created_at', { ascending: false }).then(res => dedupeAndSort(res.data || [])),
       ]);
+      // Careers counts: head-only queries, so no applicant data is fetched here.
+      // They fail quietly if the careers migration has not been run yet.
+      Promise.all([
+        supabase.from('job_listings').select('id', { count: 'exact', head: true }),
+        supabase.from('job_applications').select('id', { count: 'exact', head: true }),
+      ]).then(([listings, applications]) => {
+        setJobListingCount(listings.count || 0);
+        setJobApplicationCount(applications.count || 0);
+      }).catch(() => {});
+
       setTournamentRegistrations(tournRegData); setParkleaRegistrations(parkleaData); setHolidayRegistrations(holidayData);
       setOffseasonRegistrations(offseasonData); setAiaRegistrations(aiaData); setReels(reelData);
       setCompletedTournaments(allT.filter(t => t.status === 'completed'));
@@ -406,6 +424,10 @@ export default function AdminDashboard() {
       { key: 'academy', label: 'Academy', icon: ClipboardList, count: parkleaRegistrations.length + offseasonRegistrations.length + holidayRegistrations.length + aiaRegistrations.length },
       { key: 'tournaments', label: 'Tournaments', icon: Users, count: tournamentRegistrations.length },
     ]},
+    { label: 'Careers', items: [
+      { key: 'job-listings', label: 'Job Listings', icon: Briefcase, count: jobListingCount },
+      { key: 'job-applications', label: 'Applications', icon: FileText, count: jobApplicationCount },
+    ]},
     { label: 'Management', items: [
       { key: 'scores', label: 'Score Control', icon: Trophy },
       { key: 'gallery', label: 'Gallery', icon: Upload },
@@ -413,7 +435,7 @@ export default function AdminDashboard() {
     ]},
   ];
 
-  const sectionTitle = { overview: 'Overview', academy: 'Academy Registrations', tournaments: 'Tournament Registrations', scores: 'Score Control', gallery: 'Gallery', reels: 'Featured Reels' };
+  const sectionTitle = { overview: 'Overview', academy: 'Academy Registrations', tournaments: 'Tournament Registrations', 'job-listings': 'Job Listings', 'job-applications': 'Job Applications', scores: 'Score Control', gallery: 'Gallery', reels: 'Featured Reels' };
 
   const SectionHeader = ({ title, count, action }) => (
     <div className="flex items-start justify-between mb-6">
@@ -436,7 +458,7 @@ export default function AdminDashboard() {
               <StatCard title="Tournament Regs" icon={Users} total={tournamentRegistrations.length} paid={paidCount(tournamentRegistrations)} pending={pendingCount(tournamentRegistrations)} onClick={() => setActiveSection('tournaments')} delay={0.32} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[{key:'scores',label:'Score Control',icon:Trophy,desc:'Manage live game scores'},{key:'gallery',label:'Gallery',icon:Upload,desc:'Upload tournament media'},{key:'reels',label:'Featured Reels',icon:Film,desc:`${reels.length} reels published`}].map(({ key, label, icon: Icon, desc }) => (
+              {[{key:'job-listings',label:'Job Listings',icon:Briefcase,desc:`${jobListingCount} role${jobListingCount === 1 ? '' : 's'} on the careers page`},{key:'job-applications',label:'Applications',icon:FileText,desc:`${jobApplicationCount} received`},{key:'scores',label:'Score Control',icon:Trophy,desc:'Manage live game scores'},{key:'gallery',label:'Gallery',icon:Upload,desc:'Upload tournament media'},{key:'reels',label:'Featured Reels',icon:Film,desc:`${reels.length} reels published`}].map(({ key, label, icon: Icon, desc }) => (
                 <button key={key} onClick={() => setActiveSection(key)} className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 text-left hover:border-[#FF6B00]/40 transition-all group">
                   <Icon className="w-6 h-6 text-[#FF6B00] mb-3" />
                   <p className="text-white font-semibold headline-font">{label}</p>
@@ -679,6 +701,25 @@ export default function AdminDashboard() {
               </T>
             )}
           </div>
+        );
+
+      case 'job-listings':
+        return (
+          <JobListingsManager
+            onCountChange={setJobListingCount}
+            onViewApplications={(jobId) => {
+              setApplicationsJobFilter(jobId);
+              setActiveSection('job-applications');
+            }}
+          />
+        );
+
+      case 'job-applications':
+        return (
+          <JobApplicationsManager
+            initialJobId={applicationsJobFilter}
+            onCountChange={setJobApplicationCount}
+          />
         );
 
       default: return null;

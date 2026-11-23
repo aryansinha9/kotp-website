@@ -9,3 +9,5 @@ export * from './YouTubeVideo.js';
 export * from './Team.js';
 export * from './Game.js';
 export * from './Field.js';
+export * from './JobListing.js';
+export * from './JobApplication.js';
