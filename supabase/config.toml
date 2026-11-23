@@ -83,3 +83,11 @@ entrypoint = "./functions/offseason-webhook/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/tournament-webhook/index.ts"
+
+[functions.submit-job-application]
+enabled = true
+# The anon key is still required (invoke sends it), but applicants are not
+# signed in, so no user JWT is verified.
+verify_jwt = true
+import_map = "./functions/submit-job-application/deno.json"
+entrypoint = "./functions/submit-job-application/index.ts"

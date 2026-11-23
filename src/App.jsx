@@ -34,6 +34,8 @@ import Gallery from './Pages/Gallery';
 import RegistrationSuccess from './Pages/RegistrationSuccess';
 import UpdatePassword from './Pages/UpdatePassword';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
+import Careers from './Pages/Careers';
+import JobDetail from './Pages/JobDetail';
 import TermsAndConditions from './Pages/TermsAndConditions';
 import { supabase } from './supabaseClient';
 
@@ -129,6 +131,9 @@ export default function App() {
           <Route path="/academy/off-season-summer" element={<OffSeasonSummerProgram />} />
           <Route path="/holiday-program" element={<HolidayProgram />} />
           <Route path="/academy/aia-after-school" element={<AIAAfterSchoolProgram />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/careers/:slug" element={<JobDetail />} />
+
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

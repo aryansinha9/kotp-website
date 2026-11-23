@@ -54,6 +54,7 @@ export default function Layout({ children }) {
     { name: "MOMENTS", path: "/moments" },
     { name: "ABOUT", path: "/about" },
     { name: "SPONSORS", path: "/sponsors" },
+    { name: "CAREERS", path: "/careers" },
     { name: "CONTACT", path: "/contact" },
   ];
 
